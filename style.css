@@ -1,8 +1,11 @@
 :root {
-  --green-950: #1f352c;
-  --green-800: #335c4b;
-  --green-600: #4f7e63;
+  --green-950: #203b31;
+  --green-800: #396452;
+  --green-600: #56816d;
   --green-100: #eef4ec;
+  --magenta-700: #b43c6d;
+  --magenta-900: #8f2d55;
+  --magenta-100: #f8eaf1;
   --earth-700: #7b674c;
   --earth-200: #ddd2bf;
   --white: #ffffff;
@@ -67,26 +70,24 @@ a {
 .brand {
   align-items: center;
   display: inline-flex;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.brand-symbol {
-  align-items: center;
-  background: var(--green-800);
+.brand-symbol-img {
   border-radius: 50%;
-  color: var(--white);
-  display: inline-flex;
-  font-weight: 800;
-  height: 42px;
-  justify-content: center;
-  width: 42px;
+  display: block;
+  height: 46px;
+  object-fit: cover;
+  object-position: top center;
+  width: 46px;
 }
 
-.brand-text {
-  color: var(--green-950);
-  font-size: 1.08rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+.brand-wordmark-img {
+  display: block;
+  height: 26px;
+  object-fit: contain;
+  width: auto;
 }
 
 .nav-menu {
@@ -100,13 +101,36 @@ a {
   color: var(--green-950);
   font-size: 0.96rem;
   font-weight: 700;
+  position: relative;
   transition: color 0.2s ease;
 }
 
 .nav-menu a:hover,
 .nav-menu a:focus,
 .nav-menu a.active {
-  color: var(--green-600);
+  color: var(--magenta-700);
+}
+
+.nav-menu a::after {
+  background: var(--magenta-700);
+  border-radius: 999px;
+  bottom: -8px;
+  content: "";
+  height: 3px;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  transform: scaleX(0.4);
+  transform-origin: left;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  width: 100%;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a:focus::after,
+.nav-menu a.active::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .nav-toggle {
@@ -156,10 +180,23 @@ a {
 
 .page-hero {
   background:
-    linear-gradient(135deg, rgba(238, 244, 236, 0.95), rgba(255, 255, 255, 0.7)),
+    linear-gradient(135deg, rgba(238, 244, 236, 0.95), rgba(248, 234, 241, 0.72)),
     var(--cream);
   border-bottom: 1px solid var(--line);
   max-width: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-hero::after {
+  background: var(--magenta-700);
+  border-radius: 999px;
+  content: "";
+  height: 8px;
+  left: max(24px, calc((100vw - 1180px) / 2 + 24px));
+  position: absolute;
+  top: 0;
+  width: 140px;
 }
 
 .page-hero > div {
@@ -168,7 +205,7 @@ a {
 }
 
 .eyebrow {
-  color: var(--earth-700);
+  color: var(--magenta-700);
   font-size: 0.82rem;
   font-weight: 800;
   margin-bottom: 12px;
@@ -237,27 +274,28 @@ p {
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background: var(--green-950);
+  background: var(--magenta-700);
 }
 
 .btn-outline {
   background: transparent;
-  border-color: var(--line);
-  color: var(--green-950);
+  border-color: rgba(180, 60, 109, 0.32);
+  color: var(--magenta-700);
 }
 
 .btn-outline:hover,
 .btn-outline:focus {
-  border-color: var(--green-800);
+  background: var(--magenta-100);
+  border-color: var(--magenta-700);
 }
 
 .media-placeholder {
   align-items: center;
   aspect-ratio: 4 / 3;
   background:
-    linear-gradient(135deg, rgba(51, 92, 75, 0.12), rgba(221, 210, 191, 0.42)),
+    linear-gradient(135deg, rgba(57, 100, 82, 0.14), rgba(180, 60, 109, 0.12)),
     var(--white);
-  border: 2px dashed rgba(51, 92, 75, 0.36);
+  border: 2px dashed rgba(180, 60, 109, 0.42);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   display: flex;
@@ -269,7 +307,7 @@ p {
 }
 
 .media-placeholder span {
-  color: var(--earth-700);
+  color: var(--magenta-700);
   font-size: 0.85rem;
   font-weight: 800;
   margin-bottom: 8px;
@@ -322,7 +360,24 @@ p {
   border-radius: var(--radius);
   box-shadow: 0 12px 32px rgba(31, 53, 44, 0.08);
   padding: 30px;
+  position: relative;
   transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.summary-card::before,
+.info-card::before,
+.service-card::before,
+.location-card::before,
+.schedule-card::before,
+.contact-card::before {
+  background: linear-gradient(90deg, var(--green-800), var(--magenta-700));
+  border-radius: var(--radius) var(--radius) 0 0;
+  content: "";
+  height: 5px;
+  left: -1px;
+  position: absolute;
+  right: -1px;
+  top: -1px;
 }
 
 .summary-card:hover,
@@ -336,7 +391,7 @@ p {
 }
 
 .text-link {
-  color: var(--green-800);
+  color: var(--magenta-700);
   display: inline-flex;
   font-weight: 800;
   margin-top: 20px;
@@ -344,11 +399,11 @@ p {
 
 .text-link:hover,
 .text-link:focus {
-  color: var(--earth-700);
+  color: var(--green-800);
 }
 
 .stat {
-  color: var(--green-600);
+  color: var(--magenta-700);
   display: block;
   font-size: 2.2rem;
   font-weight: 900;
@@ -359,7 +414,7 @@ p {
 .service-icon,
 .location-tag,
 .contact-card span {
-  color: var(--earth-700);
+  color: var(--magenta-700);
   display: inline-flex;
   font-size: 0.82rem;
   font-weight: 800;
@@ -370,7 +425,8 @@ p {
 
 .service-icon {
   align-items: center;
-  background: var(--green-100);
+  background: linear-gradient(135deg, var(--green-100), var(--magenta-100));
+  border: 1px solid rgba(180, 60, 109, 0.18);
   border-radius: var(--radius);
   height: 48px;
   justify-content: center;
@@ -426,12 +482,12 @@ p {
 
 .contact-card a:hover,
 .contact-card a:focus {
-  color: var(--green-600);
+  color: var(--magenta-700);
 }
 
 .site-footer {
   align-items: center;
-  background: var(--green-950);
+  background: linear-gradient(135deg, var(--green-950), var(--green-800));
   color: var(--white);
   display: flex;
   gap: 24px;
@@ -446,11 +502,17 @@ p {
 .site-footer a {
   color: var(--white);
   font-weight: 800;
+  transition: color 0.2s ease;
+}
+
+.site-footer a:hover,
+.site-footer a:focus {
+  color: #f4c7da;
 }
 
 .back-to-top {
   align-items: center;
-  background: var(--green-800);
+  background: var(--magenta-700);
   border: 0;
   border-radius: var(--radius);
   bottom: 22px;
@@ -479,7 +541,7 @@ p {
 
 .back-to-top:hover,
 .back-to-top:focus {
-  background: var(--earth-700);
+  background: var(--green-800);
 }
 
 .reveal {
@@ -569,14 +631,14 @@ p {
     padding: 0 18px;
   }
 
-  .brand-text {
-    font-size: 0.92rem;
-    letter-spacing: 0.08em;
+  .brand-symbol-img {
+    height: 40px;
+    width: 40px;
   }
 
-  .brand-symbol {
-    height: 38px;
-    width: 38px;
+  .brand-wordmark-img {
+    height: 21px;
+    max-width: 190px;
   }
 
   .button-row,
