@@ -77,10 +77,10 @@ a {
 .brand-symbol-img {
   border-radius: 50%;
   display: block;
-  height: 90px;
+  height: 10px;
   object-fit: cover;
   object-position: top center;
-  width: 90px;
+  width: 10px;
 }
 
 .brand-wordmark-img {
@@ -199,7 +199,7 @@ a {
   width: 140px;
 }
 
-.page-hero > div {
+.page-hero>div {
   margin: 0 auto;
   max-width: 1180px;
 }
@@ -556,6 +556,7 @@ p {
 }
 
 @media (max-width: 980px) {
+
   .hero,
   .split-section,
   .content-grid,
@@ -658,6 +659,7 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
