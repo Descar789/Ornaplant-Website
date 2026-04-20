@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Catálogo de plantas ornamentales ORNAPLANT SA DE CV — flores, follaje, cactus, árboles y exóticas en Cuautla, Morelos.">
+  <title>Catálogo | ORNAPLANT SA DE CV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar" aria-label="Navegación principal">
+      <a class="brand" href="index.html" aria-label="ORNAPLANT SA DE CV">
+        <img class="brand-symbol-img" src="assets/logo-symbol-web.png" alt="Símbolo ORNAPLANT">
+        <img class="brand-wordmark-img" src="assets/logo-palabras-web.png" alt="ORNAPLANT">
+      </a>
+
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-controls="main-menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-menu" id="main-menu">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="nosotros.html">Sobre Nosotros</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a class="active" href="catalogo.html">Catálogo</a></li>
+        <li><a href="sucursales.html">Sucursales</a></li>
+        <li><a href="horarios.html">Horarios</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-hero page-section">
+      <div class="reveal">
+        <p class="eyebrow">Catálogo de plantas</p>
+        <h1>Encuentra tu planta ideal</h1>
+        <p class="lead">Descubre nuestra selección de plantas ornamentales: flores, follaje, cactus, árboles frutales y variedades exóticas.</p>
+      </div>
+    </section>
+
+    <section class="page-section catalogo-section">
+      <div class="catalogo-controls reveal">
+        <div class="catalogo-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" id="catalogo-buscar" placeholder="Buscar planta…" aria-label="Buscar planta">
+        </div>
+        <div class="filter-chips" role="group" aria-label="Filtrar por categoría">
+          <button class="filter-chip active" data-filter="todas" type="button">Todas</button>
+          <button class="filter-chip" data-filter="Flores" type="button">Flores</button>
+          <button class="filter-chip" data-filter="Follaje" type="button">Follaje</button>
+          <button class="filter-chip" data-filter="Temporada" type="button">Temporada</button>
+          <button class="filter-chip" data-filter="Cactus y suculentas" type="button">Cactus y suculentas</button>
+          <button class="filter-chip" data-filter="Árboles y frutales" type="button">Árboles y frutales</button>
+          <button class="filter-chip" data-filter="Exóticas" type="button">Exóticas</button>
+        </div>
+      </div>
+
+      <div class="catalogo-grid" id="catalogo-grid" aria-live="polite">
+
+        <!-- Monstera -->
+        <article class="plant-card reveal" data-category="Follaje" data-search="monstera deliciosa follaje tropical hojas grandes interior">
+          <div class="plant-card__media" role="img" aria-label="Monstera">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--popular">Popular</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Follaje</span>
+            <h2 class="plant-card__name">Monstera</h2>
+            <p class="plant-card__scientific">Monstera deliciosa</p>
+            <p class="plant-card__desc">Hojas grandes perforadas que crean un efecto tropical único. Perfecta para interiores luminosos con luz indirecta.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Luz indirecta
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Moderado
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Pothos -->
+        <article class="plant-card reveal" data-category="Follaje" data-search="pothos epipremnum aureum follaje colgante interior fácil cuidado">
+          <div class="plant-card__media" role="img" aria-label="Pothos">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--recomendada">Recomendada</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Follaje</span>
+            <h2 class="plant-card__name">Pothos</h2>
+            <p class="plant-card__scientific">Epipremnum aureum</p>
+            <p class="plant-card__desc">Resistente y de cuidado muy fácil. Ideal para colgar o dejar trepar en interiores con poca luz.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Luz baja
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Poco
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Ficus -->
+        <article class="plant-card reveal" data-category="Follaje" data-search="ficus benjamina follaje árbol interior elegante">
+          <div class="plant-card__media" role="img" aria-label="Ficus">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Follaje</span>
+            <h2 class="plant-card__name">Ficus</h2>
+            <p class="plant-card__scientific">Ficus benjamina</p>
+            <p class="plant-card__desc">Árbol de interior elegante con follaje denso y brillante. Da presencia a espacios amplios con buena iluminación.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Luz indirecta
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Moderado
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Nochebuena -->
+        <article class="plant-card reveal" data-category="Temporada" data-search="nochebuena euphorbia pulcherrima temporada navidad roja flores">
+          <div class="plant-card__media" role="img" aria-label="Nochebuena">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--popular">Popular</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Temporada</span>
+            <h2 class="plant-card__name">Nochebuena</h2>
+            <p class="plant-card__scientific">Euphorbia pulcherrima</p>
+            <p class="plant-card__desc">Icónica planta de temporada navideña con brácteas rojas brillantes. Símbolo de la flora mexicana reconocido mundialmente.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Luz indirecta
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Moderado
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Cempasúchil -->
+        <article class="plant-card reveal" data-category="Temporada" data-search="cempasúchil tagetes erecta temporada flor muertos naranja amarilla">
+          <div class="plant-card__media" role="img" aria-label="Cempasúchil">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--popular">Popular</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Temporada</span>
+            <h2 class="plant-card__name">Cempasúchil</h2>
+            <p class="plant-card__scientific">Tagetes erecta</p>
+            <p class="plant-card__desc">Flor tradicional del Día de Muertos. Tonos naranja y amarillo intenso con aroma característico e inconfundible.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Moderado
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Geranio -->
+        <article class="plant-card reveal" data-category="Flores" data-search="geranio pelargonium flores exterior maceta colorida jardín">
+          <div class="plant-card__media" role="img" aria-label="Geranio">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Flores</span>
+            <h2 class="plant-card__name">Geranio</h2>
+            <p class="plant-card__scientific">Pelargonium spp.</p>
+            <p class="plant-card__desc">Planta de flor colorida en rojo, rosa o blanco. Ideal para macetas, jardineras y exteriores soleados.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Moderado
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Aloe Vera -->
+        <article class="plant-card reveal" data-category="Cactus y suculentas" data-search="aloe vera barbadensis suculenta cactus medicinal sol resistente">
+          <div class="plant-card__media" role="img" aria-label="Aloe Vera">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--recomendada">Recomendada</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Cactus y suculentas</span>
+            <h2 class="plant-card__name">Aloe Vera</h2>
+            <p class="plant-card__scientific">Aloe barbadensis</p>
+            <p class="plant-card__desc">Suculenta de múltiples usos ornamentales y medicinales. Muy resistente, requiere poco riego y mucho sol.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Poco
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Echeveria -->
+        <article class="plant-card reveal" data-category="Cactus y suculentas" data-search="echeveria suculenta cactus decorativa rosa sol resistente nueva">
+          <div class="plant-card__media" role="img" aria-label="Echeveria">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--nueva">Nueva</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Cactus y suculentas</span>
+            <h2 class="plant-card__name">Echeveria</h2>
+            <p class="plant-card__scientific">Echeveria spp.</p>
+            <p class="plant-card__desc">Suculenta en forma de rosa con tonos azul-grisáceos y rosados. Muy decorativa y perfecta para arreglos.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Poco
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Nopal -->
+        <article class="plant-card reveal" data-category="Cactus y suculentas" data-search="nopal opuntia cactus mexicano suculenta sol seco resistente">
+          <div class="plant-card__media" role="img" aria-label="Nopal">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Cactus y suculentas</span>
+            <h2 class="plant-card__name">Nopal</h2>
+            <p class="plant-card__scientific">Opuntia spp.</p>
+            <p class="plant-card__desc">Cactus emblemático mexicano. Altamente resistente al clima seco y al sol intenso, ideal para jardines exteriores.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Mínimo
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Limonero -->
+        <article class="plant-card reveal" data-category="Árboles y frutales" data-search="limonero citrus limon árbol frutal jardín cítrico exterior">
+          <div class="plant-card__media" role="img" aria-label="Limonero">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Árboles y frutales</span>
+            <h2 class="plant-card__name">Limonero</h2>
+            <p class="plant-card__scientific">Citrus limon</p>
+            <p class="plant-card__desc">Frutal cítrico productivo apto para jardín o macetón grande. Produce limones de manera constante en clima cálido.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Frecuente
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Guayabo -->
+        <article class="plant-card reveal" data-category="Árboles y frutales" data-search="guayabo psidium guajava árbol frutal tropical exterior jardín">
+          <div class="plant-card__media" role="img" aria-label="Guayabo">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Árboles y frutales</span>
+            <h2 class="plant-card__name">Guayabo</h2>
+            <p class="plant-card__scientific">Psidium guajava</p>
+            <p class="plant-card__desc">Árbol frutal tropical de rápido crecimiento. Produce guayabas dulces y su follaje es denso y decorativo.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Pleno sol
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Moderado
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Orquídea -->
+        <article class="plant-card reveal" data-category="Exóticas" data-search="orquídea phalaenopsis exótica flor elegante regalo interior nueva">
+          <div class="plant-card__media" role="img" aria-label="Orquídea">
+            <div class="plant-card__placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
+            </div>
+            <div class="plant-card__tags">
+              <span class="tag tag--nueva">Nueva</span>
+            </div>
+          </div>
+          <div class="plant-card__body">
+            <span class="plant-card__category">Exóticas</span>
+            <h2 class="plant-card__name">Orquídea</h2>
+            <p class="plant-card__scientific">Phalaenopsis spp.</p>
+            <p class="plant-card__desc">Elegante flor exótica de larga duración. Perfecta como regalo o como pieza decorativa en interiores iluminados.</p>
+            <div class="plant-card__care">
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Luz indirecta
+              </span>
+              <span class="care-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
+                Poco
+              </span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <p class="catalogo-empty" id="catalogo-empty" role="status" aria-live="polite">
+        No se encontraron plantas con ese criterio. Prueba con otro término o categoría.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>ORNAPLANT SA DE CV</strong>
+      <p>Plantas ornamentales, experiencia y servicio profesional desde 1992.</p>
+    </div>
+    <a href="contacto.html">Contacto</a>
+  </footer>
+
+  <button class="back-to-top" type="button" aria-label="Volver arriba">↑</button>
+  <script src="script.js"></script>
+  <script>
+    const chips = document.querySelectorAll('.filter-chip');
+    const searchInput = document.getElementById('catalogo-buscar');
+    const cards = document.querySelectorAll('.plant-card');
+    const emptyMsg = document.getElementById('catalogo-empty');
+    let activeFilter = 'todas';
+
+    function filterCards() {
+      const query = searchInput.value.toLowerCase().trim();
+      let visible = 0;
+      cards.forEach(card => {
+        const matchesFilter = activeFilter === 'todas' || card.dataset.category === activeFilter;
+        const searchTarget = card.dataset.search + ' ' + card.querySelector('.plant-card__name').textContent.toLowerCase();
+        const matchesSearch = !query || searchTarget.includes(query);
+        const show = matchesFilter && matchesSearch;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      emptyMsg.classList.toggle('visible', visible === 0);
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilter = chip.dataset.filter;
+        filterCards();
+      });
+    });
+
+    searchInput.addEventListener('input', filterCards);
+  </script>
+</body>
+</html>
