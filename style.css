@@ -93,7 +93,7 @@ a {
 .nav-menu {
   align-items: center;
   display: flex;
-  gap: 22px;
+  gap: 60px;
   list-style: none;
 }
 
