@@ -77,15 +77,15 @@ a {
 .brand-symbol-img {
   border-radius: 50%;
   display: block;
-  height: 150px;
+  height: 60px;
   object-fit: cover;
   object-position: top center;
-  width: 150px;
+  width: 60px;
 }
 
 .brand-wordmark-img {
   display: block;
-  height: 75px;
+  height: 60px;
   object-fit: contain;
   width: auto;
 }
