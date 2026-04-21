@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Planta — ORNAPLANT</title>
+  <meta name="description" content="Detalle de planta ornamental — ORNAPLANT, Cuautla, Morelos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+  <link rel="stylesheet" href="style.css">
+  <!-- Tailwind CDN — allowed for planta.html per project spec -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'g950': '#203b31', 'g800': '#396452', 'g600': '#56816d', 'g100': '#eef4ec',
+            'm700': '#b43c6d', 'm900': '#8f2d55', 'm100': '#f8eaf1',
+            'e700': '#7b674c', 'e200': '#ddd2bf', 'cream': '#f8f7f1', 'ot': '#223029', 'muted': '#69776d'
+          },
+          fontFamily: { heading: ['Plus Jakarta Sans','system-ui','sans-serif'], body: ['Manrope','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Keep site-header from style.css working alongside Tailwind */
+    .tailwind-page { font-family: 'Manrope', system-ui, sans-serif; }
+    .gallery-main { aspect-ratio: 4/3; overflow: hidden; border-radius: 16px; background: #eef4ec; }
+    .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-thumb { aspect-ratio: 4/3; overflow: hidden; border-radius: 12px; background: #eef4ec; cursor: pointer; }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 300ms ease; }
+    .gallery-thumb:hover img { transform: scale(1.04); }
+    .gallery-thumb.active { outline: 3px solid #396452; outline-offset: 2px; }
+    .care-card { background: white; border: 1px solid rgba(51,92,75,0.16); border-radius: 12px; padding: 1.25rem; }
+    .disp-available { background: #dcfce7; color: #166534; }
+    .disp-order { background: #fef9c3; color: #854d0e; }
+    .disp-sold { background: #fee2e2; color: #991b1b; }
+    .pill { display: inline-flex; align-items: center; padding: 0.2rem 0.75rem; border-radius: 100px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: capitalize; white-space: nowrap; background: #eef4ec; color: #396452; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .whatsapp-cta { display: inline-flex; align-items: center; gap: 0.5rem; background: #25D366; color: white; padding: 0.875rem 2rem; border-radius: 8px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1rem; text-decoration: none; transition: background 200ms ease, transform 200ms ease; width: 100%; justify-content: center; }
+    .whatsapp-cta:hover { background: #128C7E; }
+    .whatsapp-cta:active { transform: scale(0.97); }
+    .whatsapp-cta svg { width: 1.25rem; height: 1.25rem; fill: currentColor; }
+    .breadcrumb { display: flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--muted, #69776d); flex-wrap: wrap; }
+    .breadcrumb a { color: var(--muted, #69776d); text-decoration: none; transition: color 200ms ease; }
+    .breadcrumb a:hover { color: var(--green-800, #396452); }
+    .breadcrumb .sep { font-size: 0.75rem; color: var(--muted, #69776d); opacity: 0.5; }
+    .not-found { min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column; gap: 1rem; }
+  </style>
+</head>
+<body class="tailwind-page">
+
+  <!-- Shared header (styled via style.css) -->
+  <header class="site-header" id="header">
+    <nav class="navbar container">
+      <a class="nav-brand" href="index.html">
+        <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="40">
+        <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
+      </a>
+      <ul class="nav-menu" id="navMenu" role="list">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="nosotros.html">Sobre Nosotros</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="sucursales.html">Sucursales</a></li>
+        <li><a href="horarios.html">Horarios</a></li>
+        <li><a href="contacto.html" class="nav-cta">Contacto</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span class="material-symbols-outlined" id="navIcon">menu</span>
+      </button>
+    </nav>
+  </header>
+
+  <main id="plantDetail" style="background:var(--cream);">
+
+    <!-- Rendered by JS below -->
+    <div class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
+      <div id="plantContent">
+        <div style="text-align:center;padding:4rem 0;color:var(--muted);">
+          <span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 1rem;color:var(--earth-200);">hourglass_empty</span>
+          <p>Cargando planta...</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Shared footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/logo-horizontal-web.png" alt="ORNAPLANT">
+          <p>Comercializadora de plantas ornamentales en Cuautla, Morelos. Desde 1992.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navegación</h4>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="catalogo.html">Catálogo</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Visítanos</h4>
+          <ul>
+            <li><a href="sucursales.html">Sucursales</a></li>
+            <li><a href="horarios.html">Horarios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="mailto:informesornaplant@hotmail.com">Enviar email</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 ORNAPLANT SA DE CV · Cuautla, Morelos</span>
+        <span>Plantas ornamentales desde 1992</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" aria-label="Volver arriba">
+    <span class="material-symbols-outlined">keyboard_arrow_up</span>
+  </button>
+
+  <script src="plantas.js"></script>
+  <script>
+    (function () {
+      const dispCls = { disponible: 'disp-available', 'bajo pedido': 'disp-order', agotado: 'disp-sold' };
+      const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
+      const sucLabel = { matriz: 'Sucursal Matriz', embarques: 'Sucursal Embarques', ambas: 'Ambas sucursales' };
+      const luzIcon = { 'sol directo': 'wb_sunny', 'luz indirecta': 'light_mode', 'media sombra': 'partly_cloudy_day', 'sombra': 'cloud' };
+      const cuidadoIcon = { 'fácil': 'sentiment_satisfied', 'intermedia': 'sentiment_neutral', 'difícil': 'sentiment_dissatisfied' };
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const planta = plantas.find(p => p.id === id);
+      const content = document.getElementById('plantContent');
+
+      if (!planta) {
+        content.innerHTML = `
+          <div class="not-found">
+            <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">search_off</span>
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;">Planta no encontrada</h2>
+            <p style="color:var(--muted);">No encontramos la planta que buscas.</p>
+            <a href="catalogo.html" class="btn btn-primary"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
+          </div>`;
+        return;
+      }
+
+      document.title = `${planta.nombre} — ORNAPLANT`;
+      document.querySelector('meta[name="description"]').content = planta.descripcion.slice(0, 160);
+
+      const imgs = planta.imagenes.length >= 3 ? planta.imagenes : [...planta.imagenes, ...Array(3 - planta.imagenes.length).fill(planta.imagenes[0])];
+      const waMsg = encodeURIComponent(`Hola, me interesa consultar la disponibilidad de: ${planta.nombre} (${planta.nombreCientifico}). ¡Gracias!`);
+
+      content.innerHTML = `
+        <!-- BREADCRUMB -->
+        <nav class="breadcrumb" aria-label="Ruta de navegación" style="margin-bottom:1.5rem;">
+          <a href="catalogo.html">Catálogo</a>
+          <span class="sep" aria-hidden="true">/</span>
+          <a href="catalogo.html">${planta.categoria.charAt(0).toUpperCase()+planta.categoria.slice(1)}</a>
+          <span class="sep" aria-hidden="true">/</span>
+          <span aria-current="page">${planta.nombre}</span>
+        </nav>
+
+        <!-- MAIN GRID -->
+        <div class="lg:grid lg:grid-cols-12 lg:gap-10" style="display:grid;grid-template-columns:repeat(12,1fr);gap:2.5rem;align-items:start;">
+
+          <!-- GALLERY — col 1-8 -->
+          <div style="grid-column:1/span 8;" class="flex flex-col gap-3">
+            <div class="gallery-main" id="mainImgWrap">
+              <img id="mainImg" src="${imgs[0]}" alt="${planta.nombre}" width="800" height="600" loading="eager">
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
+              ${imgs.slice(0,3).map((src,i) => `
+                <button class="gallery-thumb${i===0?' active':''}" onclick="setThumb(${i},'${src}')" aria-label="Ver imagen ${i+1}">
+                  <img src="${src}" alt="${planta.nombre} imagen ${i+1}" loading="lazy" width="300" height="225">
+                </button>`).join('')}
+            </div>
+          </div>
+
+          <!-- INFO — col 9-12 -->
+          <div style="grid-column:span 4;" class="flex flex-col gap-5">
+
+            <!-- Tags + Disponibilidad -->
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
+              <span style="padding:0.25rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;font-family:'Plus Jakarta Sans',sans-serif;" class="${dispCls[planta.disponibilidad] || 'disp-available'}">${dispLbl[planta.disponibilidad] || planta.disponibilidad}</span>
+              ${planta.etiquetas.map(t => `<span class="pill">${t}</span>`).join('')}
+            </div>
+
+            <!-- Name -->
+            <div>
+              <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.75rem,3.5vw,2.25rem);font-weight:800;line-height:1.1;color:#223029;margin-bottom:0.375rem;">${planta.nombre}</h1>
+              <p style="font-style:italic;color:#69776d;font-size:0.9375rem;">${planta.nombreCientifico}</p>
+            </div>
+
+            <!-- Sucursal -->
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:#69776d;background:#eef4ec;padding:0.625rem 0.875rem;border-radius:8px;">
+              <span class="material-symbols-outlined" style="font-size:1rem;color:#396452;">storefront</span>
+              ${sucLabel[planta.sucursal] || planta.sucursal}
+            </div>
+
+            <!-- Bento Care Specs -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;" role="list" aria-label="Especificaciones de cuidado">
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">${luzIcon[planta.luz] || 'wb_sunny'}</span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Luz</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;">${planta.luz}</p>
+              </div>
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">water_drop</span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Riego</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;">${planta.riego}</p>
+              </div>
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">${cuidadoIcon[planta.cuidado] || 'eco'}</span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Cuidado</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;">${planta.cuidado}</p>
+              </div>
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:${planta.mascotas==='tóxica'?'#b43c6d':'#396452'};">pets</span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Mascotas</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:${planta.mascotas==='tóxica'?'#b43c6d':'#166534'};text-transform:capitalize;">${planta.mascotas === 'tóxica' ? '⚠ Tóxica' : 'No tóxica'}</p>
+              </div>
+            </div>
+
+            <!-- Variaciones -->
+            <div>
+              <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;margin-bottom:0.625rem;">Tamaños disponibles</p>
+              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                ${planta.variaciones.map(v => `<span style="padding:0.375rem 0.875rem;border:1.5px solid rgba(51,92,75,0.16);border-radius:6px;font-size:0.875rem;font-weight:600;color:#396452;background:white;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize;">${v}</span>`).join('')}
+              </div>
+            </div>
+
+            <!-- WhatsApp CTA -->
+            <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" class="whatsapp-cta" target="_blank" rel="noopener noreferrer" aria-label="Consultar disponibilidad de ${planta.nombre} por WhatsApp">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.07 21.47a.75.75 0 00.918.918l4.356-1.371A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.25a8.245 8.245 0 01-4.21-1.16l-.3-.178-3.108.978.99-3.042-.197-.31A8.25 8.25 0 1120.25 12a8.26 8.26 0 01-8.251 8.25z"/>
+              </svg>
+              Consultar disponibilidad
+            </a>
+
+            <p style="font-size:0.8125rem;color:#69776d;text-align:center;">Respuesta en horario de atención · Sin precio en línea</p>
+
+          </div>
+        </div>
+
+        <!-- DESCRIPCIÓN -->
+        <div style="margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(51,92,75,0.16);">
+          <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1rem;">Descripción</h2>
+          <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;">${planta.descripcion}</p>
+        </div>
+
+        <!-- BACK LINK -->
+        <div style="margin-top:2.5rem;">
+          <a href="catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+            Volver al catálogo
+          </a>
+        </div>`;
+
+      // Gallery thumb switcher
+      window.setThumb = function (idx, src) {
+        document.getElementById('mainImg').src = src;
+        document.querySelectorAll('.gallery-thumb').forEach((el, i) => el.classList.toggle('active', i === idx));
+      };
+
+      // Responsive: collapse gallery to 1 column on small screens
+      const gallery = content.querySelector('[style*="grid-column:1/span 8"]');
+      const info = content.querySelector('[style*="grid-column:span 4"]');
+      const mainGrid = gallery && gallery.parentElement;
+      function fixLayout() {
+        if (!mainGrid) return;
+        if (window.innerWidth < 1024) {
+          mainGrid.style.gridTemplateColumns = '1fr';
+          if (gallery) gallery.style.gridColumn = '1';
+          if (info) info.style.gridColumn = '1';
+        } else {
+          mainGrid.style.gridTemplateColumns = 'repeat(12,1fr)';
+          if (gallery) gallery.style.gridColumn = '1/span 8';
+          if (info) info.style.gridColumn = 'span 4';
+        }
+      }
+      fixLayout();
+      window.addEventListener('resize', fixLayout);
+    })();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

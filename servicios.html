@@ -3,89 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Servicios de ORNAPLANT SA DE CV para venta de plantas ornamentales.">
-  <title>Servicios | ORNAPLANT SA DE CV</title>
+  <title>Servicios — ORNAPLANT</title>
+  <meta name="description" content="Venta de plantas ornamentales en menudeo, medio mayoreo y mayoreo. Andenes de carga, logística y más. Cuautla, Morelos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <nav class="navbar" aria-label="Navegación principal">
-      <a class="brand" href="index.html" aria-label="ORNAPLANT SA DE CV">
-        <img class="brand-symbol-img" src="assets/logo-symbol-web.png" alt="Símbolo ORNAPLANT">
-        <img class="brand-wordmark-img" src="assets/logo-palabras-web.png" alt="ORNAPLANT">
+
+  <header class="site-header" id="header">
+    <nav class="navbar container">
+      <a class="nav-brand" href="index.html">
+        <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="40">
+        <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
       </a>
-
-      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-controls="main-menu" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <ul class="nav-menu" id="main-menu">
+      <ul class="nav-menu" id="navMenu" role="list">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="nosotros.html">Sobre Nosotros</a></li>
-        <li><a class="active" href="servicios.html">Servicios</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
         <li><a href="catalogo.html">Catálogo</a></li>
         <li><a href="sucursales.html">Sucursales</a></li>
         <li><a href="horarios.html">Horarios</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
+        <li><a href="contacto.html" class="nav-cta">Contacto</a></li>
       </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span class="material-symbols-outlined" id="navIcon">menu</span>
+      </button>
     </nav>
   </header>
 
   <main>
-    <section class="page-hero page-section">
-      <div class="reveal">
-        <p class="eyebrow">Servicios</p>
-        <h1>Variedad y apoyo para tus compras de plantas</h1>
-        <p class="lead">
-          Servicios públicos e informativos para clientes de menudeo, medio mayoreo y mayoreo.
-        </p>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero" aria-label="Servicios">
+      <div class="container">
+        <p class="eyebrow"><span class="material-symbols-outlined">category</span>Lo que hacemos</p>
+        <h1>Servicios para cada<br>necesidad</h1>
+        <p>Desde una planta para tu hogar hasta pedidos de mayoreo para tu negocio. Tenemos la escala y variedad que necesitas.</p>
       </div>
     </section>
 
-    <section class="page-section services-grid">
-      <article class="service-card reveal">
-        <span class="service-icon">01</span>
-        <h2>Venta de plantas ornamentales</h2>
-        <p>Comercio de menudeo, medio mayoreo y mayoreo de plantas ornamentales.</p>
-      </article>
-
-      <article class="service-card reveal">
-        <span class="service-icon">02</span>
-        <h2>Variedad de plantas</h2>
-        <p>Plantas de flor, follaje, exóticas, cactus, de temporada como cempasúchil y nochebuena, árboles y frutales.</p>
-      </article>
-
-      <article class="service-card reveal">
-        <span class="service-icon">03</span>
-        <h2>Andenes de carga</h2>
-        <p>Área de andenes de carga con techado dentro de las instalaciones.</p>
-      </article>
-
-      <article class="service-card reveal">
-        <span class="service-icon">04</span>
-        <h2>Vinculación con fletes</h2>
-        <p>Vinculación con empresas de servicio de fletes para apoyar el traslado de plantas.</p>
-      </article>
-
-      <article class="service-card reveal">
-        <span class="service-icon">05</span>
-        <h2>Dos sucursales</h2>
-        <p>Dos sucursales a su servicio en Cuautla, Morelos.</p>
-      </article>
+    <!-- TIPOS DE VENTA -->
+    <section class="section" aria-labelledby="sales-heading">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow"><span class="material-symbols-outlined">sell</span>Tipos de venta</p>
+          <h2 id="sales-heading">Tres escalas, misma calidad</h2>
+          <p>Atendemos desde el cliente particular hasta distribuidores y empresas de gran volumen.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card reveal" style="padding:2rem;">
+            <div style="width:56px;height:56px;border-radius:var(--radius);background:var(--green-100);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+              <span class="material-symbols-outlined" style="font-size:1.75rem;color:var(--green-800);">shopping_bag</span>
+            </div>
+            <h3 style="margin-bottom:0.75rem;">Menudeo</h3>
+            <p style="color:var(--muted);font-size:0.9375rem;">Venta de plantas individuales o en pequeñas cantidades para el hogar, jardín personal o como regalo. Atención personalizada en sucursal.</p>
+            <ul style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.625rem;" aria-label="Características menudeo">
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Sin cantidad mínima</li>
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Asesoría en punto de venta</li>
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Selección amplia en tienda</li>
+            </ul>
+          </div>
+          <div class="card reveal" style="padding:2rem;border-color:var(--green-600);box-shadow:var(--shadow-sm);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+              <div style="width:56px;height:56px;border-radius:var(--radius);background:var(--green-800);display:flex;align-items:center;justify-content:center;">
+                <span class="material-symbols-outlined" style="font-size:1.75rem;color:var(--white);">inventory_2</span>
+              </div>
+              <span class="badge badge-green">Popular</span>
+            </div>
+            <h3 style="margin-bottom:0.75rem;">Medio Mayoreo</h3>
+            <p style="color:var(--muted);font-size:0.9375rem;">Ideal para pequeños viveros, florerías, restaurantes, hoteles y proyectos de paisajismo que requieren volumen moderado con precio preferencial.</p>
+            <ul style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.625rem;" aria-label="Características medio mayoreo">
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Precio especial por volumen</li>
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Pedido con anticipación</li>
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Variedad garantizada</li>
+            </ul>
+          </div>
+          <div class="card reveal" style="padding:2rem;">
+            <div style="width:56px;height:56px;border-radius:var(--radius);background:var(--magenta-100);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+              <span class="material-symbols-outlined" style="font-size:1.75rem;color:var(--magenta-700);">local_shipping</span>
+            </div>
+            <h3 style="margin-bottom:0.75rem;">Mayoreo</h3>
+            <p style="color:var(--muted);font-size:0.9375rem;">Pedidos a gran escala para distribuidores, cadenas de tiendas, desarrolladoras y empresas con grandes proyectos de áreas verdes.</p>
+            <ul style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.625rem;" aria-label="Características mayoreo">
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Andenes de carga techados</li>
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Vinculación con fletes</li>
+              <li style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:var(--muted);"><span class="material-symbols-outlined" style="font-size:1rem;color:var(--green-600);">check_circle</span>Cotización personalizada</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- VARIEDADES -->
+    <section class="section" style="background:var(--green-100);" aria-labelledby="variety-heading">
+      <div class="container">
+        <div class="section-heading center">
+          <p class="eyebrow"><span class="material-symbols-outlined">local_florist</span>Nuestra oferta</p>
+          <h2 id="variety-heading">Todo tipo de plantas</h2>
+          <p>Una selección que cambia con las temporadas para siempre tener lo que necesitas.</p>
+        </div>
+        <div class="grid-4">
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">spa</span></div>
+            <h3>Ornamentales</h3>
+            <p>Plantas de interior y exterior para decorar espacios con follaje, flores y texturas únicas.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">water_drop</span></div>
+            <h3>Suculentas y Cactus</h3>
+            <p>Bajo mantenimiento y alta resistencia. Ideales para climas cálidos como el de Morelos.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">park</span></div>
+            <h3>Árboles y Frutales</h3>
+            <p>Desde jacarandas ornamentales hasta árboles frutales para jardines y áreas verdes amplias.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">filter_vintage</span></div>
+            <h3>Flor y Follaje</h3>
+            <p>Corte de flor, follaje decorativo y plantas de temporada para arreglos y espacios.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">nature</span></div>
+            <h3>Plantas Exóticas</h3>
+            <p>Variedades tropicales y exóticas difíciles de encontrar. Para el coleccionista y el entusiasta.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">medication</span></div>
+            <h3>Medicinales</h3>
+            <p>Aloe vera, lavanda, menta, romero y más plantas con usos medicinales y culinarios.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">celebration</span></div>
+            <h3>Temporada</h3>
+            <p>Cempasúchil en octubre-noviembre. Nochebuena y poinsettias en diciembre. Bajo pedido anticipado.</p>
+          </div>
+          <div class="service-card reveal">
+            <div class="service-icon"><span class="material-symbols-outlined">emoji_nature</span></div>
+            <h3>Plantas de Interior</h3>
+            <p>Monsteras, pothos, helechos, ficus y más. Selección amplia para cada rincón del hogar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFRAESTRUCTURA -->
+    <section class="section" aria-labelledby="infra-heading">
+      <div class="container">
+        <div class="split-section reveal">
+          <div class="split-img">
+            <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&auto=format&fit=crop" alt="Andenes de carga en vivero" loading="lazy" width="600" height="750">
+          </div>
+          <div>
+            <p class="eyebrow"><span class="material-symbols-outlined">warehouse</span>Infraestructura</p>
+            <h2 id="infra-heading" style="margin-top:0.5rem;">Listos para volumen</h2>
+            <p style="margin-top:1rem;color:var(--muted);">Nuestra sucursal Embarques cuenta con andenes de carga techados que facilitan la recepción y distribución de pedidos grandes sin importar las condiciones climáticas.</p>
+            <p style="margin-top:1rem;color:var(--muted);">Además, contamos con vinculación directa con empresas de fletes locales para quienes necesitan que sus pedidos lleguen a su destino final.</p>
+            <div style="display:flex;flex-direction:column;gap:1rem;margin-top:2rem;">
+              <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--green-100);border-radius:var(--radius);">
+                <span class="material-symbols-outlined" style="color:var(--green-800);font-size:1.375rem;">garage</span>
+                <div>
+                  <div style="font-family:var(--font-heading);font-weight:600;font-size:0.9375rem;">Andenes techados</div>
+                  <div style="font-size:0.875rem;color:var(--muted);">Carga y descarga protegida del clima</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--green-100);border-radius:var(--radius);">
+                <span class="material-symbols-outlined" style="color:var(--green-800);font-size:1.375rem;">local_shipping</span>
+                <div>
+                  <div style="font-family:var(--font-heading);font-weight:600;font-size:0.9375rem;">Vinculación con fletes</div>
+                  <div style="font-size:0.875rem;color:var(--muted);">Conectamos tu pedido con transportistas locales</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:var(--green-100);border-radius:var(--radius);">
+                <span class="material-symbols-outlined" style="color:var(--green-800);font-size:1.375rem;">storefront</span>
+                <div>
+                  <div style="font-family:var(--font-heading);font-weight:600;font-size:0.9375rem;">Dos sucursales activas</div>
+                  <div style="font-size:0.875rem;color:var(--muted);">Matriz y Embarques en Cuautla</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BAND -->
+    <section class="cta-band" aria-label="Llamada a la acción">
+      <div class="container">
+        <h2>¿Necesitas cotización para mayoreo?</h2>
+        <p>Escríbenos y te respondemos con los detalles para tu pedido.</p>
+        <a href="contacto.html" class="btn btn-accent">
+          <span class="material-symbols-outlined">chat</span>
+          Solicitar información
+        </a>
+      </div>
+    </section>
+
   </main>
 
   <footer class="site-footer">
-    <div>
-      <strong>ORNAPLANT SA DE CV</strong>
-      <p>Plantas ornamentales, experiencia y servicio profesional desde 1992.</p>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/logo-horizontal-web.png" alt="ORNAPLANT">
+          <p>Comercializadora de plantas ornamentales en Cuautla, Morelos. Desde 1992.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navegación</h4>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="catalogo.html">Catálogo</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Visítanos</h4>
+          <ul>
+            <li><a href="sucursales.html">Sucursales</a></li>
+            <li><a href="horarios.html">Horarios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="mailto:informesornaplant@hotmail.com">Enviar email</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 ORNAPLANT SA DE CV · Cuautla, Morelos</span>
+        <span>Plantas ornamentales desde 1992</span>
+      </div>
     </div>
-    <a href="contacto.html">Contacto</a>
   </footer>
 
-  <button class="back-to-top" type="button" aria-label="Volver arriba">↑</button>
+  <button class="back-to-top" id="backToTop" aria-label="Volver arriba">
+    <span class="material-symbols-outlined">keyboard_arrow_up</span>
+  </button>
+
   <script src="script.js"></script>
 </body>
 </html>

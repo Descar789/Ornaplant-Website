@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — ORNAPLANT</title>
+  <!-- Tailwind CDN — allowed for admin.html per project spec -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'g950': '#203b31', 'g800': '#396452', 'g600': '#56816d', 'g100': '#eef4ec',
+            'm700': '#b43c6d', 'm900': '#8f2d55', 'm100': '#f8eaf1',
+            'e700': '#7b674c', 'e200': '#ddd2bf', 'cream': '#f8f7f1'
+          },
+          fontFamily: { heading: ['Plus Jakarta Sans','system-ui','sans-serif'], body: ['Manrope','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+  <style>
+    body { font-family: 'Manrope', system-ui, sans-serif; background: #f8f7f1; }
+    h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .modal { background: white; border-radius: 16px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.2); }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid rgba(51,92,75,0.16); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; z-index: 1; }
+    .form-label { display: block; font-size: 0.8125rem; font-weight: 700; color: #223029; margin-bottom: 0.375rem; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 0.625rem 0.875rem; border: 1px solid rgba(51,92,75,0.16);
+      border-radius: 8px; font-size: 0.9rem; font-family: inherit; color: #223029;
+      background: white; transition: border-color 200ms, box-shadow 200ms;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none; border-color: #56816d; box-shadow: 0 0 0 3px rgba(86,129,109,0.12);
+    }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .btn-admin { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 200ms; border: none; }
+    .btn-primary-a { background: #396452; color: white; }
+    .btn-primary-a:hover { background: #203b31; }
+    .btn-danger { background: #fee2e2; color: #991b1b; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-ghost-a { background: transparent; color: #396452; border: 1.5px solid rgba(51,92,75,0.3); }
+    .btn-ghost-a:hover { background: #eef4ec; }
+    .stat-card { background: white; border: 1px solid rgba(51,92,75,0.16); border-radius: 12px; padding: 1.25rem 1.5rem; }
+    .plant-row { display: grid; grid-template-columns: 56px 1fr auto; gap: 1rem; align-items: center; padding: 0.875rem 1rem; border-bottom: 1px solid rgba(51,92,75,0.1); }
+    .plant-row:last-child { border-bottom: none; }
+    .plant-thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: #eef4ec; }
+    .disp-select { padding: 0.25rem 0.5rem; border: 1px solid rgba(51,92,75,0.16); border-radius: 6px; font-size: 0.8rem; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; cursor: pointer; }
+    .disp-select.disponible { background: #dcfce7; color: #166534; }
+    .disp-select.bajo-pedido { background: #fef9c3; color: #854d0e; }
+    .disp-select.agotado { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+  <!-- ACCESS DENIED SCREEN -->
+  <div id="accessDenied" style="display:none;min-height:100vh;display:none;align-items:center;justify-content:center;text-align:center;padding:2rem;">
+    <div style="max-width:480px;">
+      <span class="material-symbols-outlined" style="font-size:4rem;color:#ddd2bf;display:block;margin:0 auto 1.5rem;">lock</span>
+      <h1 style="font-size:1.5rem;margin-bottom:0.75rem;color:#223029;">Acceso Restringido</h1>
+      <p style="color:#69776d;margin-bottom:1.5rem;">Este panel es de uso interno. Para acceder en modo de prueba, añade <code style="background:#eef4ec;padding:0.2em 0.5em;border-radius:4px;font-size:0.9em;">?tester=true</code> a la URL.</p>
+      <a href="index.html" style="display:inline-flex;align-items:center;gap:0.5rem;background:#396452;color:white;padding:0.75rem 1.5rem;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;text-decoration:none;font-size:0.9375rem;">
+        <span class="material-symbols-outlined" style="font-size:1rem;">home</span>
+        Volver al sitio
+      </a>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" style="display:none;">
+
+    <!-- HEADER -->
+    <header style="background:#203b31;color:white;padding:1rem 0;position:sticky;top:0;z-index:100;box-shadow:0 4px 16px rgba(32,59,49,0.2);">
+      <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <span class="material-symbols-outlined" style="font-size:1.375rem;color:#56816d;">admin_panel_settings</span>
+          <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;">Panel Admin</span>
+          <span style="font-size:0.7rem;background:rgba(86,129,109,0.3);color:#9ec4b0;padding:0.15rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">DEMO</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <span style="font-size:0.8125rem;color:rgba(255,255,255,0.55);">Modo demo — cambios no persisten al recargar</span>
+          <a href="index.html" class="btn-admin btn-ghost-a" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);">
+            <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span>
+            Ver sitio
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main style="max-width:1200px;margin:0 auto;padding:2rem 1.5rem;">
+
+      <!-- DEMO NOTICE -->
+      <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:0.875rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:0.75rem;" role="note">
+        <span class="material-symbols-outlined" style="color:#854d0e;font-size:1.25rem;flex-shrink:0;">warning</span>
+        <p style="font-size:0.875rem;color:#78350f;"><strong>Modo demo:</strong> Los cambios que realices aquí se reflejan en la UI pero <strong>no persisten al recargar</strong> la página. Para conectar a un backend real, reemplaza las funciones marcadas con <code>TODO: replace with API call</code>.</p>
+      </div>
+
+      <!-- STATS -->
+      <section style="margin-bottom:2.5rem;" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" style="font-size:1rem;font-weight:700;color:#69776d;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1rem;">Resumen</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;" id="statsGrid"></div>
+      </section>
+
+      <!-- PLANT LIST -->
+      <section aria-labelledby="plants-heading">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem;">
+          <h2 id="plants-heading" style="font-size:1.25rem;font-weight:700;color:#223029;">Plantas</h2>
+          <button class="btn-admin btn-primary-a" id="addPlantBtn" onclick="openModal()">
+            <span class="material-symbols-outlined" style="font-size:1.125rem;">add</span>
+            Agregar planta
+          </button>
+        </div>
+        <div style="background:white;border:1px solid rgba(51,92,75,0.16);border-radius:12px;overflow:hidden;">
+          <div id="plantList"><!-- rendered by JS --></div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL: Add / Edit Plant -->
+  <div class="modal-overlay" id="plantModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="font-size:1.125rem;font-weight:700;">Agregar planta</h3>
+        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;padding:0.25rem;border-radius:6px;color:#69776d;" aria-label="Cerrar modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <label class="form-label" for="f-nombre">Nombre *</label>
+            <input class="form-input" id="f-nombre" type="text" required>
+          </div>
+          <div>
+            <label class="form-label" for="f-sci">Nombre científico *</label>
+            <input class="form-input" id="f-sci" type="text" required>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <label class="form-label" for="f-cat">Categoría *</label>
+            <select class="form-select" id="f-cat">
+              <option value="ornamental">Ornamental</option>
+              <option value="suculenta">Suculenta</option>
+              <option value="árbol">Árbol</option>
+              <option value="interior">Interior</option>
+              <option value="exterior">Exterior</option>
+              <option value="medicinal">Medicinal</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="f-disp">Disponibilidad *</label>
+            <select class="form-select" id="f-disp">
+              <option value="disponible">Disponible</option>
+              <option value="bajo pedido">Bajo pedido</option>
+              <option value="agotado">Agotado</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="f-desc">Descripción *</label>
+          <textarea class="form-textarea" id="f-desc"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+          <div>
+            <label class="form-label" for="f-luz">Luz *</label>
+            <select class="form-select" id="f-luz">
+              <option value="sol directo">Sol directo</option>
+              <option value="luz indirecta">Luz indirecta</option>
+              <option value="media sombra">Media sombra</option>
+              <option value="sombra">Sombra</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="f-riego">Riego *</label>
+            <select class="form-select" id="f-riego">
+              <option value="bajo">Bajo</option>
+              <option value="medio">Medio</option>
+              <option value="alto">Alto</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="f-cuidado">Cuidado *</label>
+            <select class="form-select" id="f-cuidado">
+              <option value="fácil">Fácil</option>
+              <option value="intermedia">Intermedio</option>
+              <option value="difícil">Difícil</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <label class="form-label" for="f-suc">Sucursal *</label>
+            <select class="form-select" id="f-suc">
+              <option value="ambas">Ambas</option>
+              <option value="matriz">Matriz</option>
+              <option value="embarques">Embarques</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" for="f-mascotas">Mascotas *</label>
+            <select class="form-select" id="f-mascotas">
+              <option value="no tóxica">No tóxica</option>
+              <option value="tóxica">Tóxica</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="f-etiquetas">Etiquetas (separadas por coma)</label>
+          <input class="form-input" id="f-etiquetas" type="text" placeholder="popular, nueva, recomendada">
+        </div>
+        <div>
+          <label class="form-label" for="f-variaciones">Variaciones (separadas por coma)</label>
+          <input class="form-input" id="f-variaciones" type="text" placeholder="chico, mediano, grande">
+        </div>
+        <div>
+          <label class="form-label" for="f-imagen">URL de imagen principal</label>
+          <input class="form-input" id="f-imagen" type="url" placeholder="https://...">
+        </div>
+      </div>
+      <div style="padding:1rem 1.5rem;border-top:1px solid rgba(51,92,75,0.12);display:flex;justify-content:flex-end;gap:0.75rem;">
+        <button class="btn-admin btn-ghost-a" onclick="closeModal()">Cancelar</button>
+        <button class="btn-admin btn-primary-a" id="saveBtn" onclick="savePlant()">
+          <span class="material-symbols-outlined" style="font-size:1rem;">save</span>
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="plantas.js"></script>
+  <script>
+    // PRODUCTION: replace URL param check with real auth
+    const ADMIN_MODE = 'url_param'; // options: 'url_param' | 'none' (dev) | 'password'
+
+    function checkAccess() {
+      if (ADMIN_MODE === 'none') return true;
+      if (ADMIN_MODE === 'url_param') {
+        return new URLSearchParams(window.location.search).get('tester') === 'true';
+      }
+      // PRODUCTION: implement real auth check here
+      return false;
+    }
+
+    if (!checkAccess()) {
+      document.getElementById('accessDenied').style.display = 'flex';
+    } else {
+      document.getElementById('adminPanel').style.display = 'block';
+      init();
+    }
+
+    // In-memory plant list (copy of global array)
+    let plantList = plantas.map(p => ({ ...p }));
+    let editingId = null;
+
+    function init() {
+      renderStats();
+      renderList();
+    }
+
+    function renderStats() {
+      const total = plantList.length;
+      const byCat = {};
+      let disponibles = 0;
+      let agotadas = 0;
+      plantList.forEach(p => {
+        byCat[p.categoria] = (byCat[p.categoria] || 0) + 1;
+        if (p.disponibilidad === 'disponible') disponibles++;
+        if (p.disponibilidad === 'agotado') agotadas++;
+      });
+      const grid = document.getElementById('statsGrid');
+      const stats = [
+        { icon: 'local_florist', num: total, label: 'Total plantas' },
+        { icon: 'check_circle', num: disponibles, label: 'Disponibles' },
+        { icon: 'cancel', num: agotadas, label: 'Agotadas' },
+        { icon: 'category', num: Object.keys(byCat).length, label: 'Categorías' },
+      ];
+      grid.innerHTML = stats.map(s => `
+        <div class="stat-card" style="display:flex;align-items:center;gap:1rem;">
+          <span class="material-symbols-outlined" style="color:#56816d;font-size:1.75rem;">${s.icon}</span>
+          <div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.75rem;font-weight:800;color:#223029;line-height:1;">${s.num}</div>
+            <div style="font-size:0.8125rem;color:#69776d;">${s.label}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    function dispStyle(d) {
+      return d === 'disponible' ? 'disponible' : d === 'bajo pedido' ? 'bajo-pedido' : 'agotado';
+    }
+
+    function renderList() {
+      const list = document.getElementById('plantList');
+      if (plantList.length === 0) {
+        list.innerHTML = `<div style="text-align:center;padding:3rem;color:#69776d;"><span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 0.75rem;color:#ddd2bf;">inbox</span><p>No hay plantas. Agrega la primera.</p></div>`;
+        return;
+      }
+      list.innerHTML = plantList.map(p => `
+        <div class="plant-row" data-id="${p.id}">
+          <img class="plant-thumb" src="${p.imagenes[0]}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200'">
+          <div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.9375rem;color:#223029;">${p.nombre}</div>
+            <div style="font-size:0.8rem;color:#69776d;font-style:italic;">${p.nombreCientifico}</div>
+            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria} · ${p.sucursal}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.625rem;flex-shrink:0;">
+            <select class="disp-select ${dispStyle(p.disponibilidad)}" onchange="updateDisp('${p.id}',this.value)" aria-label="Disponibilidad de ${p.nombre}">
+              <option value="disponible" ${p.disponibilidad==='disponible'?'selected':''}>Disponible</option>
+              <option value="bajo pedido" ${p.disponibilidad==='bajo pedido'?'selected':''}>Bajo pedido</option>
+              <option value="agotado" ${p.disponibilidad==='agotado'?'selected':''}>Agotado</option>
+            </select>
+            <button class="btn-admin btn-ghost-a" onclick="openModal('${p.id}')" aria-label="Editar ${p.nombre}" style="padding:0.375rem 0.625rem;">
+              <span class="material-symbols-outlined" style="font-size:1rem;">edit</span>
+            </button>
+            <button class="btn-admin btn-danger" onclick="deletePlant('${p.id}')" aria-label="Eliminar ${p.nombre}" style="padding:0.375rem 0.625rem;">
+              <span class="material-symbols-outlined" style="font-size:1rem;">delete</span>
+            </button>
+          </div>
+        </div>`).join('');
+    }
+
+    function updateDisp(id, val) {
+      const p = plantList.find(x => x.id === id);
+      if (p) {
+        p.disponibilidad = val;
+        // TODO: replace with API call → fetch(`/api/plantas/${id}`, { method:'PATCH', body: JSON.stringify({disponibilidad:val}) });
+        renderStats();
+        // Re-style the select
+        const sel = document.querySelector(`[data-id="${id}"] .disp-select`);
+        if (sel) sel.className = `disp-select ${dispStyle(val)}`;
+      }
+    }
+
+    function deletePlant(id) {
+      if (!confirm('¿Eliminar esta planta? Esta acción no se puede deshacer en esta sesión.')) return;
+      plantList = plantList.filter(p => p.id !== id);
+      // TODO: replace with API call → fetch(`/api/plantas/${id}`, { method:'DELETE' });
+      renderStats();
+      renderList();
+    }
+
+    function openModal(id = null) {
+      editingId = id;
+      const modal = document.getElementById('plantModal');
+      const title = document.getElementById('modalTitle');
+      if (id) {
+        title.textContent = 'Editar planta';
+        const p = plantList.find(x => x.id === id);
+        if (!p) return;
+        document.getElementById('f-nombre').value = p.nombre;
+        document.getElementById('f-sci').value = p.nombreCientifico;
+        document.getElementById('f-cat').value = p.categoria;
+        document.getElementById('f-disp').value = p.disponibilidad;
+        document.getElementById('f-desc').value = p.descripcion;
+        document.getElementById('f-luz').value = p.luz;
+        document.getElementById('f-riego').value = p.riego;
+        document.getElementById('f-cuidado').value = p.cuidado;
+        document.getElementById('f-suc').value = p.sucursal;
+        document.getElementById('f-mascotas').value = p.mascotas;
+        document.getElementById('f-etiquetas').value = p.etiquetas.join(', ');
+        document.getElementById('f-variaciones').value = p.variaciones.join(', ');
+        document.getElementById('f-imagen').value = p.imagenes[0] || '';
+      } else {
+        title.textContent = 'Agregar planta';
+        ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-imagen'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('f-cat').value = 'ornamental';
+        document.getElementById('f-disp').value = 'disponible';
+        document.getElementById('f-luz').value = 'luz indirecta';
+        document.getElementById('f-riego').value = 'medio';
+        document.getElementById('f-cuidado').value = 'fácil';
+        document.getElementById('f-suc').value = 'ambas';
+        document.getElementById('f-mascotas').value = 'no tóxica';
+      }
+      modal.style.display = 'flex';
+      document.getElementById('f-nombre').focus();
+    }
+
+    function closeModal() {
+      document.getElementById('plantModal').style.display = 'none';
+      editingId = null;
+    }
+
+    function savePlant() {
+      const nombre = document.getElementById('f-nombre').value.trim();
+      if (!nombre) { alert('El nombre es requerido.'); return; }
+      const data = {
+        nombre,
+        nombreCientifico: document.getElementById('f-sci').value.trim(),
+        categoria: document.getElementById('f-cat').value,
+        disponibilidad: document.getElementById('f-disp').value,
+        descripcion: document.getElementById('f-desc').value.trim(),
+        luz: document.getElementById('f-luz').value,
+        riego: document.getElementById('f-riego').value,
+        cuidado: document.getElementById('f-cuidado').value,
+        sucursal: document.getElementById('f-suc').value,
+        mascotas: document.getElementById('f-mascotas').value,
+        etiquetas: document.getElementById('f-etiquetas').value.split(',').map(s => s.trim()).filter(Boolean),
+        variaciones: document.getElementById('f-variaciones').value.split(',').map(s => s.trim()).filter(Boolean),
+        imagenes: [document.getElementById('f-imagen').value.trim() || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop'],
+      };
+      if (editingId) {
+        const idx = plantList.findIndex(p => p.id === editingId);
+        if (idx > -1) {
+          plantList[idx] = { ...plantList[idx], ...data };
+          // TODO: replace with API call → fetch(`/api/plantas/${editingId}`, { method:'PUT', body: JSON.stringify(data) });
+        }
+      } else {
+        data.id = nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        plantList.push(data);
+        // TODO: replace with API call → fetch('/api/plantas', { method:'POST', body: JSON.stringify(data) });
+      }
+      closeModal();
+      renderStats();
+      renderList();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('plantModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('plantModal')) closeModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>

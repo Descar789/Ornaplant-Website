@@ -3,436 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Catálogo de plantas ornamentales ORNAPLANT SA DE CV — flores, follaje, cactus, árboles y exóticas en Cuautla, Morelos.">
-  <title>Catálogo | ORNAPLANT SA DE CV</title>
+  <title>Catálogo — ORNAPLANT</title>
+  <meta name="description" content="Explora nuestro catálogo de plantas ornamentales en Cuautla, Morelos. Filtra por categoría, luz, riego y más.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Mobile filter toggle */
+    .filter-mobile-toggle { display: none; }
+    @media (max-width: 1024px) {
+      .filter-mobile-toggle {
+        display: flex; align-items: center; gap: 0.5rem;
+        width: 100%; padding: 0.75rem 1rem;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius); font-family: var(--font-heading);
+        font-weight: 600; font-size: 0.875rem; color: var(--text);
+        cursor: pointer; margin-bottom: 0.5rem;
+        transition: background 200ms ease;
+      }
+      .filter-mobile-toggle:hover { background: var(--green-100); }
+      .filter-panel { display: none; }
+      .filter-panel.open { display: block; }
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <nav class="navbar" aria-label="Navegación principal">
-      <a class="brand" href="index.html" aria-label="ORNAPLANT SA DE CV">
-        <img class="brand-symbol-img" src="assets/logo-symbol-web.png" alt="Símbolo ORNAPLANT">
-        <img class="brand-wordmark-img" src="assets/logo-palabras-web.png" alt="ORNAPLANT">
+
+  <header class="site-header" id="header">
+    <nav class="navbar container">
+      <a class="nav-brand" href="index.html">
+        <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="40">
+        <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
       </a>
-
-      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-controls="main-menu" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <ul class="nav-menu" id="main-menu">
+      <ul class="nav-menu" id="navMenu" role="list">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="nosotros.html">Sobre Nosotros</a></li>
         <li><a href="servicios.html">Servicios</a></li>
-        <li><a class="active" href="catalogo.html">Catálogo</a></li>
+        <li><a href="catalogo.html">Catálogo</a></li>
         <li><a href="sucursales.html">Sucursales</a></li>
         <li><a href="horarios.html">Horarios</a></li>
-        <li><a href="contacto.html">Contacto</a></li>
+        <li><a href="contacto.html" class="nav-cta">Contacto</a></li>
       </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span class="material-symbols-outlined" id="navIcon">menu</span>
+      </button>
     </nav>
   </header>
 
   <main>
-    <section class="page-hero page-section">
-      <div class="reveal">
-        <p class="eyebrow">Catálogo de plantas</p>
-        <h1>Encuentra tu planta ideal</h1>
-        <p class="lead">Descubre nuestra selección de plantas ornamentales: flores, follaje, cactus, árboles frutales y variedades exóticas.</p>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero" style="padding:3.5rem 0 2.5rem;" aria-label="Catálogo de plantas">
+      <div class="container">
+        <p class="eyebrow"><span class="material-symbols-outlined">local_florist</span>Nuestras plantas</p>
+        <h1 style="font-size:clamp(1.75rem,4vw,2.75rem);">Catálogo</h1>
+        <p style="font-size:1rem;">Explora nuestra selección y consulta disponibilidad directamente.</p>
       </div>
     </section>
 
-    <section class="page-section catalogo-section">
-      <div class="catalogo-controls reveal">
-        <div class="catalogo-search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="search" id="catalogo-buscar" placeholder="Buscar planta…" aria-label="Buscar planta">
-        </div>
-        <div class="filter-chips" role="group" aria-label="Filtrar por categoría">
-          <button class="filter-chip active" data-filter="todas" type="button">Todas</button>
-          <button class="filter-chip" data-filter="Flores" type="button">Flores</button>
-          <button class="filter-chip" data-filter="Follaje" type="button">Follaje</button>
-          <button class="filter-chip" data-filter="Temporada" type="button">Temporada</button>
-          <button class="filter-chip" data-filter="Cactus y suculentas" type="button">Cactus y suculentas</button>
-          <button class="filter-chip" data-filter="Árboles y frutales" type="button">Árboles y frutales</button>
-          <button class="filter-chip" data-filter="Exóticas" type="button">Exóticas</button>
+    <!-- CATALOG -->
+    <section class="section-sm" aria-labelledby="catalog-heading">
+      <div class="container">
+        <h2 id="catalog-heading" class="sr-only">Catálogo de plantas</h2>
+
+        <div class="catalog-layout">
+
+          <!-- SIDEBAR FILTERS -->
+          <aside aria-label="Filtros de búsqueda">
+            <button class="filter-mobile-toggle" id="filterToggle" aria-expanded="false" aria-controls="filterPanel">
+              <span class="material-symbols-outlined" style="font-size:1.125rem;">filter_list</span>
+              Filtros
+            </button>
+            <div class="filter-panel" id="filterPanel" role="search" aria-label="Panel de filtros">
+              <h3>Filtros</h3>
+
+              <div class="filter-group">
+                <span class="filter-group-label" id="cat-label">Categoría</span>
+                <div class="filter-options" role="radiogroup" aria-labelledby="cat-label">
+                  <label class="filter-option"><input type="radio" name="categoria" value="todas" checked> Todas</label>
+                  <label class="filter-option"><input type="radio" name="categoria" value="interior"> Interior</label>
+                  <label class="filter-option"><input type="radio" name="categoria" value="exterior"> Exterior</label>
+                  <label class="filter-option"><input type="radio" name="categoria" value="suculenta"> Suculentas</label>
+                  <label class="filter-option"><input type="radio" name="categoria" value="ornamental"> Ornamental</label>
+                  <label class="filter-option"><input type="radio" name="categoria" value="árbol"> Árbol</label>
+                  <label class="filter-option"><input type="radio" name="categoria" value="medicinal"> Medicinal</label>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-group-label" id="disp-label">Disponibilidad</span>
+                <div class="filter-options" role="radiogroup" aria-labelledby="disp-label">
+                  <label class="filter-option"><input type="radio" name="disponibilidad" value="todas" checked> Todas</label>
+                  <label class="filter-option"><input type="radio" name="disponibilidad" value="disponible"> Disponible</label>
+                  <label class="filter-option"><input type="radio" name="disponibilidad" value="bajo pedido"> Bajo pedido</label>
+                  <label class="filter-option"><input type="radio" name="disponibilidad" value="agotado"> Agotado</label>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-group-label" id="luz-label">Luz necesaria</span>
+                <div class="filter-options" role="group" aria-labelledby="luz-label">
+                  <label class="filter-option"><input type="checkbox" name="luz" value="sol directo"> Sol directo</label>
+                  <label class="filter-option"><input type="checkbox" name="luz" value="luz indirecta"> Luz indirecta</label>
+                  <label class="filter-option"><input type="checkbox" name="luz" value="media sombra"> Media sombra</label>
+                  <label class="filter-option"><input type="checkbox" name="luz" value="sombra"> Sombra</label>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-group-label" id="cuidado-label">Nivel de cuidado</span>
+                <div class="filter-options" role="group" aria-labelledby="cuidado-label">
+                  <label class="filter-option"><input type="checkbox" name="cuidado" value="fácil"> Fácil</label>
+                  <label class="filter-option"><input type="checkbox" name="cuidado" value="intermedia"> Intermedio</label>
+                  <label class="filter-option"><input type="checkbox" name="cuidado" value="difícil"> Difícil</label>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-group-label" id="suc-label">Sucursal</span>
+                <div class="filter-options" role="radiogroup" aria-labelledby="suc-label">
+                  <label class="filter-option"><input type="radio" name="sucursal" value="todas" checked> Todas</label>
+                  <label class="filter-option"><input type="radio" name="sucursal" value="matriz"> Matriz</label>
+                  <label class="filter-option"><input type="radio" name="sucursal" value="embarques"> Embarques</label>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <span class="filter-group-label" id="mascotas-label">Mascotas</span>
+                <div class="filter-options" role="radiogroup" aria-labelledby="mascotas-label">
+                  <label class="filter-option"><input type="radio" name="mascotas" value="todas" checked> Todas</label>
+                  <label class="filter-option"><input type="radio" name="mascotas" value="no tóxica"> No tóxicas</label>
+                  <label class="filter-option"><input type="radio" name="mascotas" value="tóxica"> Tóxicas</label>
+                </div>
+              </div>
+
+              <button class="filter-reset" id="resetFilters" type="button">Limpiar filtros</button>
+            </div>
+          </aside>
+
+          <!-- PLANT GRID -->
+          <div>
+            <div class="catalog-toolbar">
+              <span class="catalog-count" id="resultCount" aria-live="polite">10 plantas</span>
+              <div class="catalog-search">
+                <span class="si" aria-hidden="true"><span class="material-symbols-outlined">search</span></span>
+                <input type="search" id="searchInput" placeholder="Buscar por nombre..." aria-label="Buscar plantas">
+              </div>
+            </div>
+            <div class="grid-auto" id="plantGrid" aria-label="Resultados del catálogo">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
         </div>
       </div>
-
-      <div class="catalogo-grid" id="catalogo-grid" aria-live="polite">
-
-        <!-- Monstera -->
-        <article class="plant-card reveal" data-category="Follaje" data-search="monstera deliciosa follaje tropical hojas grandes interior">
-          <div class="plant-card__media" role="img" aria-label="Monstera">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--popular">Popular</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Follaje</span>
-            <h2 class="plant-card__name">Monstera</h2>
-            <p class="plant-card__scientific">Monstera deliciosa</p>
-            <p class="plant-card__desc">Hojas grandes perforadas que crean un efecto tropical único. Perfecta para interiores luminosos con luz indirecta.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Luz indirecta
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Moderado
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Pothos -->
-        <article class="plant-card reveal" data-category="Follaje" data-search="pothos epipremnum aureum follaje colgante interior fácil cuidado">
-          <div class="plant-card__media" role="img" aria-label="Pothos">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--recomendada">Recomendada</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Follaje</span>
-            <h2 class="plant-card__name">Pothos</h2>
-            <p class="plant-card__scientific">Epipremnum aureum</p>
-            <p class="plant-card__desc">Resistente y de cuidado muy fácil. Ideal para colgar o dejar trepar en interiores con poca luz.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Luz baja
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Poco
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Ficus -->
-        <article class="plant-card reveal" data-category="Follaje" data-search="ficus benjamina follaje árbol interior elegante">
-          <div class="plant-card__media" role="img" aria-label="Ficus">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Follaje</span>
-            <h2 class="plant-card__name">Ficus</h2>
-            <p class="plant-card__scientific">Ficus benjamina</p>
-            <p class="plant-card__desc">Árbol de interior elegante con follaje denso y brillante. Da presencia a espacios amplios con buena iluminación.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Luz indirecta
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Moderado
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Nochebuena -->
-        <article class="plant-card reveal" data-category="Temporada" data-search="nochebuena euphorbia pulcherrima temporada navidad roja flores">
-          <div class="plant-card__media" role="img" aria-label="Nochebuena">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--popular">Popular</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Temporada</span>
-            <h2 class="plant-card__name">Nochebuena</h2>
-            <p class="plant-card__scientific">Euphorbia pulcherrima</p>
-            <p class="plant-card__desc">Icónica planta de temporada navideña con brácteas rojas brillantes. Símbolo de la flora mexicana reconocido mundialmente.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Luz indirecta
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Moderado
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Cempasúchil -->
-        <article class="plant-card reveal" data-category="Temporada" data-search="cempasúchil tagetes erecta temporada flor muertos naranja amarilla">
-          <div class="plant-card__media" role="img" aria-label="Cempasúchil">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--popular">Popular</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Temporada</span>
-            <h2 class="plant-card__name">Cempasúchil</h2>
-            <p class="plant-card__scientific">Tagetes erecta</p>
-            <p class="plant-card__desc">Flor tradicional del Día de Muertos. Tonos naranja y amarillo intenso con aroma característico e inconfundible.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Moderado
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Geranio -->
-        <article class="plant-card reveal" data-category="Flores" data-search="geranio pelargonium flores exterior maceta colorida jardín">
-          <div class="plant-card__media" role="img" aria-label="Geranio">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Flores</span>
-            <h2 class="plant-card__name">Geranio</h2>
-            <p class="plant-card__scientific">Pelargonium spp.</p>
-            <p class="plant-card__desc">Planta de flor colorida en rojo, rosa o blanco. Ideal para macetas, jardineras y exteriores soleados.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Moderado
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Aloe Vera -->
-        <article class="plant-card reveal" data-category="Cactus y suculentas" data-search="aloe vera barbadensis suculenta cactus medicinal sol resistente">
-          <div class="plant-card__media" role="img" aria-label="Aloe Vera">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--recomendada">Recomendada</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Cactus y suculentas</span>
-            <h2 class="plant-card__name">Aloe Vera</h2>
-            <p class="plant-card__scientific">Aloe barbadensis</p>
-            <p class="plant-card__desc">Suculenta de múltiples usos ornamentales y medicinales. Muy resistente, requiere poco riego y mucho sol.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Poco
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Echeveria -->
-        <article class="plant-card reveal" data-category="Cactus y suculentas" data-search="echeveria suculenta cactus decorativa rosa sol resistente nueva">
-          <div class="plant-card__media" role="img" aria-label="Echeveria">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--nueva">Nueva</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Cactus y suculentas</span>
-            <h2 class="plant-card__name">Echeveria</h2>
-            <p class="plant-card__scientific">Echeveria spp.</p>
-            <p class="plant-card__desc">Suculenta en forma de rosa con tonos azul-grisáceos y rosados. Muy decorativa y perfecta para arreglos.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Poco
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Nopal -->
-        <article class="plant-card reveal" data-category="Cactus y suculentas" data-search="nopal opuntia cactus mexicano suculenta sol seco resistente">
-          <div class="plant-card__media" role="img" aria-label="Nopal">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Cactus y suculentas</span>
-            <h2 class="plant-card__name">Nopal</h2>
-            <p class="plant-card__scientific">Opuntia spp.</p>
-            <p class="plant-card__desc">Cactus emblemático mexicano. Altamente resistente al clima seco y al sol intenso, ideal para jardines exteriores.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Mínimo
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Limonero -->
-        <article class="plant-card reveal" data-category="Árboles y frutales" data-search="limonero citrus limon árbol frutal jardín cítrico exterior">
-          <div class="plant-card__media" role="img" aria-label="Limonero">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Árboles y frutales</span>
-            <h2 class="plant-card__name">Limonero</h2>
-            <p class="plant-card__scientific">Citrus limon</p>
-            <p class="plant-card__desc">Frutal cítrico productivo apto para jardín o macetón grande. Produce limones de manera constante en clima cálido.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Frecuente
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Guayabo -->
-        <article class="plant-card reveal" data-category="Árboles y frutales" data-search="guayabo psidium guajava árbol frutal tropical exterior jardín">
-          <div class="plant-card__media" role="img" aria-label="Guayabo">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Árboles y frutales</span>
-            <h2 class="plant-card__name">Guayabo</h2>
-            <p class="plant-card__scientific">Psidium guajava</p>
-            <p class="plant-card__desc">Árbol frutal tropical de rápido crecimiento. Produce guayabas dulces y su follaje es denso y decorativo.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Pleno sol
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Moderado
-              </span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Orquídea -->
-        <article class="plant-card reveal" data-category="Exóticas" data-search="orquídea phalaenopsis exótica flor elegante regalo interior nueva">
-          <div class="plant-card__media" role="img" aria-label="Orquídea">
-            <div class="plant-card__placeholder" aria-hidden="true">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6 0 5-4 8-9 6"/></svg>
-            </div>
-            <div class="plant-card__tags">
-              <span class="tag tag--nueva">Nueva</span>
-            </div>
-          </div>
-          <div class="plant-card__body">
-            <span class="plant-card__category">Exóticas</span>
-            <h2 class="plant-card__name">Orquídea</h2>
-            <p class="plant-card__scientific">Phalaenopsis spp.</p>
-            <p class="plant-card__desc">Elegante flor exótica de larga duración. Perfecta como regalo o como pieza decorativa en interiores iluminados.</p>
-            <div class="plant-card__care">
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                Luz indirecta
-              </span>
-              <span class="care-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6 10 6 14.5 6 15a6 6 0 0 0 12 0c0-.5 0-5-6-13z"/></svg>
-                Poco
-              </span>
-            </div>
-          </div>
-        </article>
-
-      </div>
-
-      <p class="catalogo-empty" id="catalogo-empty" role="status" aria-live="polite">
-        No se encontraron plantas con ese criterio. Prueba con otro término o categoría.
-      </p>
     </section>
+
   </main>
 
   <footer class="site-footer">
-    <div>
-      <strong>ORNAPLANT SA DE CV</strong>
-      <p>Plantas ornamentales, experiencia y servicio profesional desde 1992.</p>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="assets/logo-horizontal-web.png" alt="ORNAPLANT">
+          <p>Comercializadora de plantas ornamentales en Cuautla, Morelos. Desde 1992.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navegación</h4>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="catalogo.html">Catálogo</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Visítanos</h4>
+          <ul>
+            <li><a href="sucursales.html">Sucursales</a></li>
+            <li><a href="horarios.html">Horarios</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="mailto:informesornaplant@hotmail.com">Enviar email</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 ORNAPLANT SA DE CV · Cuautla, Morelos</span>
+        <span>Plantas ornamentales desde 1992</span>
+      </div>
     </div>
-    <a href="contacto.html">Contacto</a>
   </footer>
 
-  <button class="back-to-top" type="button" aria-label="Volver arriba">↑</button>
-  <script src="script.js"></script>
+  <button class="back-to-top" id="backToTop" aria-label="Volver arriba">
+    <span class="material-symbols-outlined">keyboard_arrow_up</span>
+  </button>
+
+  <script src="plantas.js"></script>
   <script>
-    const chips = document.querySelectorAll('.filter-chip');
-    const searchInput = document.getElementById('catalogo-buscar');
-    const cards = document.querySelectorAll('.plant-card');
-    const emptyMsg = document.getElementById('catalogo-empty');
-    let activeFilter = 'todas';
+    (function () {
+      const dispCls = { disponible: 'badge-available', 'bajo pedido': 'badge-order', agotado: 'badge-sold' };
+      const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
 
-    function filterCards() {
-      const query = searchInput.value.toLowerCase().trim();
-      let visible = 0;
-      cards.forEach(card => {
-        const matchesFilter = activeFilter === 'todas' || card.dataset.category === activeFilter;
-        const searchTarget = card.dataset.search + ' ' + card.querySelector('.plant-card__name').textContent.toLowerCase();
-        const matchesSearch = !query || searchTarget.includes(query);
-        const show = matchesFilter && matchesSearch;
-        card.style.display = show ? '' : 'none';
-        if (show) visible++;
+      function plantCard(p) {
+        const img = p.imagenes[0] || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop';
+        const tags = p.etiquetas.slice(0, 2).map(t => `<span class="badge badge-green">${t}</span>`).join('');
+        return `
+          <a href="planta.html?id=${p.id}" class="card plant-card" aria-label="Ver detalle de ${p.nombre}">
+            <div class="plant-card-img">
+              <img src="${img}" alt="${p.nombre}" loading="lazy" width="400" height="300">
+              <span class="badge ${dispCls[p.disponibilidad] || 'badge-green'}">${dispLbl[p.disponibilidad] || p.disponibilidad}</span>
+            </div>
+            <div class="plant-card-body">
+              <div class="plant-card-tags">${tags}</div>
+              <div class="plant-card-name">${p.nombre}</div>
+              <div class="plant-card-sci">${p.nombreCientifico}</div>
+              <div class="plant-card-meta">
+                <span class="plant-card-meta-item"><span class="material-symbols-outlined">wb_sunny</span>${p.luz}</span>
+                <span class="plant-card-meta-item"><span class="material-symbols-outlined">water_drop</span>${p.riego}</span>
+                <span class="plant-card-meta-item"><span class="material-symbols-outlined">eco</span>${p.cuidado}</span>
+              </div>
+            </div>
+          </a>`;
+      }
+
+      let filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], sucursal: 'todas', mascotas: 'todas' };
+
+      function applyFilters() {
+        const q = filters.search.toLowerCase();
+        const result = plantas.filter(p => {
+          if (q && !p.nombre.toLowerCase().includes(q) && !p.nombreCientifico.toLowerCase().includes(q) && !p.descripcion.toLowerCase().includes(q)) return false;
+          if (filters.categoria !== 'todas' && p.categoria !== filters.categoria) return false;
+          if (filters.disponibilidad !== 'todas' && p.disponibilidad !== filters.disponibilidad) return false;
+          if (filters.luz.length && !filters.luz.includes(p.luz)) return false;
+          if (filters.cuidado.length && !filters.cuidado.includes(p.cuidado)) return false;
+          if (filters.sucursal !== 'todas') {
+            if (p.sucursal !== 'ambas' && p.sucursal !== filters.sucursal) return false;
+          }
+          if (filters.mascotas !== 'todas' && p.mascotas !== filters.mascotas) return false;
+          return true;
+        });
+        render(result);
+      }
+
+      function render(list) {
+        const grid = document.getElementById('plantGrid');
+        const count = document.getElementById('resultCount');
+        count.textContent = `${list.length} planta${list.length !== 1 ? 's' : ''}`;
+        if (list.length === 0) {
+          grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">search_off</span><h3>Sin resultados</h3><p>Prueba con otros filtros o términos de búsqueda.</p></div>`;
+          return;
+        }
+        grid.innerHTML = list.map(plantCard).join('');
+      }
+
+      // Search
+      document.getElementById('searchInput').addEventListener('input', e => {
+        filters.search = e.target.value.trim();
+        applyFilters();
       });
-      emptyMsg.classList.toggle('visible', visible === 0);
-    }
 
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeFilter = chip.dataset.filter;
-        filterCards();
+      // Radio filters
+      document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', () => {
+          filters[input.name] = input.value;
+          applyFilters();
+        });
       });
-    });
 
-    searchInput.addEventListener('input', filterCards);
+      // Checkbox filters
+      document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', () => {
+          const key = input.name;
+          if (!Array.isArray(filters[key])) filters[key] = [];
+          if (input.checked) filters[key].push(input.value);
+          else filters[key] = filters[key].filter(v => v !== input.value);
+          applyFilters();
+        });
+      });
+
+      // Reset
+      document.getElementById('resetFilters').addEventListener('click', () => {
+        filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], sucursal: 'todas', mascotas: 'todas' };
+        document.getElementById('searchInput').value = '';
+        document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = r.value === 'todas'; });
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; });
+        applyFilters();
+      });
+
+      // Mobile filter toggle
+      const filterToggle = document.getElementById('filterToggle');
+      const filterPanel = document.getElementById('filterPanel');
+      if (filterToggle) {
+        filterToggle.addEventListener('click', () => {
+          const open = filterPanel.classList.toggle('open');
+          filterToggle.setAttribute('aria-expanded', open);
+        });
+      }
+
+      // Initial render
+      render(plantas);
+    })();
   </script>
+  <script src="script.js"></script>
 </body>
 </html>

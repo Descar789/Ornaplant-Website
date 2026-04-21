@@ -1,52 +1,65 @@
-const header = document.querySelector(".site-header");
-const navToggle = document.querySelector(".nav-toggle");
-const navMenu = document.querySelector(".nav-menu");
-const navLinks = document.querySelectorAll(".nav-menu a");
-const backToTop = document.querySelector(".back-to-top");
-const revealElements = document.querySelectorAll(".reveal");
+/* ORNAPLANT — Shared UI Script */
 
-function updateScrollUI() {
-  const hasScrolled = window.scrollY > 24;
-  header.classList.toggle("scrolled", hasScrolled);
-  backToTop.classList.toggle("show", window.scrollY > 360);
-}
+(function () {
+  'use strict';
 
-function closeMenu() {
-  navToggle.classList.remove("active");
-  navToggle.setAttribute("aria-expanded", "false");
-  navMenu.classList.remove("open");
-}
+  const header = document.getElementById('header');
+  const navMenu = document.getElementById('navMenu');
+  const navToggle = document.getElementById('navToggle');
+  const navIcon = document.getElementById('navIcon');
+  const backToTop = document.getElementById('backToTop');
 
-navToggle.addEventListener("click", () => {
-  const isOpen = navMenu.classList.toggle("open");
-  navToggle.classList.toggle("active", isOpen);
-  navToggle.setAttribute("aria-expanded", String(isOpen));
-});
+  // ── Sticky header + back-to-top visibility ──────────────
+  function onScroll() {
+    if (header) header.classList.toggle('scrolled', window.scrollY > 20);
+    if (backToTop) backToTop.classList.toggle('visible', window.scrollY > 400);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-navLinks.forEach((link) => {
-  link.addEventListener("click", closeMenu);
-});
-
-backToTop.addEventListener("click", () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-});
-
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        revealObserver.unobserve(entry.target);
+  // ── Mobile hamburger menu ───────────────────────────────
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = navMenu.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen);
+      if (navIcon) navIcon.textContent = isOpen ? 'close' : 'menu';
+    });
+    navMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        if (navIcon) navIcon.textContent = 'menu';
+      });
+    });
+    document.addEventListener('click', e => {
+      if (header && !header.contains(e.target)) {
+        navMenu.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        if (navIcon) navIcon.textContent = 'menu';
       }
     });
-  },
-  { threshold: 0.14 }
-);
+  }
 
-revealElements.forEach((element) => revealObserver.observe(element));
+  // ── Back-to-top ─────────────────────────────────────────
+  if (backToTop) {
+    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
 
-window.addEventListener("scroll", updateScrollUI);
-window.addEventListener("load", updateScrollUI);
+  // ── Active nav link (by current filename) ───────────────
+  const page = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-menu a').forEach(a => {
+    const href = a.getAttribute('href');
+    if (href === page || (page === '' && href === 'index.html')) a.classList.add('active');
+  });
+
+  // ── Scroll-reveal ────────────────────────────────────────
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }),
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }
+})();
