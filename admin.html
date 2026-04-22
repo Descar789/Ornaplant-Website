@@ -80,10 +80,10 @@
         <div style="display:flex;align-items:center;gap:0.75rem;">
           <span class="material-symbols-outlined" style="font-size:1.375rem;color:#56816d;">admin_panel_settings</span>
           <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;">Panel Admin</span>
-          <span style="font-size:0.7rem;background:rgba(86,129,109,0.3);color:#9ec4b0;padding:0.15rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">DEMO</span>
+          <span style="font-size:0.7rem;background:rgba(86,129,109,0.3);color:#9ec4b0;padding:0.15rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">LIVE</span>
         </div>
         <div style="display:flex;align-items:center;gap:1rem;">
-          <span style="font-size:0.8125rem;color:rgba(255,255,255,0.55);">Modo demo — cambios no persisten al recargar</span>
+          <span style="font-size:0.8125rem;color:rgba(255,255,255,0.55);">Conectado a Firestore</span>
           <a href="index.html" class="btn-admin btn-ghost-a" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);">
             <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span>
             Ver sitio
@@ -93,12 +93,6 @@
     </header>
 
     <main style="max-width:1200px;margin:0 auto;padding:2rem 1.5rem;">
-
-      <!-- DEMO NOTICE -->
-      <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:0.875rem 1.25rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:0.75rem;" role="note">
-        <span class="material-symbols-outlined" style="color:#854d0e;font-size:1.25rem;flex-shrink:0;">warning</span>
-        <p style="font-size:0.875rem;color:#78350f;"><strong>Modo demo:</strong> Los cambios que realices aquí se reflejan en la UI pero <strong>no persisten al recargar</strong> la página. Para conectar a un backend real, reemplaza las funciones marcadas con <code>TODO: replace with API call</code>.</p>
-      </div>
 
       <!-- STATS -->
       <section style="margin-bottom:2.5rem;" aria-labelledby="stats-heading">
@@ -117,6 +111,17 @@
         </div>
         <div style="background:white;border:1px solid rgba(51,92,75,0.16);border-radius:12px;overflow:hidden;">
           <div id="plantList"><!-- rendered by JS --></div>
+        </div>
+      </section>
+
+      <!-- COMMENTS -->
+      <section style="margin-top:2.5rem;" aria-labelledby="comments-heading">
+        <h2 id="comments-heading" style="font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1.25rem;">Comentarios</h2>
+        <div style="background:white;border:1px solid rgba(51,92,75,0.16);border-radius:12px;overflow:hidden;" id="commentsPanel">
+          <div style="text-align:center;padding:2rem;color:#69776d;">
+            <span class="material-symbols-outlined" style="font-size:2rem;display:block;margin:0 auto 0.5rem;color:#ddd2bf;">chat</span>
+            <p style="font-size:0.875rem;">Cargando comentarios...</p>
+          </div>
         </div>
       </section>
 
@@ -222,13 +227,31 @@
           <input class="form-input" id="f-variaciones" type="text" placeholder="chico, mediano, grande">
         </div>
         <div>
-          <label class="form-label" for="f-imagen">URL de imagen principal</label>
-          <input class="form-input" id="f-imagen" type="url" placeholder="https://...">
+          <label class="form-label">Imagen principal</label>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            <input class="form-input" id="f-imagen" type="url" placeholder="https://... (URL directa o sube una imagen)">
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+              <label class="btn-admin btn-ghost-a" style="cursor:pointer;position:relative;">
+                <span class="material-symbols-outlined" style="font-size:1rem;">upload</span>
+                Subir a Cloudinary
+                <input type="file" id="f-image-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleImageUpload(this)">
+              </label>
+              <button type="button" class="btn-admin" id="aiGenBtn" onclick="generateAIImage()"
+                style="background:#f8eaf1;color:#8f2d55;border:1.5px solid rgba(180,60,109,0.2);">
+                <span class="material-symbols-outlined" style="font-size:1rem;">auto_awesome</span>
+                Generar con IA
+              </button>
+              <span id="uploadStatus" style="font-size:0.8rem;color:#69776d;"></span>
+            </div>
+            <div id="imgPreview" style="display:none;">
+              <img id="imgPreviewEl" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid rgba(51,92,75,0.16);" alt="Preview">
+            </div>
+          </div>
         </div>
       </div>
       <div style="padding:1rem 1.5rem;border-top:1px solid rgba(51,92,75,0.12);display:flex;justify-content:flex-end;gap:0.75rem;">
         <button class="btn-admin btn-ghost-a" onclick="closeModal()">Cancelar</button>
-        <button class="btn-admin btn-primary-a" id="saveBtn" onclick="savePlant()">
+        <button class="btn-admin btn-primary-a" id="saveBtn" onclick="savePlantUI()">
           <span class="material-symbols-outlined" style="font-size:1rem;">save</span>
           Guardar
         </button>
@@ -236,18 +259,14 @@
     </div>
   </div>
 
-  <script src="plantas.js"></script>
-  <script>
-    // PRODUCTION: replace URL param check with real auth
-    const ADMIN_MODE = 'url_param'; // options: 'url_param' | 'none' (dev) | 'password'
+  <script type="module">
+    import { getPlants, savePlant, updatePlant, deleteFirestorePlant, getComments, deleteComment, uploadToCloudinary } from './firebase.js';
 
+    // ── Access check ─────────────────────────────────────────────
+    const ADMIN_MODE = 'url_param'; // 'url_param' | 'none' (dev)
     function checkAccess() {
       if (ADMIN_MODE === 'none') return true;
-      if (ADMIN_MODE === 'url_param') {
-        return new URLSearchParams(window.location.search).get('tester') === 'true';
-      }
-      // PRODUCTION: implement real auth check here
-      return false;
+      return new URLSearchParams(window.location.search).get('tester') === 'true';
     }
 
     if (!checkAccess()) {
@@ -257,13 +276,20 @@
       init();
     }
 
-    // In-memory plant list (copy of global array)
-    let plantList = plantas.map(p => ({ ...p }));
+    let plantList = [];
     let editingId = null;
 
-    function init() {
+    async function init() {
+      document.getElementById('plantList').innerHTML = '<div style="text-align:center;padding:2rem;color:#69776d;">Cargando...</div>';
+      try {
+        plantList = await getPlants();
+      } catch (e) {
+        document.getElementById('plantList').innerHTML = '<div style="text-align:center;padding:2rem;color:#991b1b;">Error al cargar plantas.</div>';
+        return;
+      }
       renderStats();
       renderList();
+      loadAllComments();
     }
 
     function renderStats() {
@@ -271,19 +297,21 @@
       const byCat = {};
       let disponibles = 0;
       let agotadas = 0;
+      let totalVistas = 0;
       plantList.forEach(p => {
         byCat[p.categoria] = (byCat[p.categoria] || 0) + 1;
         if (p.disponibilidad === 'disponible') disponibles++;
         if (p.disponibilidad === 'agotado') agotadas++;
+        totalVistas += (p.vistas || 0);
       });
-      const grid = document.getElementById('statsGrid');
       const stats = [
         { icon: 'local_florist', num: total, label: 'Total plantas' },
         { icon: 'check_circle', num: disponibles, label: 'Disponibles' },
         { icon: 'cancel', num: agotadas, label: 'Agotadas' },
+        { icon: 'visibility', num: totalVistas, label: 'Vistas totales' },
         { icon: 'category', num: Object.keys(byCat).length, label: 'Categorías' },
       ];
-      grid.innerHTML = stats.map(s => `
+      document.getElementById('statsGrid').innerHTML = stats.map(s => `
         <div class="stat-card" style="display:flex;align-items:center;gap:1rem;">
           <span class="material-symbols-outlined" style="color:#56816d;font-size:1.75rem;">${s.icon}</span>
           <div>
@@ -305,11 +333,11 @@
       }
       list.innerHTML = plantList.map(p => `
         <div class="plant-row" data-id="${p.id}">
-          <img class="plant-thumb" src="${p.imagenes[0]}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200'">
+          <img class="plant-thumb" src="${(p.imagenes && p.imagenes[0]) || ''}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200'">
           <div>
             <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.9375rem;color:#223029;">${p.nombre}</div>
             <div style="font-size:0.8rem;color:#69776d;font-style:italic;">${p.nombreCientifico}</div>
-            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria} · ${p.sucursal}</div>
+            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria} · ${p.sucursal} · <span class="material-symbols-outlined" style="font-size:0.7rem;vertical-align:middle;">visibility</span> ${p.vistas || 0}</div>
           </div>
           <div style="display:flex;align-items:center;gap:0.625rem;flex-shrink:0;">
             <select class="disp-select ${dispStyle(p.disponibilidad)}" onchange="updateDisp('${p.id}',this.value)" aria-label="Disponibilidad de ${p.nombre}">
@@ -320,36 +348,39 @@
             <button class="btn-admin btn-ghost-a" onclick="openModal('${p.id}')" aria-label="Editar ${p.nombre}" style="padding:0.375rem 0.625rem;">
               <span class="material-symbols-outlined" style="font-size:1rem;">edit</span>
             </button>
-            <button class="btn-admin btn-danger" onclick="deletePlant('${p.id}')" aria-label="Eliminar ${p.nombre}" style="padding:0.375rem 0.625rem;">
+            <button class="btn-admin btn-danger" onclick="deletePlantUI('${p.id}')" aria-label="Eliminar ${p.nombre}" style="padding:0.375rem 0.625rem;">
               <span class="material-symbols-outlined" style="font-size:1rem;">delete</span>
             </button>
           </div>
         </div>`).join('');
     }
 
-    function updateDisp(id, val) {
+    async function updateDisp(id, val) {
       const p = plantList.find(x => x.id === id);
-      if (p) {
-        p.disponibilidad = val;
-        // TODO: replace with API call → fetch(`/api/plantas/${id}`, { method:'PATCH', body: JSON.stringify({disponibilidad:val}) });
-        renderStats();
-        // Re-style the select
-        const sel = document.querySelector(`[data-id="${id}"] .disp-select`);
-        if (sel) sel.className = `disp-select ${dispStyle(val)}`;
-      }
+      if (!p) return;
+      p.disponibilidad = val;
+      const sel = document.querySelector(`[data-id="${id}"] .disp-select`);
+      if (sel) sel.className = `disp-select ${dispStyle(val)}`;
+      renderStats();
+      try {
+        await updatePlant(id, { disponibilidad: val });
+      } catch { alert('Error al actualizar disponibilidad.'); }
     }
 
-    function deletePlant(id) {
-      if (!confirm('¿Eliminar esta planta? Esta acción no se puede deshacer en esta sesión.')) return;
-      plantList = plantList.filter(p => p.id !== id);
-      // TODO: replace with API call → fetch(`/api/plantas/${id}`, { method:'DELETE' });
-      renderStats();
-      renderList();
+    async function deletePlantUI(id) {
+      if (!confirm('¿Eliminar esta planta de Firestore? Esta acción no se puede deshacer.')) return;
+      try {
+        await deleteFirestorePlant(id);
+        plantList = plantList.filter(p => p.id !== id);
+        renderStats();
+        renderList();
+      } catch { alert('Error al eliminar la planta.'); }
     }
 
     function openModal(id = null) {
       editingId = id;
-      const modal = document.getElementById('plantModal');
+      document.getElementById('uploadStatus').textContent = '';
+      document.getElementById('imgPreview').style.display = 'none';
       const title = document.getElementById('modalTitle');
       if (id) {
         title.textContent = 'Editar planta';
@@ -365,12 +396,14 @@
         document.getElementById('f-cuidado').value = p.cuidado;
         document.getElementById('f-suc').value = p.sucursal;
         document.getElementById('f-mascotas').value = p.mascotas;
-        document.getElementById('f-etiquetas').value = p.etiquetas.join(', ');
-        document.getElementById('f-variaciones').value = p.variaciones.join(', ');
-        document.getElementById('f-imagen').value = p.imagenes[0] || '';
+        document.getElementById('f-etiquetas').value = (p.etiquetas || []).join(', ');
+        document.getElementById('f-variaciones').value = (p.variaciones || []).join(', ');
+        const img0 = (p.imagenes && p.imagenes[0]) || '';
+        document.getElementById('f-imagen').value = img0;
+        if (img0) { document.getElementById('imgPreviewEl').src = img0; document.getElementById('imgPreview').style.display = 'block'; }
       } else {
         title.textContent = 'Agregar planta';
-        ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-imagen'].forEach(id => document.getElementById(id).value = '');
+        ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-imagen'].forEach(fid => document.getElementById(fid).value = '');
         document.getElementById('f-cat').value = 'ornamental';
         document.getElementById('f-disp').value = 'disponible';
         document.getElementById('f-luz').value = 'luz indirecta';
@@ -379,7 +412,7 @@
         document.getElementById('f-suc').value = 'ambas';
         document.getElementById('f-mascotas').value = 'no tóxica';
       }
-      modal.style.display = 'flex';
+      document.getElementById('plantModal').style.display = 'flex';
       document.getElementById('f-nombre').focus();
     }
 
@@ -388,9 +421,12 @@
       editingId = null;
     }
 
-    function savePlant() {
+    async function savePlantUI() {
       const nombre = document.getElementById('f-nombre').value.trim();
       if (!nombre) { alert('El nombre es requerido.'); return; }
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
       const data = {
         nombre,
         nombreCientifico: document.getElementById('f-sci').value.trim(),
@@ -406,31 +442,118 @@
         variaciones: document.getElementById('f-variaciones').value.split(',').map(s => s.trim()).filter(Boolean),
         imagenes: [document.getElementById('f-imagen').value.trim() || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop'],
       };
-      if (editingId) {
-        const idx = plantList.findIndex(p => p.id === editingId);
-        if (idx > -1) {
-          plantList[idx] = { ...plantList[idx], ...data };
-          // TODO: replace with API call → fetch(`/api/plantas/${editingId}`, { method:'PUT', body: JSON.stringify(data) });
-        }
-      } else {
-        data.id = nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        plantList.push(data);
-        // TODO: replace with API call → fetch('/api/plantas', { method:'POST', body: JSON.stringify(data) });
+      const id = editingId || nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+      try {
+        await savePlant(id, data);
+        const idx = plantList.findIndex(p => p.id === id);
+        if (idx > -1) plantList[idx] = { ...plantList[idx], ...data };
+        else plantList.push({ id, ...data });
+        closeModal();
+        renderStats();
+        renderList();
+      } catch (e) {
+        alert('Error al guardar: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">save</span> Guardar';
       }
-      closeModal();
-      renderStats();
-      renderList();
     }
 
-    // Close modal on overlay click
+    async function handleImageUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const status = document.getElementById('uploadStatus');
+      status.textContent = 'Subiendo...';
+      try {
+        const url = await uploadToCloudinary(file);
+        document.getElementById('f-imagen').value = url;
+        document.getElementById('imgPreviewEl').src = url;
+        document.getElementById('imgPreview').style.display = 'block';
+        status.textContent = 'Imagen subida ✓';
+        status.style.color = '#166534';
+      } catch {
+        status.textContent = 'Error al subir imagen.';
+        status.style.color = '#991b1b';
+      }
+    }
+
+    function generateAIImage() {
+      const nombre = document.getElementById('f-nombre').value.trim();
+      if (!nombre) { alert('Ingresa el nombre de la planta primero.'); return; }
+      const desc = document.getElementById('f-desc').value.trim().slice(0, 100);
+      const cat = document.getElementById('f-cat').value;
+      const tags = document.getElementById('f-etiquetas').value || cat;
+      // TODO: connect to nanobanana2 MCP endpoint
+      // Expected call: POST /generate { prompt } → { url: string }
+      // Then: document.getElementById('f-imagen').value = url;
+      const prompt = `Fotografía botánica profesional de ${nombre}, ${desc}, ambiente ${tags}, iluminación natural suave, fondo neutro, estilo vivero profesional`;
+      alert('Generación IA pendiente de configurar.\n\nPrompt listo:\n' + prompt);
+    }
+
+    // ── Comments ─────────────────────────────────────────────────
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    async function loadAllComments() {
+      const panel = document.getElementById('commentsPanel');
+      const allComments = [];
+      for (const p of plantList) {
+        try {
+          const comments = await getComments(p.id);
+          comments.forEach(c => allComments.push({ ...c, plantId: p.id, plantNombre: p.nombre }));
+        } catch { /* skip plant */ }
+      }
+      allComments.sort((a, b) => {
+        const ta = a.timestamp?.toDate?.()?.getTime() || 0;
+        const tb = b.timestamp?.toDate?.()?.getTime() || 0;
+        return tb - ta;
+      });
+      if (allComments.length === 0) {
+        panel.innerHTML = '<div style="text-align:center;padding:2rem;color:#69776d;font-size:0.875rem;">No hay comentarios aún.</div>';
+        return;
+      }
+      panel.innerHTML = allComments.map(c => {
+        const date = c.timestamp?.toDate ? c.timestamp.toDate().toLocaleDateString('es-MX', { year:'numeric', month:'short', day:'numeric' }) : '';
+        return `<div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start;padding:1rem 1.25rem;border-bottom:1px solid rgba(51,92,75,0.1);">
+          <div>
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.375rem;">
+              <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.875rem;color:#223029;">${escHtml(c.nombre)}</span>
+              <span style="font-size:0.75rem;background:#eef4ec;color:#396452;padding:0.125rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">${escHtml(c.plantNombre)}</span>
+              <span style="font-size:0.75rem;color:#69776d;">${date}</span>
+            </div>
+            <p style="font-size:0.875rem;color:#69776d;line-height:1.55;margin:0;">${escHtml(c.mensaje)}</p>
+          </div>
+          <button class="btn-admin btn-danger" onclick="deleteCommentUI('${c.plantId}','${c.id}')" style="padding:0.375rem 0.625rem;flex-shrink:0;" aria-label="Eliminar comentario">
+            <span class="material-symbols-outlined" style="font-size:1rem;">delete</span>
+          </button>
+        </div>`;
+      }).join('');
+    }
+
+    async function deleteCommentUI(plantId, commentId) {
+      if (!confirm('¿Eliminar este comentario?')) return;
+      try {
+        await deleteComment(plantId, commentId);
+        await loadAllComments();
+      } catch { alert('Error al eliminar comentario.'); }
+    }
+
+    // ── Expose globals for inline onclick handlers ────────────────
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.savePlantUI = savePlantUI;
+    window.deletePlantUI = deletePlantUI;
+    window.updateDisp = updateDisp;
+    window.handleImageUpload = handleImageUpload;
+    window.generateAIImage = generateAIImage;
+    window.deleteCommentUI = deleteCommentUI;
+
+    // Modal close on overlay click
     document.getElementById('plantModal').addEventListener('click', e => {
       if (e.target === document.getElementById('plantModal')) closeModal();
     });
-
-    // Close modal on Escape
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeModal();
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
   </script>
 </body>
 </html>

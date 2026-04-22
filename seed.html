@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Seed — ORNAPLANT</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #0f0; padding: 2rem; }
+    #log { white-space: pre-wrap; line-height: 1.6; }
+    .ok  { color: #4ade80; }
+    .err { color: #f87171; }
+    .dim { color: #6b7280; }
+    button { padding: 0.75rem 2rem; background: #16a34a; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; margin-bottom: 1.5rem; }
+    button:disabled { background: #374151; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <h2 style="color:#fff;margin-bottom:0.5rem;">🌱 Ornaplant — Seed Firestore</h2>
+  <p style="color:#9ca3af;margin-bottom:1.5rem;">Uploads all plants from plantas.js to Firestore. Run once, then delete this file.</p>
+  <button id="btn" onclick="runSeed()">Upload plants to Firestore</button>
+  <div id="log"></div>
+
+  <script src="plantas.js"></script>
+  <script type="module">
+    import { db } from './config.js';
+    import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+
+    const log = document.getElementById('log');
+    function print(msg, cls = '') {
+      const span = document.createElement('span');
+      span.className = cls;
+      span.textContent = msg + '\n';
+      log.appendChild(span);
+    }
+
+    window.runSeed = async function () {
+      const btn = document.getElementById('btn');
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+      log.innerHTML = '';
+
+      print(`Starting seed — ${plantas.length} plants`, 'dim');
+      print('─'.repeat(40), 'dim');
+
+      let ok = 0;
+      let fail = 0;
+
+      for (const p of plantas) {
+        try {
+          await setDoc(doc(db, 'plantas', p.id), {
+            nombre:          p.nombre,
+            nombreCientifico: p.nombreCientifico,
+            categoria:       p.categoria,
+            descripcion:     p.descripcion,
+            luz:             p.luz,
+            riego:           p.riego,
+            imagenes:        p.imagenes,
+            etiquetas:       p.etiquetas,
+            variaciones:     p.variaciones,
+            disponibilidad:  p.disponibilidad,
+            cuidado:         p.cuidado,
+            sucursal:        p.sucursal,
+            mascotas:        p.mascotas,
+            vistas:          0,
+          });
+          print(`✓ ${p.id}`, 'ok');
+          ok++;
+        } catch (e) {
+          print(`✗ ${p.id} — ${e.message}`, 'err');
+          fail++;
+        }
+      }
+
+      print('─'.repeat(40), 'dim');
+      print(`Done: ${ok} uploaded, ${fail} failed`, fail > 0 ? 'err' : 'ok');
+      btn.textContent = 'Done — delete this file now';
+    };
+  </script>
+</body>
+</html>

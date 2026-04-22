@@ -62,7 +62,6 @@
       <ul class="nav-menu" id="navMenu" role="list">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="nosotros.html">Sobre Nosotros</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
         <li><a href="catalogo.html">Catálogo</a></li>
         <li><a href="sucursales.html">Sucursales</a></li>
         <li><a href="horarios.html">Horarios</a></li>
@@ -94,14 +93,13 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <img src="assets/logo-horizontal-web.png" alt="ORNAPLANT">
-          <p>Comercializadora de plantas ornamentales en Cuautla, Morelos. Desde 1992.</p>
+          <p>Comercializadora de plantas ornamentales en Morelos. Desde 1992.</p>
         </div>
         <div class="footer-col">
           <h4>Navegación</h4>
           <ul>
             <li><a href="index.html">Inicio</a></li>
             <li><a href="nosotros.html">Sobre Nosotros</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
             <li><a href="catalogo.html">Catálogo</a></li>
           </ul>
         </div>
@@ -126,19 +124,44 @@
     <span class="material-symbols-outlined">keyboard_arrow_up</span>
   </button>
 
-  <script src="plantas.js"></script>
-  <script>
-    (function () {
+  <script type="module">
+    import { getPlant, incrementViews, getComments, addComment } from './firebase.js';
+
+    (async function () {
       const dispCls = { disponible: 'disp-available', 'bajo pedido': 'disp-order', agotado: 'disp-sold' };
       const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
       const sucLabel = { matriz: 'Sucursal Matriz', embarques: 'Sucursal Embarques', ambas: 'Ambas sucursales' };
       const luzIcon = { 'sol directo': 'wb_sunny', 'luz indirecta': 'light_mode', 'media sombra': 'partly_cloudy_day', 'sombra': 'cloud' };
       const cuidadoIcon = { 'fácil': 'sentiment_satisfied', 'intermedia': 'sentiment_neutral', 'difícil': 'sentiment_dissatisfied' };
+      const WHATSAPP_NUMBER = '527351024413';
 
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
-      const planta = plantas.find(p => p.id === id);
       const content = document.getElementById('plantContent');
+
+      if (!id) {
+        content.innerHTML = `
+          <div class="not-found">
+            <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">search_off</span>
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;">Planta no encontrada</h2>
+            <p style="color:var(--muted);">No encontramos la planta que buscas.</p>
+            <a href="catalogo.html" class="btn btn-primary"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
+          </div>`;
+        return;
+      }
+
+      let planta;
+      try {
+        planta = await getPlant(id);
+      } catch {
+        content.innerHTML = `
+          <div class="not-found">
+            <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">cloud_off</span>
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;">Error de conexión</h2>
+            <p style="color:var(--muted);">No pudimos cargar la planta. Intenta recargar.</p>
+          </div>`;
+        return;
+      }
 
       if (!planta) {
         content.innerHTML = `
@@ -152,17 +175,19 @@
       }
 
       document.title = `${planta.nombre} — ORNAPLANT`;
-      document.querySelector('meta[name="description"]').content = planta.descripcion.slice(0, 160);
+      document.querySelector('meta[name="description"]').content = (planta.descripcion || '').slice(0, 160);
 
-      const imgs = planta.imagenes.length >= 3 ? planta.imagenes : [...planta.imagenes, ...Array(3 - planta.imagenes.length).fill(planta.imagenes[0])];
+      const rawImgs = planta.imagenes || [];
+      const imgs = rawImgs.length >= 3 ? rawImgs : [...rawImgs, ...Array(Math.max(0, 3 - rawImgs.length)).fill(rawImgs[0] || '')];
       const waMsg = encodeURIComponent(`Hola, me interesa consultar la disponibilidad de: ${planta.nombre} (${planta.nombreCientifico}). ¡Gracias!`);
+      const vistas = (planta.vistas || 0) + 1;
 
       content.innerHTML = `
         <!-- BREADCRUMB -->
         <nav class="breadcrumb" aria-label="Ruta de navegación" style="margin-bottom:1.5rem;">
           <a href="catalogo.html">Catálogo</a>
           <span class="sep" aria-hidden="true">/</span>
-          <a href="catalogo.html">${planta.categoria.charAt(0).toUpperCase()+planta.categoria.slice(1)}</a>
+          <a href="catalogo.html">${planta.categoria ? planta.categoria.charAt(0).toUpperCase()+planta.categoria.slice(1) : ''}</a>
           <span class="sep" aria-hidden="true">/</span>
           <span aria-current="page">${planta.nombre}</span>
         </nav>
@@ -189,13 +214,17 @@
             <!-- Tags + Disponibilidad -->
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
               <span style="padding:0.25rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;font-family:'Plus Jakarta Sans',sans-serif;" class="${dispCls[planta.disponibilidad] || 'disp-available'}">${dispLbl[planta.disponibilidad] || planta.disponibilidad}</span>
-              ${planta.etiquetas.map(t => `<span class="pill">${t}</span>`).join('')}
+              ${(planta.etiquetas || []).map(t => `<span class="pill">${t}</span>`).join('')}
             </div>
 
-            <!-- Name -->
+            <!-- Name + Views -->
             <div>
               <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.75rem,3.5vw,2.25rem);font-weight:800;line-height:1.1;color:#223029;margin-bottom:0.375rem;">${planta.nombre}</h1>
               <p style="font-style:italic;color:#69776d;font-size:0.9375rem;">${planta.nombreCientifico}</p>
+              <p style="display:flex;align-items:center;gap:0.25rem;font-size:0.8rem;color:#69776d;margin-top:0.375rem;">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span>
+                ${vistas} vista${vistas !== 1 ? 's' : ''}
+              </p>
             </div>
 
             <!-- Sucursal -->
@@ -240,7 +269,7 @@
             <div>
               <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;margin-bottom:0.625rem;">Tamaños disponibles</p>
               <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-                ${planta.variaciones.map(v => `<span style="padding:0.375rem 0.875rem;border:1.5px solid rgba(51,92,75,0.16);border-radius:6px;font-size:0.875rem;font-weight:600;color:#396452;background:white;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize;">${v}</span>`).join('')}
+                ${(planta.variaciones || []).map(v => `<span style="padding:0.375rem 0.875rem;border:1.5px solid rgba(51,92,75,0.16);border-radius:6px;font-size:0.875rem;font-weight:600;color:#396452;background:white;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize;">${v}</span>`).join('')}
               </div>
             </div>
 
@@ -264,6 +293,29 @@
           <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;">${planta.descripcion}</p>
         </div>
 
+        <!-- COMENTARIOS -->
+        <div style="margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(51,92,75,0.16);">
+          <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1.25rem;">Comentarios</h2>
+          <div id="commentsList" style="margin-bottom:1.75rem;">
+            <p style="color:#69776d;font-size:0.9rem;">Cargando comentarios...</p>
+          </div>
+          <form id="commentForm" novalidate>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;max-width:560px;">
+              <input type="text" id="commentName" placeholder="Tu nombre" maxlength="80" required
+                style="padding:0.75rem 1rem;border:1px solid rgba(51,92,75,0.2);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:#223029;outline:none;background:white;">
+              <textarea id="commentMsg" placeholder="Deja tu comentario..." maxlength="500" rows="3" required
+                style="padding:0.75rem 1rem;border:1px solid rgba(51,92,75,0.2);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:#223029;resize:vertical;outline:none;background:white;"></textarea>
+              <div style="display:flex;align-items:center;gap:1rem;">
+                <button type="submit" id="commentSubmit"
+                  style="padding:0.625rem 1.5rem;background:#396452;color:white;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.875rem;cursor:pointer;">
+                  Publicar
+                </button>
+                <p id="commentStatus" style="font-size:0.8rem;color:#69776d;margin:0;"></p>
+              </div>
+            </div>
+          </form>
+        </div>
+
         <!-- BACK LINK -->
         <div style="margin-top:2.5rem;">
           <a href="catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
@@ -278,7 +330,7 @@
         document.querySelectorAll('.gallery-thumb').forEach((el, i) => el.classList.toggle('active', i === idx));
       };
 
-      // Responsive: collapse gallery to 1 column on small screens
+      // Responsive layout
       const gallery = content.querySelector('[style*="grid-column:1/span 8"]');
       const info = content.querySelector('[style*="grid-column:span 4"]');
       const mainGrid = gallery && gallery.parentElement;
@@ -296,6 +348,69 @@
       }
       fixLayout();
       window.addEventListener('resize', fixLayout);
+
+      // Increment view counter (fire and forget)
+      incrementViews(id).catch(() => {});
+
+      // Comments helpers
+      function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      async function loadComments() {
+        const list = document.getElementById('commentsList');
+        if (!list) return;
+        try {
+          const comments = await getComments(id);
+          if (comments.length === 0) {
+            list.innerHTML = '<p style="color:#69776d;font-size:0.9rem;">Sé el primero en comentar.</p>';
+            return;
+          }
+          list.innerHTML = comments.map(c => {
+            const date = c.timestamp?.toDate
+              ? c.timestamp.toDate().toLocaleDateString('es-MX', { year:'numeric', month:'long', day:'numeric' })
+              : '';
+            return `<div style="padding:1rem;border:1px solid rgba(51,92,75,0.12);border-radius:10px;background:white;margin-bottom:0.75rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.375rem;">
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.875rem;color:#223029;">${escHtml(c.nombre)}</span>
+                <span style="font-size:0.75rem;color:#69776d;">${date}</span>
+              </div>
+              <p style="font-size:0.9rem;color:#69776d;line-height:1.6;margin:0;">${escHtml(c.mensaje)}</p>
+            </div>`;
+          }).join('');
+        } catch {
+          list.innerHTML = '<p style="color:#69776d;font-size:0.875rem;">No se pudieron cargar los comentarios.</p>';
+        }
+      }
+
+      loadComments();
+
+      // Comment form submit
+      document.getElementById('commentForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const nombre = document.getElementById('commentName').value.trim();
+        const mensaje = document.getElementById('commentMsg').value.trim();
+        const status = document.getElementById('commentStatus');
+        const btn = document.getElementById('commentSubmit');
+        if (!nombre || !mensaje) return;
+        btn.disabled = true;
+        btn.textContent = 'Publicando...';
+        try {
+          await addComment(id, nombre, mensaje);
+          document.getElementById('commentName').value = '';
+          document.getElementById('commentMsg').value = '';
+          status.textContent = '¡Comentario publicado!';
+          status.style.color = '#166534';
+          await loadComments();
+        } catch {
+          status.textContent = 'Error al publicar. Intenta de nuevo.';
+          status.style.color = '#991b1b';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Publicar';
+          setTimeout(() => { status.textContent = ''; }, 4000);
+        }
+      });
     })();
   </script>
   <script src="script.js"></script>

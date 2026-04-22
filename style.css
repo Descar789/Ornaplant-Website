@@ -28,7 +28,7 @@
   --radius: 8px;
   --radius-lg: 16px;
   --radius-xl: 24px;
-  --header-height: 76px;
+  --header-height: 64px;
   --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-body: 'Manrope', system-ui, sans-serif;
   --ease: 200ms ease;
@@ -89,7 +89,8 @@ hr.divider { height: 1px; border: none; background: var(--line); }
   display: flex; align-items: center; justify-content: space-between; gap: 2rem;
 }
 .nav-brand { display: flex; align-items: center; gap: 0.625rem; flex-shrink: 0; text-decoration: none; }
-.nav-brand img { height: 40px; width: auto; }
+.nav-brand img { height: 36px; width: auto; }
+@media (max-width: 480px) { .nav-brand img { height: 28px; } }
 .nav-menu { display: flex; align-items: center; gap: 0.125rem; }
 .nav-menu a {
   font-family: var(--font-heading); font-size: 0.875rem; font-weight: 600;
@@ -101,7 +102,8 @@ hr.divider { height: 1px; border: none; background: var(--line); }
 .nav-cta { background: var(--green-800) !important; color: var(--white) !important; padding: 0.5rem 1.25rem !important; }
 .nav-cta:hover { background: var(--green-950) !important; color: var(--white) !important; }
 .nav-toggle {
-  display: none; background: none; border: none; padding: 0.5rem;
+  display: none; background: none; border: none;
+  min-width: 44px; min-height: 44px; padding: 0.5rem;
   border-radius: var(--radius); color: var(--text); cursor: pointer;
   transition: background var(--ease); align-items: center; justify-content: center;
 }

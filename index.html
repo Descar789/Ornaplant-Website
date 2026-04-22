@@ -21,7 +21,6 @@
       <ul class="nav-menu" id="navMenu" role="list">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="nosotros.html">Sobre Nosotros</a></li>
-        <li><a href="servicios.html">Servicios</a></li>
         <li><a href="catalogo.html">Catálogo</a></li>
         <li><a href="sucursales.html">Sucursales</a></li>
         <li><a href="horarios.html">Horarios</a></li>
@@ -101,52 +100,6 @@
       </div>
     </div>
 
-    <!-- SERVICIOS PREVIEW -->
-    <section class="section" aria-labelledby="services-heading">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow"><span class="material-symbols-outlined">category</span>Lo que ofrecemos</p>
-          <h2 id="services-heading">Servicios para cada escala</h2>
-          <p>Desde una maceta para casa hasta pedidos mayoreo para tu negocio.</p>
-        </div>
-        <div class="grid-3">
-          <div class="service-card reveal">
-            <div class="service-icon"><span class="material-symbols-outlined">shopping_bag</span></div>
-            <h3>Venta Menudeo</h3>
-            <p>Plantas individuales para el hogar. Gran selección de ornamentales, cactus, interiores, follaje y más.</p>
-          </div>
-          <div class="service-card reveal">
-            <div class="service-icon"><span class="material-symbols-outlined">inventory_2</span></div>
-            <h3>Medio Mayoreo</h3>
-            <p>Volumen intermedio ideal para pequeños negocios, restaurantes, hoteles y proyectos de paisajismo.</p>
-          </div>
-          <div class="service-card reveal">
-            <div class="service-icon"><span class="material-symbols-outlined">local_shipping</span></div>
-            <h3>Mayoreo</h3>
-            <p>Pedidos a gran escala con andenes de carga techados y vinculación con empresas de fletes.</p>
-          </div>
-          <div class="service-card reveal">
-            <div class="service-icon"><span class="material-symbols-outlined">park</span></div>
-            <h3>Variedad Completa</h3>
-            <p>Flor, follaje, exóticas, árboles, frutales, suculentas, cactus, cempasúchil y nochebuena.</p>
-          </div>
-          <div class="service-card reveal">
-            <div class="service-icon"><span class="material-symbols-outlined">warehouse</span></div>
-            <h3>Andenes de Carga</h3>
-            <p>Instalaciones techadas en sucursal Embarques para carga y descarga eficiente de pedidos grandes.</p>
-          </div>
-          <div class="service-card reveal">
-            <div class="service-icon"><span class="material-symbols-outlined">place</span></div>
-            <h3>Dos Sucursales</h3>
-            <p>Matriz en Peña Flores y Embarques en carr. Cuernavaca-Cuautla. Ambas en Cuautla, Morelos.</p>
-          </div>
-        </div>
-        <div style="margin-top:2.5rem;text-align:center;">
-          <a href="servicios.html" class="btn btn-outline">Ver todos los servicios</a>
-        </div>
-      </div>
-    </section>
-
     <!-- PLANTAS DESTACADAS -->
     <section class="section" style="background:var(--green-100);" aria-labelledby="plants-heading">
       <div class="container">
@@ -184,14 +137,13 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <img src="assets/logo-horizontal-web.png" alt="ORNAPLANT">
-          <p>Comercializadora de plantas ornamentales en Cuautla, Morelos. Desde 1992.</p>
+          <p>Comercializadora de plantas ornamentales en Morelos. Desde 1992.</p>
         </div>
         <div class="footer-col">
           <h4>Navegación</h4>
           <ul>
             <li><a href="index.html">Inicio</a></li>
             <li><a href="nosotros.html">Sobre Nosotros</a></li>
-            <li><a href="servicios.html">Servicios</a></li>
             <li><a href="catalogo.html">Catálogo</a></li>
           </ul>
         </div>
@@ -216,21 +168,34 @@
     <span class="material-symbols-outlined">keyboard_arrow_up</span>
   </button>
 
-  <script src="plantas.js"></script>
-  <script>
-    (function () {
+  <script type="module">
+    import { getPlants } from './firebase.js';
+
+    (async function () {
       const disp = { disponible: 'badge-available', 'bajo pedido': 'badge-order', agotado: 'badge-sold' };
       const dispL = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
-      const featured = plantas.filter(p => p.etiquetas.includes('popular') || p.etiquetas.includes('recomendada')).slice(0, 4);
       const grid = document.getElementById('featuredGrid');
+
+      let plantas;
+      try {
+        plantas = await getPlants();
+      } catch {
+        grid.innerHTML = '';
+        return;
+      }
+
+      const featured = plantas
+        .filter(p => (p.etiquetas || []).includes('popular') || (p.etiquetas || []).includes('recomendada'))
+        .slice(0, 4);
+
       grid.innerHTML = featured.map(p => `
         <a href="planta.html?id=${p.id}" class="card plant-card reveal" aria-label="Ver ${p.nombre}">
           <div class="plant-card-img">
-            <img src="${p.imagenes[0]}" alt="${p.nombre}" loading="lazy" width="400" height="300">
+            <img src="${(p.imagenes && p.imagenes[0]) || ''}" alt="${p.nombre}" loading="lazy" width="400" height="300">
             <span class="badge ${disp[p.disponibilidad] || 'badge-green'}">${dispL[p.disponibilidad] || p.disponibilidad}</span>
           </div>
           <div class="plant-card-body">
-            <div class="plant-card-tags">${p.etiquetas.slice(0,2).map(t => `<span class="badge badge-green">${t}</span>`).join('')}</div>
+            <div class="plant-card-tags">${(p.etiquetas || []).slice(0,2).map(t => `<span class="badge badge-green">${t}</span>`).join('')}</div>
             <div class="plant-card-name">${p.nombre}</div>
             <div class="plant-card-sci">${p.nombreCientifico}</div>
             <div class="plant-card-meta">
@@ -239,6 +204,7 @@
             </div>
           </div>
         </a>`).join('');
+
       if ('IntersectionObserver' in window) {
         const obs = new IntersectionObserver(
           entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }),
