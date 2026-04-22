@@ -205,9 +205,22 @@ hr.divider {
   width: auto;
 }
 
+.brand-symbol-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  flex-shrink: 0;
+}
+
 @media (max-width: 480px) {
   .nav-brand img {
     height: 28px;
+  }
+  .brand-symbol-img {
+    width: 44px;
+    height: 44px;
   }
 }
 
