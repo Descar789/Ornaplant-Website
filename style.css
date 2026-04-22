@@ -193,7 +193,7 @@ hr.divider { height: 1px; border: none; background: var(--line); }
 .site-footer a { color: rgba(255,255,255,0.72); transition: color var(--ease); }
 .site-footer a:hover { color: var(--white); }
 .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 3rem; margin-bottom: 2.5rem; }
-.footer-brand img { height: 36px; filter: brightness(0) invert(1); margin-bottom: 1rem; opacity: 0.88; }
+.footer-brand img { height: 36px; filter: none; mix-blend-mode: normal; margin-bottom: 1rem; }
 .footer-brand p { font-size: 0.9rem; max-width: 28ch; line-height: 1.6; }
 .footer-col h4 {
   font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700;

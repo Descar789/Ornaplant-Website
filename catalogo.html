@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
   <link rel="stylesheet" href="style.css">
   <style>
+    .plant-card-sku { font-family: var(--font-heading); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; color: var(--muted); margin-top: auto; padding-top: 0.375rem; }
     /* Mobile filter toggle */
     .filter-mobile-toggle { display: none; }
     @media (max-width: 1024px) {
@@ -228,6 +229,7 @@
               <div class="plant-card-tags">${tags}</div>
               <div class="plant-card-name">${p.nombre}</div>
               <div class="plant-card-sci">${p.nombreCientifico}</div>
+              ${p.sku ? `<div class="plant-card-sku">${p.sku}</div>` : ''}
               <div class="plant-card-meta">
                 <span class="plant-card-meta-item"><span class="material-symbols-outlined">wb_sunny</span>${p.luz}</span>
                 <span class="plant-card-meta-item"><span class="material-symbols-outlined">water_drop</span>${p.riego}</span>

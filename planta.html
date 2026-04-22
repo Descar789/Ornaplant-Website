@@ -179,7 +179,9 @@
 
       const rawImgs = planta.imagenes || [];
       const imgs = rawImgs.length >= 3 ? rawImgs : [...rawImgs, ...Array(Math.max(0, 3 - rawImgs.length)).fill(rawImgs[0] || '')];
-      const waMsg = encodeURIComponent(`Hola, me interesa consultar la disponibilidad de: ${planta.nombre} (${planta.nombreCientifico}). ¡Gracias!`);
+      const sucursalText = sucLabel[planta.sucursal] || planta.sucursal;
+      const skuLine = planta.sku ? `\n- SKU: ${planta.sku}` : '';
+      const waMsg = encodeURIComponent(`Hola ORNAPLANT 🌿 Me interesa la siguiente planta:\n- Nombre: ${planta.nombre}${skuLine}\n- Sucursal: ${sucursalText}\n¿Está disponible?`);
       const vistas = (planta.vistas || 0) + 1;
 
       content.innerHTML = `
@@ -221,6 +223,7 @@
             <div>
               <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.75rem,3.5vw,2.25rem);font-weight:800;line-height:1.1;color:#223029;margin-bottom:0.375rem;">${planta.nombre}</h1>
               <p style="font-style:italic;color:#69776d;font-size:0.9375rem;">${planta.nombreCientifico}</p>
+              ${planta.sku ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.07em;color:#9ec4b0;margin-top:0.25rem;">SKU: ${planta.sku}</p>` : ''}
               <p style="display:flex;align-items:center;gap:0.25rem;font-size:0.8rem;color:#69776d;margin-top:0.375rem;">
                 <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span>
                 ${vistas} vista${vistas !== 1 ? 's' : ''}
