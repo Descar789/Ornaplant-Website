@@ -2,6 +2,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebas
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js';
 import { getDatabase } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 
 // Safe to commit — Firestore rules are the real security layer
 const firebaseConfig = {
@@ -20,4 +21,5 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const analytics = getAnalytics(app);
 export const rtdb = getDatabase(app);
+export const auth = getAuth(app);
 export const WHATSAPP_NUMBER = '527351024413';

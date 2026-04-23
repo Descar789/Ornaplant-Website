@@ -61,16 +61,50 @@
 </head>
 <body>
 
-  <!-- ACCESS DENIED SCREEN -->
-  <div id="accessDenied" style="display:none;min-height:100vh;display:none;align-items:center;justify-content:center;text-align:center;padding:2rem;">
+  <!-- AUTH: LOADING -->
+  <div id="authLoading" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f8f7f1;">
+    <div style="text-align:center;">
+      <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" style="width:52px;height:52px;margin:0 auto 1.5rem;display:block;opacity:0.4;">
+      <div style="width:28px;height:28px;border:3px solid rgba(57,100,82,0.2);border-top-color:#396452;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div>
+    </div>
+  </div>
+
+  <!-- AUTH: LOGIN SCREEN -->
+  <div id="loginScreen" style="display:none;min-height:100vh;background:#eef4ec;align-items:center;justify-content:center;padding:1.5rem;">
+    <div style="text-align:center;width:100%;max-width:400px;">
+      <div style="margin-bottom:2rem;">
+        <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" style="width:56px;height:56px;margin:0 auto 0.75rem;display:block;">
+        <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" style="height:22px;margin:0 auto;display:block;opacity:0.75;">
+      </div>
+      <div style="background:white;border-radius:16px;padding:2rem;box-shadow:0 8px 32px rgba(32,59,49,0.12);border:1px solid rgba(51,92,75,0.1);">
+        <h1 style="font-size:1.25rem;font-weight:800;color:#223029;margin-bottom:0.5rem;">Panel de Administración</h1>
+        <p style="font-size:0.875rem;color:#69776d;margin-bottom:2rem;line-height:1.6;">Acceso exclusivo para personal autorizado</p>
+        <button id="googleSignInBtn" onclick="signInWithGoogle()"
+          style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.75rem;padding:0.75rem 1.5rem;background:white;border:1.5px solid rgba(51,92,75,0.2);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.9375rem;color:#223029;cursor:pointer;transition:background 150ms,border-color 150ms;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink:0;">
+            <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.49 3.18 29.54 1 24 1 14.77 1 6.9 6.43 3.24 14.25l7.08 5.5C12.07 13.66 17.57 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.1 24.55c0-1.55-.14-3.05-.4-4.5H24v8.51h12.42c-.54 2.9-2.17 5.36-4.63 7.02l7.19 5.59C43.29 37.54 46.1 31.5 46.1 24.55z"/>
+            <path fill="#FBBC05" d="M10.33 28.71A14.54 14.54 0 0 1 9.5 24c0-1.64.28-3.23.81-4.71l-7.08-5.5A23.9 23.9 0 0 0 0 24c0 3.82.92 7.43 2.53 10.62l7.8-5.91z"/>
+            <path fill="#34A853" d="M24 47c5.52 0 10.17-1.84 13.56-4.98l-7.19-5.59c-1.89 1.27-4.31 2.02-6.37 2.02-6.42 0-11.9-4.14-13.86-9.74l-7.8 5.91C6.88 41.55 14.77 47 24 47z"/>
+          </svg>
+          Continuar con Google
+        </button>
+        <p id="loginError" style="display:none;margin-top:1rem;font-size:0.8125rem;color:#991b1b;background:#fee2e2;border-radius:8px;padding:0.625rem 0.875rem;text-align:left;line-height:1.5;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH: ACCESS DENIED -->
+  <div id="accessDenied" style="display:none;min-height:100vh;background:#f8f7f1;align-items:center;justify-content:center;text-align:center;padding:2rem;">
     <div style="max-width:480px;">
-      <span class="material-symbols-outlined" style="font-size:4rem;color:#ddd2bf;display:block;margin:0 auto 1.5rem;">lock</span>
-      <h1 style="font-size:1.5rem;margin-bottom:0.75rem;color:#223029;">Acceso Restringido</h1>
-      <p style="color:#69776d;margin-bottom:1.5rem;">Este panel es de uso interno. Para acceder en modo de prueba, añade <code style="background:#eef4ec;padding:0.2em 0.5em;border-radius:4px;font-size:0.9em;">?tester=true</code> a la URL.</p>
-      <a href="index.html" style="display:inline-flex;align-items:center;gap:0.5rem;background:#396452;color:white;padding:0.75rem 1.5rem;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;text-decoration:none;font-size:0.9375rem;">
-        <span class="material-symbols-outlined" style="font-size:1rem;">home</span>
-        Volver al sitio
-      </a>
+      <span class="material-symbols-outlined" style="font-size:4rem;color:#ddd2bf;display:block;margin:0 auto 1.5rem;">block</span>
+      <h1 style="font-size:1.5rem;margin-bottom:0.75rem;color:#223029;">Sin acceso al panel</h1>
+      <p id="deniedEmail" style="color:#69776d;margin-bottom:0.5rem;font-size:0.9375rem;font-weight:600;"></p>
+      <p style="color:#69776d;margin-bottom:2rem;font-size:0.875rem;line-height:1.6;">Tu cuenta no tiene permisos de administrador. Contacta al responsable del sitio si crees que esto es un error.</p>
+      <button onclick="doSignOut()" style="display:inline-flex;align-items:center;gap:0.5rem;background:#203b31;color:white;padding:0.75rem 1.5rem;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;border:none;cursor:pointer;font-size:0.9375rem;">
+        <span class="material-symbols-outlined" style="font-size:1rem;">logout</span>
+        Cerrar sesión e intentar con otra cuenta
+      </button>
     </div>
   </div>
 
@@ -79,18 +113,25 @@
 
     <!-- HEADER -->
     <header style="background:#203b31;color:white;padding:1rem 0;position:sticky;top:0;z-index:100;box-shadow:0 4px 16px rgba(32,59,49,0.2);">
-      <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
           <span class="material-symbols-outlined" style="font-size:1.375rem;color:#56816d;">admin_panel_settings</span>
           <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:1rem;">Panel Admin</span>
           <span style="font-size:0.7rem;background:rgba(86,129,109,0.3);color:#9ec4b0;padding:0.15rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">LIVE</span>
         </div>
-        <div style="display:flex;align-items:center;gap:1rem;">
-          <span style="font-size:0.8125rem;color:rgba(255,255,255,0.55);">Conectado a Firestore</span>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;justify-content:flex-end;">
+          <span id="aiCounter" style="font-size:0.75rem;background:rgba(180,60,109,0.25);color:#f4a0c0;padding:0.2rem 0.6rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;white-space:nowrap;">IA: 0/10</span>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <img id="adminAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);object-fit:cover;display:none;flex-shrink:0;">
+            <span id="adminEmail" style="font-size:0.8125rem;color:rgba(255,255,255,0.65);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+          </div>
           <a href="index.html" class="btn-admin btn-ghost-a" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);">
             <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span>
             Ver sitio
           </a>
+          <button onclick="doSignOut()" class="btn-admin btn-ghost-a" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);" aria-label="Cerrar sesión">
+            <span class="material-symbols-outlined" style="font-size:1rem;">logout</span>
+          </button>
         </div>
       </div>
     </header>
@@ -311,24 +352,99 @@
 
   <script type="module">
     import { getPlants, savePlant, updatePlant, deleteFirestorePlant, getComments, deleteComment, uploadToCloudinary } from './firebase.js';
+    import { auth, db } from './config.js';
+    import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
     // ── Config ────────────────────────────────────────────────────
     const ANTHROPIC_API_KEY = ''; // Set your Anthropic API key here
 
-    // ── Access check ─────────────────────────────────────────────
-    const ADMIN_MODE = 'url_param'; // 'url_param' | 'none' (dev)
-    function checkAccess() {
-      if (ADMIN_MODE === 'none') return true;
-      return new URLSearchParams(window.location.search).get('tester') === 'true';
+    // ── AI rate limit (session) ───────────────────────────────────
+    let aiGenCount = 0;
+    const AI_GEN_MAX = 10;
+
+    function updateAICounter() {
+      const el = document.getElementById('aiCounter');
+      if (el) el.textContent = `IA: ${aiGenCount}/${AI_GEN_MAX}`;
+      if (aiGenCount >= AI_GEN_MAX) {
+        const btn = document.getElementById('aiDataBtn');
+        if (btn) {
+          btn.disabled = true;
+          btn.title = 'Límite de sesión alcanzado. Recarga la página para continuar.';
+        }
+      }
     }
 
-    if (!checkAccess()) {
-      document.getElementById('accessDenied').style.display = 'flex';
-    } else {
-      document.getElementById('adminPanel').style.display = 'block';
-      init();
+    // ── Auth ──────────────────────────────────────────────────────
+    const provider = new GoogleAuthProvider();
+    let panelInitialized = false;
+
+    function showScreen(id) {
+      const screens = ['authLoading', 'loginScreen', 'accessDenied', 'adminPanel'];
+      screens.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.style.display = 'none';
+      });
+      const target = document.getElementById(id);
+      if (!target) return;
+      target.style.display = id === 'adminPanel' ? 'block' : 'flex';
     }
 
+    async function signInWithGoogle() {
+      const btn = document.getElementById('googleSignInBtn');
+      const errEl = document.getElementById('loginError');
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      errEl.style.display = 'none';
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        errEl.textContent = 'Error al iniciar sesión: ' + (e.message || 'Intenta de nuevo.');
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    async function doSignOut() {
+      panelInitialized = false;
+      await signOut(auth);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        showScreen('loginScreen');
+        return;
+      }
+      // Verify admin in Firestore
+      try {
+        const snap = await getDoc(doc(db, 'admins', user.email));
+        if (snap.exists() && snap.data().activo === true) {
+          const emailEl = document.getElementById('adminEmail');
+          const avatarEl = document.getElementById('adminAvatar');
+          if (emailEl) emailEl.textContent = user.email;
+          if (avatarEl && user.photoURL) {
+            avatarEl.src = user.photoURL;
+            avatarEl.style.display = 'block';
+          }
+          showScreen('adminPanel');
+          if (!panelInitialized) {
+            panelInitialized = true;
+            init();
+          }
+        } else {
+          const deniedEl = document.getElementById('deniedEmail');
+          if (deniedEl) deniedEl.textContent = user.email;
+          showScreen('accessDenied');
+        }
+      } catch {
+        const deniedEl = document.getElementById('deniedEmail');
+        if (deniedEl) deniedEl.textContent = user.email;
+        showScreen('accessDenied');
+      }
+    });
+
+    // ── Panel init ────────────────────────────────────────────────
     let plantList = [];
     let editingId = null;
 
@@ -567,8 +683,15 @@
       const sci = document.getElementById('f-sci').value.trim();
       if (!nombre || !sci) { alert('Ingresa nombre común y científico primero.'); return; }
       if (!ANTHROPIC_API_KEY) { alert('Configura ANTHROPIC_API_KEY en admin.html primero.'); return; }
-      const btn = document.getElementById('aiDataBtn');
+
       const status = document.getElementById('aiDataStatus');
+      if (aiGenCount >= AI_GEN_MAX) {
+        status.textContent = 'Límite de sesión alcanzado. Recarga la página para continuar.';
+        status.style.color = '#991b1b';
+        return;
+      }
+
+      const btn = document.getElementById('aiDataBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;animation:spin 1s linear infinite;display:inline-block;">progress_activity</span> Generando...';
       status.textContent = '';
@@ -598,14 +721,20 @@
         if (parsed.categoria) document.getElementById('f-cat').value = parsed.categoria;
         if (parsed.mascotas) document.getElementById('f-mascotas').value = parsed.mascotas;
         if (Array.isArray(parsed.etiquetas)) document.getElementById('f-etiquetas').value = parsed.etiquetas.join(', ');
-        status.textContent = 'Datos generados — revisa y ajusta si es necesario';
+        aiGenCount++;
+        updateAICounter();
+        status.textContent = `Datos generados — revisa y ajusta si es necesario (${aiGenCount}/${AI_GEN_MAX} usadas)`;
         status.style.color = '#166534';
       } catch (e) {
         status.textContent = 'Error: ' + e.message;
         status.style.color = '#991b1b';
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">auto_awesome</span> Generar datos con IA ✨';
+        if (aiGenCount < AI_GEN_MAX) {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">auto_awesome</span> Generar datos con IA ✨';
+        } else {
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">block</span> Límite alcanzado';
+        }
       }
     }
 
@@ -659,6 +788,8 @@
     }
 
     // ── Expose globals for inline onclick handlers ────────────────
+    window.signInWithGoogle = signInWithGoogle;
+    window.doSignOut = doSignOut;
     window.openModal = openModal;
     window.closeModal = closeModal;
     window.savePlantUI = savePlantUI;
@@ -669,11 +800,17 @@
     window.generatePlantData = generatePlantData;
     window.deleteCommentUI = deleteCommentUI;
 
-    // Modal close on overlay click
+    // Modal close on overlay click / Escape
     document.getElementById('plantModal').addEventListener('click', e => {
       if (e.target === document.getElementById('plantModal')) closeModal();
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // TODO: customer auth
+    // collection: usuarios/{uid}
+    // fields: { email, nombre, rol: 'customer'|'admin', createdAt }
+    // customer routes: favoritos, historial, perfil
+    // same Firebase Auth instance — just different Firestore collection
   </script>
 </body>
 </html>
