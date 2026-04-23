@@ -424,8 +424,11 @@
       }
       // Verify admin in Firestore
       try {
-        const snap = await getDoc(doc(db, 'admins', user.email));
-        if (snap.exists() && snap.data().activo === true) {
+        const adminDoc = await getDoc(doc(db, 'admins', user.email));
+        console.log('User email:', user.email);
+        console.log('Admin doc exists:', adminDoc.exists());
+        console.log('Admin doc data:', adminDoc.data());
+        if (adminDoc.exists()) {
           const emailEl = document.getElementById('adminEmail');
           if (emailEl) emailEl.textContent = user.email;
           showScreen('adminPanel');
@@ -438,7 +441,8 @@
           if (deniedEl) deniedEl.textContent = user.email;
           showScreen('accessDenied');
         }
-      } catch {
+      } catch (e) {
+        console.error('Admin check error:', e);
         const deniedEl = document.getElementById('deniedEmail');
         if (deniedEl) deniedEl.textContent = user.email;
         showScreen('accessDenied');
