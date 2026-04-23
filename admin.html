@@ -78,17 +78,22 @@
       </div>
       <div style="background:white;border-radius:16px;padding:2rem;box-shadow:0 8px 32px rgba(32,59,49,0.12);border:1px solid rgba(51,92,75,0.1);">
         <h1 style="font-size:1.25rem;font-weight:800;color:#223029;margin-bottom:0.5rem;">Panel de Administración</h1>
-        <p style="font-size:0.875rem;color:#69776d;margin-bottom:2rem;line-height:1.6;">Acceso exclusivo para personal autorizado</p>
-        <button id="googleSignInBtn" onclick="signInWithGoogle()"
-          style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.75rem;padding:0.75rem 1.5rem;background:white;border:1.5px solid rgba(51,92,75,0.2);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.9375rem;color:#223029;cursor:pointer;transition:background 150ms,border-color 150ms;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink:0;">
-            <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.49 3.18 29.54 1 24 1 14.77 1 6.9 6.43 3.24 14.25l7.08 5.5C12.07 13.66 17.57 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.1 24.55c0-1.55-.14-3.05-.4-4.5H24v8.51h12.42c-.54 2.9-2.17 5.36-4.63 7.02l7.19 5.59C43.29 37.54 46.1 31.5 46.1 24.55z"/>
-            <path fill="#FBBC05" d="M10.33 28.71A14.54 14.54 0 0 1 9.5 24c0-1.64.28-3.23.81-4.71l-7.08-5.5A23.9 23.9 0 0 0 0 24c0 3.82.92 7.43 2.53 10.62l7.8-5.91z"/>
-            <path fill="#34A853" d="M24 47c5.52 0 10.17-1.84 13.56-4.98l-7.19-5.59c-1.89 1.27-4.31 2.02-6.37 2.02-6.42 0-11.9-4.14-13.86-9.74l-7.8 5.91C6.88 41.55 14.77 47 24 47z"/>
-          </svg>
-          Continuar con Google
-        </button>
+        <p style="font-size:0.875rem;color:#69776d;margin-bottom:1.5rem;line-height:1.6;">Acceso exclusivo para personal autorizado</p>
+        <div style="display:flex;flex-direction:column;gap:0.875rem;">
+          <div>
+            <label class="form-label" for="loginEmail">Correo electrónico</label>
+            <input class="form-input" id="loginEmail" type="email" autocomplete="email" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter')signInWithEmail()">
+          </div>
+          <div>
+            <label class="form-label" for="loginPassword">Contraseña</label>
+            <input class="form-input" id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')signInWithEmail()">
+          </div>
+          <button id="emailSignInBtn" onclick="signInWithEmail()"
+            style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 1.5rem;background:#396452;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.9375rem;color:white;cursor:pointer;transition:background 150ms;margin-top:0.25rem;">
+            <span class="material-symbols-outlined" style="font-size:1.125rem;">login</span>
+            Iniciar sesión
+          </button>
+        </div>
         <p id="loginError" style="display:none;margin-top:1rem;font-size:0.8125rem;color:#991b1b;background:#fee2e2;border-radius:8px;padding:0.625rem 0.875rem;text-align:left;line-height:1.5;"></p>
       </div>
     </div>
@@ -353,7 +358,7 @@
   <script type="module">
     import { getPlants, savePlant, updatePlant, deleteFirestorePlant, getComments, deleteComment, uploadToCloudinary } from './firebase.js';
     import { auth, db } from './config.js';
-    import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+    import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
     import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
     // ── Config ────────────────────────────────────────────────────
@@ -376,7 +381,6 @@
     }
 
     // ── Auth ──────────────────────────────────────────────────────
-    const provider = new GoogleAuthProvider();
     let panelInitialized = false;
 
     function showScreen(id) {
@@ -390,16 +394,18 @@
       target.style.display = id === 'adminPanel' ? 'block' : 'flex';
     }
 
-    async function signInWithGoogle() {
-      const btn = document.getElementById('googleSignInBtn');
+    async function signInWithEmail() {
+      const btn = document.getElementById('emailSignInBtn');
       const errEl = document.getElementById('loginError');
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
       btn.disabled = true;
       btn.style.opacity = '0.7';
       errEl.style.display = 'none';
       try {
-        await signInWithPopup(auth, provider);
-      } catch (e) {
-        errEl.textContent = 'Error al iniciar sesión: ' + (e.message || 'Intenta de nuevo.');
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch {
+        errEl.textContent = 'Correo o contraseña incorrectos.';
         errEl.style.display = 'block';
         btn.disabled = false;
         btn.style.opacity = '1';
@@ -421,12 +427,7 @@
         const snap = await getDoc(doc(db, 'admins', user.email));
         if (snap.exists() && snap.data().activo === true) {
           const emailEl = document.getElementById('adminEmail');
-          const avatarEl = document.getElementById('adminAvatar');
           if (emailEl) emailEl.textContent = user.email;
-          if (avatarEl && user.photoURL) {
-            avatarEl.src = user.photoURL;
-            avatarEl.style.display = 'block';
-          }
           showScreen('adminPanel');
           if (!panelInitialized) {
             panelInitialized = true;
@@ -788,7 +789,7 @@
     }
 
     // ── Expose globals for inline onclick handlers ────────────────
-    window.signInWithGoogle = signInWithGoogle;
+    window.signInWithEmail = signInWithEmail;
     window.doSignOut = doSignOut;
     window.openModal = openModal;
     window.closeModal = closeModal;
