@@ -25,3 +25,6 @@ Thumbs.db
 
 # AgentOps session artifacts
 .agents/
+
+# Local tools
+nano-banana-2-mcp/
