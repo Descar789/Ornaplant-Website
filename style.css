@@ -206,8 +206,8 @@ hr.divider {
 }
 
 .brand-symbol-img {
-  width: 55px;
-  height: 55px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
   object-position: top center;
@@ -728,12 +728,10 @@ hr.divider {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(
-    to right,
-    rgba(10, 30, 18, 0.82) 0%,
-    rgba(10, 30, 18, 0.65) 45%,
-    rgba(10, 30, 18, 0.15) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(10, 30, 18, 0.82) 0%,
+      rgba(10, 30, 18, 0.65) 45%,
+      rgba(10, 30, 18, 0.15) 100%);
 }
 
 .hero-inner {
