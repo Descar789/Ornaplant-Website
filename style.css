@@ -206,8 +206,8 @@ hr.divider {
 }
 
 .brand-symbol-img {
-  width: 80px;
-  height: 80px;
+  width: 55px;
+  height: 55px;
   border-radius: 50%;
   object-fit: cover;
   object-position: top center;
@@ -220,8 +220,8 @@ hr.divider {
   }
 
   .brand-symbol-img {
-    width: 44px;
-    height: 44px;
+    width: 55px;
+    height: 55px;
   }
 }
 
