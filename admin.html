@@ -503,7 +503,7 @@
           <div>
             <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.9375rem;color:#223029;">${p.nombre}</div>
             <div style="font-size:0.8rem;color:#69776d;font-style:italic;">${p.nombreCientifico}</div>
-            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria} · ${p.sucursal} · <span class="material-symbols-outlined" style="font-size:0.7rem;vertical-align:middle;">visibility</span> ${p.vistas || 0}${p.sku ? ` · <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">${p.sku}</span>` : ''}</div>
+            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria} · <span class="material-symbols-outlined" style="font-size:0.7rem;vertical-align:middle;">visibility</span> ${p.vistas || 0}${p.sku ? ` · <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">${p.sku}</span>` : ''}</div>
           </div>
           <div style="display:flex;align-items:center;gap:0.625rem;flex-shrink:0;">
             <select class="disp-select ${dispStyle(p.disponibilidad)}" onchange="updateDisp('${p.id}',this.value)" aria-label="Disponibilidad de ${p.nombre}">
