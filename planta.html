@@ -180,7 +180,7 @@
       document.querySelector('meta[name="description"]').content = (planta.descripcion || '').slice(0, 160);
 
       const rawImgs = planta.imagenes || [];
-      const imgs = rawImgs.length >= 3 ? rawImgs : [...rawImgs, ...Array(Math.max(0, 3 - rawImgs.length)).fill(rawImgs[0] || '')];
+      const mainImage = rawImgs[0] || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop';
       const sucursalText = sucLabel[planta.sucursal] || planta.sucursal;
       const skuLine = planta.sku ? `\n- SKU: ${planta.sku}` : '';
       const waMsg = encodeURIComponent(`Hola ORNAPLANT 🌿 Me interesa la siguiente planta:\n- Nombre: ${planta.nombre}${skuLine}\n- Sucursal: ${sucursalText}\n¿Está disponible?`);
@@ -200,16 +200,14 @@
         <div class="lg:grid lg:grid-cols-12 lg:gap-10" style="display:grid;grid-template-columns:repeat(12,1fr);gap:2.5rem;align-items:start;">
 
           <!-- GALLERY — col 1-8 -->
-          <div style="grid-column:1/span 8;" class="flex flex-col gap-3">
+          <div style="grid-column:1/span 8;" class="flex flex-col gap-2">
             <div class="gallery-main" id="mainImgWrap">
-              <img id="mainImg" src="${imgs[0]}" alt="${planta.nombre}" width="800" height="600" loading="eager">
+              <img id="mainImg" src="${mainImage}" alt="${planta.nombre}" width="800" height="600" loading="eager">
             </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;">
-              ${imgs.slice(0,3).map((src,i) => `
-                <button class="gallery-thumb${i===0?' active':''}" onclick="setThumb(${i},'${src}')" aria-label="Ver imagen ${i+1}">
-                  <img src="${src}" alt="${planta.nombre} imagen ${i+1}" loading="lazy" width="300" height="225">
-                </button>`).join('')}
-            </div>
+            <p style="display:flex;align-items:center;gap:0.375rem;font-size:0.75rem;color:#69776d;font-style:italic;margin-top:0.25rem;">
+              <span class="material-symbols-outlined" style="font-size:0.95rem;color:#9ec4b0;">info</span>
+              La imagen es solo de referencia y no representa el producto almacenado.
+            </p>
           </div>
 
           <!-- INFO — col 9-12 -->
@@ -328,12 +326,6 @@
             Volver al catálogo
           </a>
         </div>`;
-
-      // Gallery thumb switcher
-      window.setThumb = function (idx, src) {
-        document.getElementById('mainImg').src = src;
-        document.querySelectorAll('.gallery-thumb').forEach((el, i) => el.classList.toggle('active', i === idx));
-      };
 
       // Responsive layout
       const gallery = content.querySelector('[style*="grid-column:1/span 8"]');
