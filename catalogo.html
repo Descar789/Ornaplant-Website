@@ -123,15 +123,6 @@
               </div>
 
               <div class="filter-group">
-                <span class="filter-group-label" id="suc-label">Sucursal</span>
-                <div class="filter-options" role="radiogroup" aria-labelledby="suc-label">
-                  <label class="filter-option"><input type="radio" name="sucursal" value="todas" checked> Todas</label>
-                  <label class="filter-option"><input type="radio" name="sucursal" value="matriz"> Matriz</label>
-                  <label class="filter-option"><input type="radio" name="sucursal" value="embarques"> Embarques</label>
-                </div>
-              </div>
-
-              <div class="filter-group">
                 <span class="filter-group-label" id="mascotas-label">Mascotas</span>
                 <div class="filter-options" role="radiogroup" aria-labelledby="mascotas-label">
                   <label class="filter-option"><input type="radio" name="mascotas" value="todas" checked> Todas</label>
@@ -202,6 +193,7 @@
 
   <script type="module">
     import { getPlants } from './firebase.js';
+    import { WHATSAPP_NUMBER } from './config.js';
 
     (async function () {
       const dispCls = { disponible: 'badge-available', 'bajo pedido': 'badge-order', agotado: 'badge-sold' };
@@ -241,7 +233,7 @@
           </a>`;
       }
 
-      let filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], sucursal: 'todas', mascotas: 'todas' };
+      let filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], mascotas: 'todas' };
 
       function applyFilters() {
         const q = filters.search.toLowerCase();
@@ -251,9 +243,6 @@
           if (filters.disponibilidad !== 'todas' && p.disponibilidad !== filters.disponibilidad) return false;
           if (filters.luz.length && !filters.luz.includes(p.luz)) return false;
           if (filters.cuidado.length && !filters.cuidado.includes(p.cuidado)) return false;
-          if (filters.sucursal !== 'todas') {
-            if (p.sucursal !== 'ambas' && p.sucursal !== filters.sucursal) return false;
-          }
           if (filters.mascotas !== 'todas' && p.mascotas !== filters.mascotas) return false;
           return true;
         });
@@ -264,7 +253,8 @@
         const count = document.getElementById('resultCount');
         count.textContent = `${list.length} planta${list.length !== 1 ? 's' : ''}`;
         if (list.length === 0) {
-          grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">search_off</span><h3>Sin resultados</h3><p>Prueba con otros filtros o términos de búsqueda.</p></div>`;
+          const waMsg = encodeURIComponent('Hola, no encontré lo que buscaba en el catálogo. ¿Me pueden ayudar?');
+          grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><span class="material-symbols-outlined">search_off</span><h3>Sin resultados</h3><p>¿No encuentras lo que buscas? <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" target="_blank" rel="noopener noreferrer" style="color:var(--green-700);font-weight:700;text-decoration:underline;">¡Escríbenos!</a></p></div>`;
           return;
         }
         grid.innerHTML = list.map(plantCard).join('');
@@ -297,7 +287,7 @@
 
       // Reset
       document.getElementById('resetFilters').addEventListener('click', () => {
-        filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], sucursal: 'todas', mascotas: 'todas' };
+        filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], mascotas: 'todas' };
         document.getElementById('searchInput').value = '';
         document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = r.value === 'todas'; });
         document.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; });
