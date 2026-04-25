@@ -132,7 +132,6 @@
     (async function () {
       const dispCls = { disponible: 'disp-available', 'bajo pedido': 'disp-order', agotado: 'disp-sold' };
       const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
-      const sucLabel = { matriz: 'Sucursal Matriz', embarques: 'Sucursal Embarques', ambas: 'Ambas sucursales' };
       const luzIcon = { 'sol directo': 'wb_sunny', 'luz indirecta': 'light_mode', 'media sombra': 'partly_cloudy_day', 'sombra': 'cloud' };
       const cuidadoIcon = { 'fácil': 'sentiment_satisfied', 'intermedia': 'sentiment_neutral', 'difícil': 'sentiment_dissatisfied' };
       const WHATSAPP_NUMBER = '527351024413';
@@ -181,9 +180,8 @@
 
       const rawImgs = planta.imagenes || [];
       const mainImage = rawImgs[0] || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop';
-      const sucursalText = sucLabel[planta.sucursal] || planta.sucursal;
       const skuLine = planta.sku ? `\n- SKU: ${planta.sku}` : '';
-      const waMsg = encodeURIComponent(`Hola ORNAPLANT 🌿 Me interesa la siguiente planta:\n- Nombre: ${planta.nombre}${skuLine}\n- Sucursal: ${sucursalText}\n¿Está disponible?`);
+      const waMsg = encodeURIComponent(`Hola ORNAPLANT, me interesa la siguiente planta:\n- Nombre: ${planta.nombre}${skuLine}\n¿Está disponible?`);
       const vistas = (planta.vistas || 0) + 1;
 
       content.innerHTML = `
@@ -228,12 +226,6 @@
                 <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span>
                 ${vistas} vista${vistas !== 1 ? 's' : ''}
               </p>
-            </div>
-
-            <!-- Sucursal -->
-            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;color:#69776d;background:#eef4ec;padding:0.625rem 0.875rem;border-radius:8px;">
-              <span class="material-symbols-outlined" style="font-size:1rem;color:#396452;">storefront</span>
-              ${sucLabel[planta.sucursal] || planta.sucursal}
             </div>
 
             <!-- Bento Care Specs -->
