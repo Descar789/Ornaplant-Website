@@ -127,7 +127,7 @@
   </button>
 
   <script type="module">
-    import { getPlant, incrementViews, getComments, addComment } from './firebase.js';
+    import { getPlant, incrementViews } from './firebase.js';
 
     (async function () {
       const dispCls = { disponible: 'disp-available', 'bajo pedido': 'disp-order', agotado: 'disp-sold' };
@@ -296,29 +296,6 @@
           <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;">${planta.descripcion}</p>
         </div>
 
-        <!-- COMENTARIOS -->
-        <div style="margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(51,92,75,0.16);">
-          <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1.25rem;">Comentarios</h2>
-          <div id="commentsList" style="margin-bottom:1.75rem;">
-            <p style="color:#69776d;font-size:0.9rem;">Cargando comentarios...</p>
-          </div>
-          <form id="commentForm" novalidate>
-            <div style="display:flex;flex-direction:column;gap:0.75rem;max-width:560px;">
-              <input type="text" id="commentName" placeholder="Tu nombre" maxlength="80" required
-                style="padding:0.75rem 1rem;border:1px solid rgba(51,92,75,0.2);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:#223029;outline:none;background:white;">
-              <textarea id="commentMsg" placeholder="Deja tu comentario..." maxlength="500" rows="3" required
-                style="padding:0.75rem 1rem;border:1px solid rgba(51,92,75,0.2);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:#223029;resize:vertical;outline:none;background:white;"></textarea>
-              <div style="display:flex;align-items:center;gap:1rem;">
-                <button type="submit" id="commentSubmit"
-                  style="padding:0.625rem 1.5rem;background:#396452;color:white;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.875rem;cursor:pointer;">
-                  Publicar
-                </button>
-                <p id="commentStatus" style="font-size:0.8rem;color:#69776d;margin:0;"></p>
-              </div>
-            </div>
-          </form>
-        </div>
-
         <!-- BACK LINK -->
         <div style="margin-top:2.5rem;">
           <a href="catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
@@ -348,66 +325,6 @@
 
       // Increment view counter (fire and forget)
       incrementViews(id).catch(() => {});
-
-      // Comments helpers
-      function escHtml(s) {
-        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      }
-
-      async function loadComments() {
-        const list = document.getElementById('commentsList');
-        if (!list) return;
-        try {
-          const comments = await getComments(id);
-          if (comments.length === 0) {
-            list.innerHTML = '<p style="color:#69776d;font-size:0.9rem;">Sé el primero en comentar.</p>';
-            return;
-          }
-          list.innerHTML = comments.map(c => {
-            const date = c.timestamp?.toDate
-              ? c.timestamp.toDate().toLocaleDateString('es-MX', { year:'numeric', month:'long', day:'numeric' })
-              : '';
-            return `<div style="padding:1rem;border:1px solid rgba(51,92,75,0.12);border-radius:10px;background:white;margin-bottom:0.75rem;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.375rem;">
-                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.875rem;color:#223029;">${escHtml(c.nombre)}</span>
-                <span style="font-size:0.75rem;color:#69776d;">${date}</span>
-              </div>
-              <p style="font-size:0.9rem;color:#69776d;line-height:1.6;margin:0;">${escHtml(c.mensaje)}</p>
-            </div>`;
-          }).join('');
-        } catch {
-          list.innerHTML = '<p style="color:#69776d;font-size:0.875rem;">No se pudieron cargar los comentarios.</p>';
-        }
-      }
-
-      loadComments();
-
-      // Comment form submit
-      document.getElementById('commentForm').addEventListener('submit', async e => {
-        e.preventDefault();
-        const nombre = document.getElementById('commentName').value.trim();
-        const mensaje = document.getElementById('commentMsg').value.trim();
-        const status = document.getElementById('commentStatus');
-        const btn = document.getElementById('commentSubmit');
-        if (!nombre || !mensaje) return;
-        btn.disabled = true;
-        btn.textContent = 'Publicando...';
-        try {
-          await addComment(id, nombre, mensaje);
-          document.getElementById('commentName').value = '';
-          document.getElementById('commentMsg').value = '';
-          status.textContent = '¡Comentario publicado!';
-          status.style.color = '#166534';
-          await loadComments();
-        } catch {
-          status.textContent = 'Error al publicar. Intenta de nuevo.';
-          status.style.color = '#991b1b';
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Publicar';
-          setTimeout(() => { status.textContent = ''; }, 4000);
-        }
-      });
     })();
   </script>
   <script src="script.js"></script>

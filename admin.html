@@ -204,17 +204,6 @@
         </div>
       </section>
 
-      <!-- COMMENTS -->
-      <section style="margin-top:2.5rem;" aria-labelledby="comments-heading">
-        <h2 id="comments-heading" style="font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1.25rem;">Comentarios</h2>
-        <div style="background:white;border:1px solid rgba(51,92,75,0.16);border-radius:12px;overflow:hidden;" id="commentsPanel">
-          <div style="text-align:center;padding:2rem;color:#69776d;">
-            <span class="material-symbols-outlined" style="font-size:2rem;display:block;margin:0 auto 0.5rem;color:#ddd2bf;">chat</span>
-            <p style="font-size:0.875rem;">Cargando comentarios...</p>
-          </div>
-        </div>
-      </section>
-
     </main>
 
   </div>
@@ -348,7 +337,7 @@
   </div>
 
   <script type="module">
-    import { getPlants, savePlant, updatePlant, deleteFirestorePlant, getComments, deleteComment, uploadToCloudinary } from './firebase.js';
+    import { getPlants, savePlant, updatePlant, deleteFirestorePlant, uploadToCloudinary } from './firebase.js';
     import { auth, db } from './config.js';
     import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
     import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
@@ -436,7 +425,6 @@
       }
       renderStats();
       renderList();
-      loadAllComments();
     }
 
     function renderStats() {
@@ -714,53 +702,8 @@
       }
     }
 
-    // ── Comments ─────────────────────────────────────────────────
     function escHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    async function loadAllComments() {
-      const panel = document.getElementById('commentsPanel');
-      const allComments = [];
-      for (const p of plantList) {
-        try {
-          const comments = await getComments(p.id);
-          comments.forEach(c => allComments.push({ ...c, plantId: p.id, plantNombre: p.nombre }));
-        } catch { /* skip plant */ }
-      }
-      allComments.sort((a, b) => {
-        const ta = a.timestamp?.toDate?.()?.getTime() || 0;
-        const tb = b.timestamp?.toDate?.()?.getTime() || 0;
-        return tb - ta;
-      });
-      if (allComments.length === 0) {
-        panel.innerHTML = '<div style="text-align:center;padding:2rem;color:#69776d;font-size:0.875rem;">No hay comentarios aún.</div>';
-        return;
-      }
-      panel.innerHTML = allComments.map(c => {
-        const date = c.timestamp?.toDate ? c.timestamp.toDate().toLocaleDateString('es-MX', { year:'numeric', month:'short', day:'numeric' }) : '';
-        return `<div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start;padding:1rem 1.25rem;border-bottom:1px solid rgba(51,92,75,0.1);">
-          <div>
-            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.375rem;">
-              <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.875rem;color:#223029;">${escHtml(c.nombre)}</span>
-              <span style="font-size:0.75rem;background:#eef4ec;color:#396452;padding:0.125rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">${escHtml(c.plantNombre)}</span>
-              <span style="font-size:0.75rem;color:#69776d;">${date}</span>
-            </div>
-            <p style="font-size:0.875rem;color:#69776d;line-height:1.55;margin:0;">${escHtml(c.mensaje)}</p>
-          </div>
-          <button class="btn-admin btn-danger" onclick="deleteCommentUI('${c.plantId}','${c.id}')" style="padding:0.375rem 0.625rem;flex-shrink:0;" aria-label="Eliminar comentario">
-            <span class="material-symbols-outlined" style="font-size:1rem;">delete</span>
-          </button>
-        </div>`;
-      }).join('');
-    }
-
-    async function deleteCommentUI(plantId, commentId) {
-      if (!confirm('¿Eliminar este comentario?')) return;
-      try {
-        await deleteComment(plantId, commentId);
-        await loadAllComments();
-      } catch { alert('Error al eliminar comentario.'); }
     }
 
     // ── Expose globals for inline onclick handlers ────────────────
@@ -772,7 +715,6 @@
     window.deletePlantUI = deletePlantUI;
     window.updateDisp = updateDisp;
     window.handleImageUpload = handleImageUpload;
-    window.deleteCommentUI = deleteCommentUI;
 
     // Modal close on overlay click / Escape
     document.getElementById('plantModal').addEventListener('click', e => {
