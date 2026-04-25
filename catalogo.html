@@ -29,6 +29,27 @@
       .filter-panel { display: none; }
       .filter-panel.open { display: block; }
     }
+    /* Pagination */
+    .pagination {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 0.375rem; margin-top: 2rem;
+    }
+    .pagination button {
+      min-width: 2.25rem; height: 2.25rem; padding: 0 0.625rem;
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius); font-family: var(--font-heading);
+      font-weight: 600; font-size: 0.875rem; color: var(--text);
+      cursor: pointer; transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .pagination button:hover:not(:disabled):not(.is-active) { background: var(--green-100); border-color: var(--green-700); }
+    .pagination button.is-active { background: var(--green-700); color: var(--white); border-color: var(--green-700); cursor: default; }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination .pagination-ellipsis {
+      min-width: 1.5rem; text-align: center; color: var(--muted);
+      font-family: var(--font-heading); user-select: none;
+    }
+    .pagination .pagination-nav .material-symbols-outlined { font-size: 1.125rem; }
   </style>
 </head>
 <body>
@@ -147,6 +168,7 @@
             <div class="grid-auto" id="plantGrid" aria-label="Resultados del catálogo">
               <!-- Rendered by JS -->
             </div>
+            <nav class="pagination" id="pagination" aria-label="Paginación del catálogo" hidden></nav>
           </div>
 
         </div>
@@ -234,10 +256,24 @@
       }
 
       let filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], mascotas: 'todas' };
+      let currentPage = 1;
+      let currentList = [];
+      const ROWS_PER_PAGE = 3;
+      const pagEl = document.getElementById('pagination');
+
+      function getColumns() {
+        const cs = getComputedStyle(grid).gridTemplateColumns;
+        const cols = cs.split(' ').filter(Boolean).length;
+        return Math.max(1, cols);
+      }
+
+      function pageSize() {
+        return getColumns() * ROWS_PER_PAGE;
+      }
 
       function applyFilters() {
         const q = filters.search.toLowerCase();
-        const result = plantas.filter(p => {
+        currentList = plantas.filter(p => {
           if (q && !p.nombre.toLowerCase().includes(q) && !(p.nombreCientifico || '').toLowerCase().includes(q) && !(p.descripcion || '').toLowerCase().includes(q)) return false;
           if (filters.categoria !== 'todas' && p.categoria !== filters.categoria) return false;
           if (filters.disponibilidad !== 'todas' && p.disponibilidad !== filters.disponibilidad) return false;
@@ -246,19 +282,78 @@
           if (filters.mascotas !== 'todas' && p.mascotas !== filters.mascotas) return false;
           return true;
         });
-        render(result);
+        currentPage = 1;
+        render();
       }
 
-      function render(list) {
+      function render() {
+        const list = currentList;
         const count = document.getElementById('resultCount');
         count.textContent = `${list.length} planta${list.length !== 1 ? 's' : ''}`;
         if (list.length === 0) {
           const waMsg = encodeURIComponent('Hola, no encontré lo que buscaba en el catálogo. ¿Me pueden ayudar?');
           grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><span class="material-symbols-outlined">search_off</span><h3>Sin resultados</h3><p>¿No encuentras lo que buscas? <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" target="_blank" rel="noopener noreferrer" style="color:var(--green-700);font-weight:700;text-decoration:underline;">¡Escríbenos!</a></p></div>`;
+          pagEl.hidden = true;
+          pagEl.innerHTML = '';
           return;
         }
-        grid.innerHTML = list.map(plantCard).join('');
+        const size = pageSize();
+        const totalPages = Math.max(1, Math.ceil(list.length / size));
+        if (currentPage > totalPages) currentPage = totalPages;
+        const start = (currentPage - 1) * size;
+        const slice = list.slice(start, start + size);
+        grid.innerHTML = slice.map(plantCard).join('');
+        renderPagination(totalPages);
       }
+
+      function renderPagination(totalPages) {
+        if (totalPages <= 1) {
+          pagEl.hidden = true;
+          pagEl.innerHTML = '';
+          return;
+        }
+        pagEl.hidden = false;
+        const WINDOW = 3;
+        const pages = new Set();
+        pages.add(1);
+        pages.add(totalPages);
+        for (let i = currentPage - WINDOW; i <= currentPage + WINDOW; i++) {
+          if (i >= 1 && i <= totalPages) pages.add(i);
+        }
+        const sorted = [...pages].sort((a, b) => a - b);
+        const parts = [];
+        parts.push(`<button type="button" class="pagination-nav" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Página anterior"><span class="material-symbols-outlined">chevron_left</span></button>`);
+        let prev = 0;
+        for (const p of sorted) {
+          if (prev && p - prev > 1) parts.push(`<span class="pagination-ellipsis" aria-hidden="true">…</span>`);
+          parts.push(`<button type="button" data-page="${p}" class="${p === currentPage ? 'is-active' : ''}" ${p === currentPage ? 'aria-current="page"' : ''}>${p}</button>`);
+          prev = p;
+        }
+        parts.push(`<button type="button" class="pagination-nav" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Página siguiente"><span class="material-symbols-outlined">chevron_right</span></button>`);
+        pagEl.innerHTML = parts.join('');
+      }
+
+      pagEl.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-page]');
+        if (!btn || btn.disabled) return;
+        const p = parseInt(btn.dataset.page, 10);
+        if (!p || p === currentPage) return;
+        currentPage = p;
+        render();
+        const heading = document.getElementById('catalog-heading');
+        const top = (heading?.getBoundingClientRect().top || 0) + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
+
+      let resizeTimer;
+      let lastSize = 0;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const s = pageSize();
+          if (s !== lastSize) { lastSize = s; render(); }
+        }, 150);
+      });
 
       // Search
       document.getElementById('searchInput').addEventListener('input', e => {
@@ -305,7 +400,9 @@
       }
 
       // Initial render
-      render(plantas);
+      currentList = plantas;
+      lastSize = pageSize();
+      render();
     })();
   </script>
   <script src="script.js"></script>
