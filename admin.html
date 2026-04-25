@@ -57,6 +57,40 @@
     .disp-select.bajo-pedido { background: #fef9c3; color: #854d0e; }
     .disp-select.agotado { background: #fee2e2; color: #991b1b; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    /* Search bar */
+    .admin-search {
+      position: relative; flex: 1; min-width: 220px; max-width: 420px;
+    }
+    .admin-search input {
+      width: 100%; padding: 0.5rem 0.875rem 0.5rem 2.25rem;
+      border: 1px solid rgba(51,92,75,0.16); border-radius: 8px;
+      font-size: 0.875rem; font-family: inherit; color: #223029; background: white;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .admin-search input:focus { outline: none; border-color: #56816d; box-shadow: 0 0 0 3px rgba(86,129,109,0.12); }
+    .admin-search .si {
+      position: absolute; left: 0.625rem; top: 50%; transform: translateY(-50%);
+      color: #69776d; pointer-events: none; display: inline-flex;
+    }
+    .admin-search .si .material-symbols-outlined { font-size: 1.125rem; }
+    /* Pagination */
+    .admin-pagination {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 0.375rem; padding: 1rem; border-top: 1px solid rgba(51,92,75,0.1); background: #fafaf6;
+    }
+    .admin-pagination button {
+      min-width: 2.25rem; height: 2.25rem; padding: 0 0.625rem;
+      background: white; border: 1px solid rgba(51,92,75,0.16); border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 0.875rem;
+      color: #223029; cursor: pointer;
+      transition: background 200ms, color 200ms, border-color 200ms;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .admin-pagination button:hover:not(:disabled):not(.is-active) { background: #eef4ec; border-color: #56816d; }
+    .admin-pagination button.is-active { background: #396452; color: white; border-color: #396452; cursor: default; }
+    .admin-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .admin-pagination .ellipsis { min-width: 1.5rem; text-align: center; color: #69776d; user-select: none; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .admin-pagination .material-symbols-outlined { font-size: 1.125rem; }
   </style>
 </head>
 <body>
@@ -158,8 +192,16 @@
             Agregar planta
           </button>
         </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+          <div class="admin-search">
+            <span class="si"><span class="material-symbols-outlined">search</span></span>
+            <input type="search" id="adminSearch" placeholder="Buscar por nombre, etiqueta o SKU..." aria-label="Buscar plantas">
+          </div>
+          <span id="adminCount" style="font-size:0.8125rem;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;" aria-live="polite"></span>
+        </div>
         <div style="background:white;border:1px solid rgba(51,92,75,0.16);border-radius:12px;overflow:hidden;">
           <div id="plantList"><!-- rendered by JS --></div>
+          <nav class="admin-pagination" id="adminPagination" aria-label="Paginación de plantas" hidden></nav>
         </div>
       </section>
 
@@ -499,13 +541,44 @@
       return d === 'disponible' ? 'disponible' : d === 'bajo pedido' ? 'bajo-pedido' : 'agotado';
     }
 
+    let adminSearchTerm = '';
+    let adminCurrentPage = 1;
+    const ADMIN_PAGE_SIZE = 10;
+
+    function getFilteredPlants() {
+      const q = adminSearchTerm.toLowerCase();
+      if (!q) return plantList;
+      return plantList.filter(p => {
+        if ((p.nombre || '').toLowerCase().includes(q)) return true;
+        if ((p.nombreCientifico || '').toLowerCase().includes(q)) return true;
+        if ((p.sku || '').toLowerCase().includes(q)) return true;
+        if (Array.isArray(p.etiquetas) && p.etiquetas.some(t => (t || '').toLowerCase().includes(q))) return true;
+        return false;
+      });
+    }
+
     function renderList() {
       const list = document.getElementById('plantList');
+      const pagEl = document.getElementById('adminPagination');
+      const countEl = document.getElementById('adminCount');
       if (plantList.length === 0) {
         list.innerHTML = `<div style="text-align:center;padding:3rem;color:#69776d;"><span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 0.75rem;color:#ddd2bf;">inbox</span><p>No hay plantas. Agrega la primera.</p></div>`;
+        if (pagEl) { pagEl.hidden = true; pagEl.innerHTML = ''; }
+        if (countEl) countEl.textContent = '';
         return;
       }
-      list.innerHTML = plantList.map(p => `
+      const filtered = getFilteredPlants();
+      if (countEl) countEl.textContent = `${filtered.length} de ${plantList.length}`;
+      if (filtered.length === 0) {
+        list.innerHTML = `<div style="text-align:center;padding:3rem;color:#69776d;"><span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 0.75rem;color:#ddd2bf;">search_off</span><p>Sin resultados para "${escHtml(adminSearchTerm)}"</p></div>`;
+        if (pagEl) { pagEl.hidden = true; pagEl.innerHTML = ''; }
+        return;
+      }
+      const totalPages = Math.max(1, Math.ceil(filtered.length / ADMIN_PAGE_SIZE));
+      if (adminCurrentPage > totalPages) adminCurrentPage = totalPages;
+      const start = (adminCurrentPage - 1) * ADMIN_PAGE_SIZE;
+      const slice = filtered.slice(start, start + ADMIN_PAGE_SIZE);
+      list.innerHTML = slice.map(p => `
         <div class="plant-row" data-id="${p.id}">
           <img class="plant-thumb" src="${(p.imagenes && p.imagenes[0]) || ''}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200'">
           <div>
@@ -527,7 +600,55 @@
             </button>
           </div>
         </div>`).join('');
+      renderAdminPagination(totalPages);
     }
+
+    function renderAdminPagination(totalPages) {
+      const pagEl = document.getElementById('adminPagination');
+      if (!pagEl) return;
+      if (totalPages <= 1) { pagEl.hidden = true; pagEl.innerHTML = ''; return; }
+      pagEl.hidden = false;
+      const WINDOW = 3;
+      const pages = new Set();
+      pages.add(1);
+      pages.add(totalPages);
+      for (let i = adminCurrentPage - WINDOW; i <= adminCurrentPage + WINDOW; i++) {
+        if (i >= 1 && i <= totalPages) pages.add(i);
+      }
+      const sorted = [...pages].sort((a, b) => a - b);
+      const parts = [];
+      parts.push(`<button type="button" data-page="${adminCurrentPage - 1}" ${adminCurrentPage === 1 ? 'disabled' : ''} aria-label="Página anterior"><span class="material-symbols-outlined">chevron_left</span></button>`);
+      let prev = 0;
+      for (const p of sorted) {
+        if (prev && p - prev > 1) parts.push(`<span class="ellipsis" aria-hidden="true">…</span>`);
+        parts.push(`<button type="button" data-page="${p}" class="${p === adminCurrentPage ? 'is-active' : ''}" ${p === adminCurrentPage ? 'aria-current="page"' : ''}>${p}</button>`);
+        prev = p;
+      }
+      parts.push(`<button type="button" data-page="${adminCurrentPage + 1}" ${adminCurrentPage === totalPages ? 'disabled' : ''} aria-label="Página siguiente"><span class="material-symbols-outlined">chevron_right</span></button>`);
+      pagEl.innerHTML = parts.join('');
+    }
+
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('#adminPagination button[data-page]');
+      if (!btn || btn.disabled) return;
+      const p = parseInt(btn.dataset.page, 10);
+      if (!p || p === adminCurrentPage) return;
+      adminCurrentPage = p;
+      renderList();
+      const heading = document.getElementById('plants-heading');
+      if (heading) {
+        const top = heading.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+
+    document.addEventListener('input', e => {
+      if (e.target && e.target.id === 'adminSearch') {
+        adminSearchTerm = e.target.value.trim();
+        adminCurrentPage = 1;
+        renderList();
+      }
+    });
 
     async function updateDisp(id, val) {
       const p = plantList.find(x => x.id === id);
