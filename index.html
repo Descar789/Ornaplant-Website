@@ -205,9 +205,23 @@
         return;
       }
 
-      const featured = plantas
-        .filter(p => (p.etiquetas || []).includes('popular') || (p.etiquetas || []).includes('recomendada'))
-        .slice(0, 4);
+      const shuffle = arr => {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      };
+
+      const populares = plantas.filter(p =>
+        (p.etiquetas || []).includes('popular') || (p.etiquetas || []).includes('recomendada')
+      );
+      const resto = plantas.filter(p => !populares.includes(p));
+      const shuffledPop = shuffle(populares);
+      const featured = shuffledPop.length >= 4
+        ? shuffledPop.slice(0, 4)
+        : [...shuffledPop, ...shuffle(resto).slice(0, 4 - shuffledPop.length)];
 
       grid.innerHTML = featured.map(p => `
         <a href="planta.html?id=${p.id}" class="card plant-card reveal" aria-label="Ver ${p.nombre}">
