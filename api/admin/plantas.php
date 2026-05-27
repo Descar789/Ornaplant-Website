@@ -1,0 +1,148 @@
+<?php
+// api/admin/plantas.php — CRUD admin (requiere JWT).
+declare(strict_types=1);
+
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../jwt.php';
+
+require_admin();
+
+const ENUMS = [
+    'categoria'      => ['interior', 'exterior', 'suculenta', 'ornamental', 'árbol', 'medicinal'],
+    'luz'            => ['sol directo', 'luz indirecta', 'media sombra', 'sombra'],
+    'riego'          => ['bajo', 'medio', 'alto'],
+    'cuidado'        => ['fácil', 'intermedio', 'intermedia', 'difícil'],
+    'disponibilidad' => ['disponible', 'bajo pedido', 'agotado'],
+    'sucursal'       => ['ambas', 'matriz', 'embarques'],
+    'mascotas'       => ['no tóxica', 'tóxica'],
+];
+
+function decode_planta(array $row): array {
+    foreach (['etiquetas', 'variaciones', 'imagenes'] as $f) {
+        $row[$f] = $row[$f] ? json_decode($row[$f], true) : [];
+        if (!is_array($row[$f])) $row[$f] = [];
+    }
+    $row['nombreCientifico'] = $row['nombre_cientifico'] ?? '';
+    unset($row['nombre_cientifico']);
+    $row['vistas'] = (int)($row['vistas'] ?? 0);
+    return $row;
+}
+
+function validate_enum(string $field, $value): void {
+    if (!isset(ENUMS[$field])) return;
+    if (!in_array($value, ENUMS[$field], true)) {
+        json_error("Valor inválido para '$field': $value", 400);
+    }
+}
+
+function build_payload(array $body, bool $isUpdate = false): array {
+    // Frontend manda nombreCientifico (camelCase). Convertir a snake.
+    if (isset($body['nombreCientifico'])) {
+        $body['nombre_cientifico'] = $body['nombreCientifico'];
+        unset($body['nombreCientifico']);
+    }
+
+    $allowed = [
+        'nombre', 'nombre_cientifico', 'categoria', 'descripcion',
+        'luz', 'riego', 'cuidado', 'disponibilidad', 'sucursal', 'mascotas',
+        'sku', 'etiquetas', 'variaciones', 'imagenes',
+    ];
+    $out = [];
+    foreach ($allowed as $f) {
+        if (array_key_exists($f, $body)) $out[$f] = $body[$f];
+    }
+
+    if (!$isUpdate) {
+        if (empty($out['nombre'])) json_error('Campo "nombre" requerido', 400);
+    }
+
+    foreach (['categoria', 'luz', 'riego', 'cuidado', 'disponibilidad', 'sucursal', 'mascotas'] as $f) {
+        if (isset($out[$f])) validate_enum($f, $out[$f]);
+    }
+
+    foreach (['etiquetas', 'variaciones', 'imagenes'] as $f) {
+        if (isset($out[$f])) {
+            if (!is_array($out[$f])) json_error("Campo '$f' debe ser array", 400);
+            $out[$f] = json_encode(array_values($out[$f]), JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    return $out;
+}
+
+function slugify(string $s): string {
+    $s = mb_strtolower($s, 'UTF-8');
+    $s = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s) ?: $s;
+    $s = preg_replace('/[^a-z0-9]+/', '-', $s) ?? '';
+    return trim($s, '-');
+}
+
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
+
+if ($method === 'GET') {
+    if ($id !== '') {
+        $stmt = db()->prepare('SELECT * FROM plantas WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+        if (!$row) json_error('Planta no encontrada', 404);
+        json_response(decode_planta($row));
+    }
+    $stmt = db()->query('SELECT * FROM plantas ORDER BY creado_en DESC');
+    json_response(array_map('decode_planta', $stmt->fetchAll()));
+}
+
+if ($method === 'POST') {
+    $body = json_input();
+    $newId = trim((string)($body['id'] ?? ''));
+    if ($newId === '') {
+        $newId = !empty($body['sku']) ? strtoupper(trim($body['sku']))
+               : slugify((string)($body['nombre'] ?? ''));
+    }
+    if ($newId === '') json_error('No se pudo generar ID', 400);
+    if (strlen($newId) > 100) json_error('ID demasiado largo', 400);
+
+    $payload = build_payload($body, false);
+    $payload['id'] = $newId;
+
+    $cols = array_keys($payload);
+    $place = array_map(fn($c) => ":$c", $cols);
+    $sql = 'INSERT INTO plantas (' . implode(',', $cols) . ') VALUES (' . implode(',', $place) . ')';
+    try {
+        $stmt = db()->prepare($sql);
+        $stmt->execute(array_combine($place, array_values($payload)));
+    } catch (PDOException $e) {
+        if ($e->errorInfo[1] ?? 0 === 1062) json_error('ID o SKU duplicado', 409);
+        throw $e;
+    }
+    json_response(['id' => $newId, 'ok' => true], 201);
+}
+
+if ($method === 'PUT') {
+    if ($id === '') json_error('ID requerido', 400);
+    $body = json_input();
+    $payload = build_payload($body, true);
+    if (!$payload) json_error('Sin campos para actualizar', 400);
+
+    $sets = [];
+    $params = [':id' => $id];
+    foreach ($payload as $col => $val) {
+        $sets[] = "$col = :$col";
+        $params[":$col"] = $val;
+    }
+    $sql = 'UPDATE plantas SET ' . implode(',', $sets) . ' WHERE id = :id';
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
+    json_response(['ok' => true, 'actualizado' => $stmt->rowCount()]);
+}
+
+if ($method === 'DELETE') {
+    if ($id === '') json_error('ID requerido', 400);
+    $stmt = db()->prepare('DELETE FROM plantas WHERE id = :id');
+    $stmt->execute([':id' => $id]);
+    if ($stmt->rowCount() === 0) json_error('Planta no encontrada', 404);
+    json_response(['ok' => true]);
+}
+
+json_error('Método no permitido', 405);

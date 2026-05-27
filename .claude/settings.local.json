@@ -5,7 +5,11 @@
       "Bash(claude plugin *)",
       "Bash(python3 *)",
       "Bash(python *)",
-      "Bash(claude mcp *)"
+      "Bash(claude mcp *)",
+      "mcp__agent-link__list_agents",
+      "mcp__agent-link__spawn_agents",
+      "Bash(php -v)",
+      "Bash(pip install *)"
     ]
   }
 }

@@ -312,16 +312,16 @@
         </div>
         <div>
           <label class="form-label">Imagen *</label>
-          <input class="form-input" id="f-imagen" type="url" placeholder="https://... (URL o sube)" style="margin-bottom:0.375rem;">
+          <p style="font-size:0.75rem;color:#69776d;margin-bottom:0.5rem;line-height:1.4;">JPG, PNG o WebP, máximo 5MB. Se guarda en el hosting con el nombre del SKU.</p>
           <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
             <label class="btn-admin btn-ghost-a" style="cursor:pointer;position:relative;">
               <span class="material-symbols-outlined" style="font-size:1rem;">upload</span>
-              Subir
-              <input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleImageUpload(this,0)">
+              Subir imagen
+              <input type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleImageUpload(this,0)">
             </label>
             <span id="uploadStatus0" style="font-size:0.8rem;color:#69776d;"></span>
           </div>
-          <div id="imgPreview0" style="display:none;margin-top:0.375rem;">
+          <div id="imgPreview0" style="display:none;margin-top:0.5rem;">
             <img id="imgPreviewEl0" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid rgba(51,92,75,0.16);" alt="Preview">
           </div>
         </div>
@@ -337,13 +337,15 @@
   </div>
 
   <script type="module">
-    import { getPlants, savePlant, updatePlant, deleteFirestorePlant, uploadToCloudinary } from './firebase.js';
-    import { auth, db } from './config.js';
-    import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
-    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+    import {
+      getPlants, savePlant, updatePlant, deletePlant, uploadImage,
+      adminLogin, adminLogout, isAdminLogged, getAdminEmail,
+    } from './api.js';
 
-    // ── Auth ──────────────────────────────────────────────────────
+    // ── Auth (JWT propio) ─────────────────────────────────────────
     let panelInitialized = false;
+    // URL temporal de la imagen recién subida (antes de guardar la planta).
+    let pendingImageUrl = '';
 
     function showScreen(id) {
       const screens = ['authLoading', 'loginScreen', 'accessDenied', 'adminPanel'];
@@ -365,51 +367,38 @@
       btn.style.opacity = '0.7';
       errEl.style.display = 'none';
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch {
-        errEl.textContent = 'Correo o contraseña incorrectos.';
+        await adminLogin(email, password);
+        bootPanel();
+      } catch (e) {
+        errEl.textContent = (e && e.message) || 'Correo o contraseña incorrectos.';
         errEl.style.display = 'block';
         btn.disabled = false;
         btn.style.opacity = '1';
       }
     }
 
-    async function doSignOut() {
+    function doSignOut() {
       panelInitialized = false;
-      await signOut(auth);
+      adminLogout();
+      showScreen('loginScreen');
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        showScreen('loginScreen');
-        return;
+    function bootPanel() {
+      const emailEl = document.getElementById('adminEmail');
+      if (emailEl) emailEl.textContent = getAdminEmail();
+      showScreen('adminPanel');
+      if (!panelInitialized) {
+        panelInitialized = true;
+        init();
       }
-      // Verify admin in Firestore
-      try {
-        const adminDoc = await getDoc(doc(db, 'admins', user.email));
-        console.log('User email:', user.email);
-        console.log('Admin doc exists:', adminDoc.exists());
-        console.log('Admin doc data:', adminDoc.data());
-        if (adminDoc.exists()) {
-          const emailEl = document.getElementById('adminEmail');
-          if (emailEl) emailEl.textContent = user.email;
-          showScreen('adminPanel');
-          if (!panelInitialized) {
-            panelInitialized = true;
-            init();
-          }
-        } else {
-          const deniedEl = document.getElementById('deniedEmail');
-          if (deniedEl) deniedEl.textContent = user.email;
-          showScreen('accessDenied');
-        }
-      } catch (e) {
-        console.error('Admin check error:', e);
-        const deniedEl = document.getElementById('deniedEmail');
-        if (deniedEl) deniedEl.textContent = user.email;
-        showScreen('accessDenied');
-      }
-    });
+    }
+
+    // Estado inicial al cargar
+    if (isAdminLogged()) {
+      bootPanel();
+    } else {
+      showScreen('loginScreen');
+    }
 
     // ── Panel init ────────────────────────────────────────────────
     let plantList = [];
@@ -582,9 +571,9 @@
     }
 
     async function deletePlantUI(id) {
-      if (!confirm('¿Eliminar esta planta de Firestore? Esta acción no se puede deshacer.')) return;
+      if (!confirm('¿Eliminar esta planta? Esta acción no se puede deshacer.')) return;
       try {
-        await deleteFirestorePlant(id);
+        await deletePlant(id);
         plantList = plantList.filter(p => p.id !== id);
         renderStats();
         renderList();
@@ -593,6 +582,7 @@
 
     function openModal(id = null) {
       editingId = id;
+      pendingImageUrl = '';
       document.getElementById('uploadStatus0').textContent = '';
       document.getElementById('imgPreview0').style.display = 'none';
       const title = document.getElementById('modalTitle');
@@ -608,20 +598,20 @@
         document.getElementById('f-luz').value = p.luz;
         document.getElementById('f-riego').value = p.riego;
         document.getElementById('f-cuidado').value = p.cuidado;
-        document.getElementById('f-suc').value = p.sucursal;
+        document.getElementById('f-suc').value = p.sucursal || 'ambas';
         document.getElementById('f-mascotas').value = p.mascotas;
         document.getElementById('f-etiquetas').value = (p.etiquetas || []).join(', ');
         document.getElementById('f-variaciones').value = (p.variaciones || []).join(', ');
         document.getElementById('f-sku').value = p.sku || '';
         const url = (p.imagenes || [])[0] || '';
-        document.getElementById('f-imagen').value = url;
+        pendingImageUrl = url;
         if (url) {
           document.getElementById('imgPreviewEl0').src = url;
           document.getElementById('imgPreview0').style.display = 'block';
         }
       } else {
         title.textContent = 'Agregar planta';
-        ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-imagen','f-sku'].forEach(fid => document.getElementById(fid).value = '');
+        ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-sku'].forEach(fid => document.getElementById(fid).value = '');
         document.getElementById('f-cat').value = 'ornamental';
         document.getElementById('f-disp').value = 'disponible';
         document.getElementById('f-luz').value = 'luz indirecta';
@@ -650,7 +640,7 @@
       const btn = document.getElementById('saveBtn');
       btn.disabled = true;
       btn.textContent = 'Guardando...';
-      const imgs = [document.getElementById('f-imagen').value.trim()].filter(Boolean);
+      const imgs = [pendingImageUrl].filter(Boolean);
       const data = {
         nombre,
         nombreCientifico: document.getElementById('f-sci').value.trim(),
@@ -688,16 +678,32 @@
       const file = input.files[0];
       if (!file) return;
       const status = document.getElementById('uploadStatus0');
+      const sku = (document.getElementById('f-sku').value || '').trim().toUpperCase();
+      if (!sku) {
+        status.textContent = 'Define primero el SKU.';
+        status.style.color = '#991b1b';
+        input.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        status.textContent = 'Imagen mayor a 5MB.';
+        status.style.color = '#991b1b';
+        input.value = '';
+        return;
+      }
       status.textContent = 'Subiendo...';
+      status.style.color = '#69776d';
       try {
-        const url = await uploadToCloudinary(file);
-        document.getElementById('f-imagen').value = url;
-        document.getElementById('imgPreviewEl0').src = url;
+        const url = await uploadImage(file, sku);
+        // cache-bust por si se sobrescribió la misma URL
+        const display = `${url}?t=${Date.now()}`;
+        pendingImageUrl = url;
+        document.getElementById('imgPreviewEl0').src = display;
         document.getElementById('imgPreview0').style.display = 'block';
         status.textContent = 'Subida ✓';
         status.style.color = '#166534';
-      } catch {
-        status.textContent = 'Error al subir.';
+      } catch (e) {
+        status.textContent = 'Error: ' + (e && e.message ? e.message : 'falló subida');
         status.style.color = '#991b1b';
       }
     }
@@ -722,11 +728,6 @@
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // TODO: customer auth
-    // collection: usuarios/{uid}
-    // fields: { email, nombre, rol: 'customer'|'admin', createdAt }
-    // customer routes: favoritos, historial, perfil
-    // same Firebase Auth instance — just different Firestore collection
   </script>
 </body>
 </html>

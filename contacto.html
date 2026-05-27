@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 
 <head>
   <meta charset="UTF-8">
@@ -8,6 +8,38 @@
   <link rel="apple-touch-icon" href="assets/favicon-32.png">
   <title>Contacto — ORNAPLANT</title>
   <meta name="description" content="Contáctanos por WhatsApp, email o redes sociales. ORNAPLANT — Cuautla, Morelos.">
+  <link rel="canonical" href="https://ornaplant.com.mx/contacto.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ornaplant.com.mx/contacto.html">
+  <meta property="og:title" content="Contacto — ORNAPLANT">
+  <meta property="og:description" content="Contáctanos por WhatsApp, email o redes sociales. ORNAPLANT — Cuautla, Morelos.">
+  <meta property="og:image" content="https://ornaplant.com.mx/assets/logo-final-ornaplant.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contacto — ORNAPLANT">
+  <meta name="twitter:description" content="Contáctanos por WhatsApp, email o redes sociales. ORNAPLANT — Cuautla, Morelos.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ContactPage",
+        "@id": "https://ornaplant.com.mx/contacto.html#webpage",
+        "url": "https://ornaplant.com.mx/contacto.html",
+        "name": "Contacto — ORNAPLANT",
+        "isPartOf": { "@id": "https://ornaplant.com.mx/#website" },
+        "about": { "@id": "https://ornaplant.com.mx/#organization" },
+        "inLanguage": "es-MX"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://ornaplant.com.mx/" },
+          { "@type": "ListItem", "position": 2, "name": "Contacto", "item": "https://ornaplant.com.mx/contacto.html" }
+        ]
+      }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"
@@ -218,9 +250,8 @@
     <span class="material-symbols-outlined">keyboard_arrow_up</span>
   </button>
 
-  <script src="plantas.js"></script>
-  <script>
-    // REPLACE_WHATSAPP_NUMBER — update WHATSAPP_NUMBER in plantas.js
+  <script type="module">
+    import { WHATSAPP_NUMBER } from './config.js';
     const waMsg = encodeURIComponent('Hola, me gustaría obtener información sobre sus plantas y disponibilidad. ¡Gracias!');
     document.getElementById('whatsappBtn').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}`;
   </script>

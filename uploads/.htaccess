@@ -1,0 +1,8 @@
+# Bloquear ejecución PHP en /uploads — sólo se sirven archivos estáticos.
+<FilesMatch "\.(php|phtml|phar|phps|cgi|pl|py|sh)$">
+  Require all denied
+</FilesMatch>
+Options -ExecCGI -Indexes
+RemoveHandler .php .phtml .phar .phps
+RemoveType .php .phtml .phar .phps
+AddType text/plain .php .phtml .phar .phps

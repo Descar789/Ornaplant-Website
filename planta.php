@@ -1,3 +1,83 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/api/config.php';
+require_once __DIR__ . '/api/db.php';
+
+$id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
+$planta = null;
+
+if ($id !== '') {
+    $stmt = db()->prepare('SELECT * FROM plantas WHERE id = :id LIMIT 1');
+    $stmt->execute([':id' => $id]);
+    $row = $stmt->fetch();
+    if ($row) {
+        foreach (['etiquetas','variaciones','imagenes'] as $f) {
+            $row[$f] = $row[$f] ? json_decode($row[$f], true) : [];
+            if (!is_array($row[$f])) $row[$f] = [];
+        }
+        $planta = $row;
+    }
+}
+
+if (!$planta) {
+    http_response_code(404);
+}
+
+$base = rtrim(BASE_URL, '/');
+$canonical = $planta
+    ? $base . '/planta/' . rawurlencode($planta['id'])
+    : $base . '/planta.php';
+
+$titulo = $planta
+    ? htmlspecialchars($planta['nombre'] . ' — ORNAPLANT', ENT_QUOTES, 'UTF-8')
+    : 'Planta no encontrada — ORNAPLANT';
+
+$descRaw = $planta ? (string)($planta['descripcion'] ?? '') : 'Planta ornamental no encontrada.';
+$descRaw = trim(preg_replace('/\s+/', ' ', $descRaw));
+if (mb_strlen($descRaw) > 160) {
+    $descRaw = mb_substr($descRaw, 0, 157) . '...';
+}
+$descripcion = htmlspecialchars($descRaw !== '' ? $descRaw : 'Planta ornamental en ORNAPLANT, Cuautla, Morelos.', ENT_QUOTES, 'UTF-8');
+
+$imagenes = $planta['imagenes'] ?? [];
+$ogImage = !empty($imagenes[0])
+    ? (string)$imagenes[0]
+    : $base . '/assets/logo-final-ornaplant.png';
+$ogImage = htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8');
+
+$schema = null;
+if ($planta) {
+    $availMap = [
+        'disponible'  => 'https://schema.org/InStock',
+        'bajo pedido' => 'https://schema.org/PreOrder',
+        'agotado'     => 'https://schema.org/OutOfStock',
+    ];
+    $schema = [
+        '@context'    => 'https://schema.org',
+        '@type'       => 'Product',
+        'name'        => $planta['nombre'],
+        'description' => $descRaw,
+        'image'       => array_values(array_filter($imagenes)),
+        'sku'         => $planta['sku'] ?? $planta['id'],
+        'category'    => $planta['categoria'] ?? 'ornamental',
+        'brand'       => ['@type' => 'Brand', 'name' => 'ORNAPLANT'],
+        'additionalProperty' => [
+            ['@type' => 'PropertyValue', 'name' => 'Nombre científico', 'value' => $planta['nombre_cientifico'] ?? ''],
+            ['@type' => 'PropertyValue', 'name' => 'Luz',      'value' => $planta['luz'] ?? ''],
+            ['@type' => 'PropertyValue', 'name' => 'Riego',    'value' => $planta['riego'] ?? ''],
+            ['@type' => 'PropertyValue', 'name' => 'Cuidado',  'value' => $planta['cuidado'] ?? ''],
+            ['@type' => 'PropertyValue', 'name' => 'Mascotas', 'value' => $planta['mascotas'] ?? ''],
+        ],
+        'offers' => [
+            '@type'         => 'Offer',
+            'url'           => $canonical,
+            'priceCurrency' => 'MXN',
+            'availability'  => $availMap[$planta['disponibilidad']] ?? 'https://schema.org/InStock',
+            'seller'        => ['@type' => 'Organization', 'name' => 'ORNAPLANT SA DE CV'],
+        ],
+    ];
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,13 +85,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/favicon-32.png">
-  <title>Detalle de Planta — ORNAPLANT</title>
-  <meta name="description" content="Detalle de planta ornamental — ORNAPLANT, Cuautla, Morelos.">
+  <title><?= $titulo ?></title>
+  <meta name="description" content="<?= $descripcion ?>">
+  <link rel="canonical" href="<?= htmlspecialchars($canonical, ENT_QUOTES, 'UTF-8') ?>">
+  <meta property="og:type" content="product">
+  <meta property="og:url" content="<?= htmlspecialchars($canonical, ENT_QUOTES, 'UTF-8') ?>">
+  <meta property="og:title" content="<?= $titulo ?>">
+  <meta property="og:description" content="<?= $descripcion ?>">
+  <meta property="og:image" content="<?= $ogImage ?>">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= $titulo ?>">
+  <meta name="twitter:description" content="<?= $descripcion ?>">
+  <meta name="twitter:image" content="<?= $ogImage ?>">
+  <?php if ($schema): ?>
+  <script type="application/ld+json"><?= json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
+  <?php endif; ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
   <link rel="stylesheet" href="style.css">
-  <!-- Tailwind CDN — allowed for planta.html per project spec -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -28,7 +120,6 @@
     }
   </script>
   <style>
-    /* Keep site-header from style.css working alongside Tailwind */
     .tailwind-page { font-family: 'Manrope', system-ui, sans-serif; }
     .gallery-main { aspect-ratio: 4/3; overflow: hidden; border-radius: 16px; background: #eef4ec; }
     .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
@@ -50,11 +141,12 @@
     .breadcrumb a:hover { color: var(--green-800, #396452); }
     .breadcrumb .sep { font-size: 0.75rem; color: var(--muted, #69776d); opacity: 0.5; }
     .not-found { min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column; gap: 1rem; }
+    /* SEO fallback content (oculto visualmente, indexable) */
+    .seo-fallback { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
   </style>
 </head>
 <body class="tailwind-page">
 
-  <!-- Shared header (styled via style.css) -->
   <header class="site-header" id="header">
     <nav class="navbar container">
       <a class="nav-brand" href="index.html">
@@ -76,8 +168,22 @@
   </header>
 
   <main id="plantDetail" style="background:var(--cream);">
+    <?php if ($planta): ?>
+    <div class="seo-fallback">
+      <h1><?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?></h1>
+      <p><em><?= htmlspecialchars($planta['nombre_cientifico'] ?? '', ENT_QUOTES, 'UTF-8') ?></em></p>
+      <p><?= htmlspecialchars((string)($planta['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
+      <ul>
+        <li>Categoría: <?= htmlspecialchars($planta['categoria'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
+        <li>Luz: <?= htmlspecialchars($planta['luz'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
+        <li>Riego: <?= htmlspecialchars($planta['riego'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
+        <li>Cuidado: <?= htmlspecialchars($planta['cuidado'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
+        <li>Disponibilidad: <?= htmlspecialchars($planta['disponibilidad'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
+        <li>Mascotas: <?= htmlspecialchars($planta['mascotas'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
+      </ul>
+    </div>
+    <?php endif; ?>
 
-    <!-- Rendered by JS below -->
     <div class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
       <div id="plantContent">
         <div style="text-align:center;padding:4rem 0;color:var(--muted);">
@@ -89,7 +195,6 @@
 
   </main>
 
-  <!-- Shared footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
@@ -127,17 +232,17 @@
   </button>
 
   <script type="module">
-    import { getPlant, incrementViews } from './firebase.js';
+    import { getPlant, incrementViews } from './api.js';
+    import { WHATSAPP_NUMBER } from './config.js';
 
     (async function () {
       const dispCls = { disponible: 'disp-available', 'bajo pedido': 'disp-order', agotado: 'disp-sold' };
       const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
       const luzIcon = { 'sol directo': 'wb_sunny', 'luz indirecta': 'light_mode', 'media sombra': 'partly_cloudy_day', 'sombra': 'cloud' };
       const cuidadoIcon = { 'fácil': 'sentiment_satisfied', 'intermedia': 'sentiment_neutral', 'difícil': 'sentiment_dissatisfied' };
-      const WHATSAPP_NUMBER = '527351024413';
 
       const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
+      const id = params.get('id') || <?= json_encode($planta['id'] ?? '') ?>;
       const content = document.getElementById('plantContent');
 
       if (!id) {
@@ -175,9 +280,6 @@
         return;
       }
 
-      document.title = `${planta.nombre} — ORNAPLANT`;
-      document.querySelector('meta[name="description"]').content = (planta.descripcion || '').slice(0, 160);
-
       const rawImgs = planta.imagenes || [];
       const mainImage = rawImgs[0] || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop';
       const skuLine = planta.sku ? `\n- SKU: ${planta.sku}` : '';
@@ -185,7 +287,6 @@
       const vistas = (planta.vistas || 0) + 1;
 
       content.innerHTML = `
-        <!-- BREADCRUMB -->
         <nav class="breadcrumb" aria-label="Ruta de navegación" style="margin-bottom:1.5rem;">
           <a href="catalogo.html">Catálogo</a>
           <span class="sep" aria-hidden="true">/</span>
@@ -194,10 +295,8 @@
           <span aria-current="page">${planta.nombre}</span>
         </nav>
 
-        <!-- MAIN GRID -->
         <div class="lg:grid lg:grid-cols-12 lg:gap-10" style="display:grid;grid-template-columns:repeat(12,1fr);gap:2.5rem;align-items:start;">
 
-          <!-- GALLERY — col 1-8 -->
           <div style="grid-column:1/span 8;" class="flex flex-col gap-2">
             <div class="gallery-main" id="mainImgWrap">
               <img id="mainImg" src="${mainImage}" alt="${planta.nombre}" width="800" height="600" loading="eager">
@@ -208,16 +307,13 @@
             </p>
           </div>
 
-          <!-- INFO — col 9-12 -->
           <div style="grid-column:span 4;" class="flex flex-col gap-5">
 
-            <!-- Tags + Disponibilidad -->
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
               <span style="padding:0.25rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;font-family:'Plus Jakarta Sans',sans-serif;" class="${dispCls[planta.disponibilidad] || 'disp-available'}">${dispLbl[planta.disponibilidad] || planta.disponibilidad}</span>
               ${(planta.etiquetas || []).map(t => `<span class="pill">${t}</span>`).join('')}
             </div>
 
-            <!-- Name + Views -->
             <div>
               <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.75rem,3.5vw,2.25rem);font-weight:800;line-height:1.1;color:#223029;margin-bottom:0.375rem;">${planta.nombre}</h1>
               <p style="font-style:italic;color:#69776d;font-size:0.9375rem;">${planta.nombreCientifico}</p>
@@ -228,7 +324,6 @@
               </p>
             </div>
 
-            <!-- Bento Care Specs -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;" role="list" aria-label="Especificaciones de cuidado">
               <div class="care-card" role="listitem">
                 <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
@@ -260,7 +355,6 @@
               </div>
             </div>
 
-            <!-- Variaciones -->
             <div>
               <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;margin-bottom:0.625rem;">Tamaños disponibles</p>
               <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
@@ -268,7 +362,6 @@
               </div>
             </div>
 
-            <!-- WhatsApp CTA -->
             <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" class="whatsapp-cta" target="_blank" rel="noopener noreferrer" aria-label="Consultar disponibilidad de ${planta.nombre} por WhatsApp">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -282,13 +375,11 @@
           </div>
         </div>
 
-        <!-- DESCRIPCIÓN -->
         <div style="margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(51,92,75,0.16);">
           <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1rem;">Descripción</h2>
           <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;">${planta.descripcion}</p>
         </div>
 
-        <!-- BACK LINK -->
         <div style="margin-top:2.5rem;">
           <a href="catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
             <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
@@ -296,7 +387,6 @@
           </a>
         </div>`;
 
-      // Responsive layout
       const gallery = content.querySelector('[style*="grid-column:1/span 8"]');
       const info = content.querySelector('[style*="grid-column:span 4"]');
       const mainGrid = gallery && gallery.parentElement;
@@ -315,7 +405,6 @@
       fixLayout();
       window.addEventListener('resize', fixLayout);
 
-      // Increment view counter (fire and forget)
       incrementViews(id).catch(() => {});
     })();
   </script>

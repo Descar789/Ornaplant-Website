@@ -1,0 +1,19 @@
+# Permitir header Authorization (algunos hostings lo filtran)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} ^(.*)
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>
+
+# Negar listado de directorio
+Options -Indexes
+
+# No exponer .env ni archivos ocultos
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# Forzar PHP a interpretar archivos .php (defensa por si hay misconfig)
+<FilesMatch "\.php$">
+  SetHandler application/x-httpd-php
+</FilesMatch>
