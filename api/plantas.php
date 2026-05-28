@@ -25,7 +25,14 @@ function decode_planta(array $row): array {
 
 if ($method === 'GET') {
     $id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
-    if ($id !== '') {
+    $slug = isset($_GET['slug']) ? trim((string)$_GET['slug']) : '';
+    if ($slug !== '') {
+        $stmt = db()->prepare('SELECT * FROM plantas WHERE slug = :slug LIMIT 1');
+        $stmt->execute([':slug' => $slug]);
+        $row = $stmt->fetch();
+        if (!$row) json_error('Planta no encontrada', 404);
+        json_response(decode_planta($row));
+    } elseif ($id !== '') {
         $stmt = db()->prepare('SELECT * FROM plantas WHERE id = :id LIMIT 1');
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch();

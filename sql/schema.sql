@@ -1,5 +1,5 @@
--- ORNAPLANT — esquema MySQL
--- Charset utf8mb4 / collation utf8mb4_unicode_ci para soportar acentos y emojis.
+-- ORNAPLANT - esquema MySQL
+-- Charset utf8mb4 / collation utf8mb4_unicode_ci.
 -- Engine InnoDB para integridad transaccional.
 
 SET NAMES utf8mb4;
@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS plantas;
 CREATE TABLE plantas (
   id                VARCHAR(100)  NOT NULL,
   nombre            VARCHAR(150)  NOT NULL,
+  slug              VARCHAR(180)  NULL,
   nombre_cientifico VARCHAR(150)  NOT NULL DEFAULT '',
   categoria         VARCHAR(50)   NOT NULL DEFAULT 'ornamental',
   descripcion       TEXT          NULL,

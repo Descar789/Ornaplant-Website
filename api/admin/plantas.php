@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../jwt.php';
+require_once __DIR__ . '/../slug.php';
 
 require_admin();
 
@@ -71,13 +72,6 @@ function build_payload(array $body, bool $isUpdate = false): array {
     return $out;
 }
 
-function slugify(string $s): string {
-    $s = mb_strtolower($s, 'UTF-8');
-    $s = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s) ?: $s;
-    $s = preg_replace('/[^a-z0-9]+/', '-', $s) ?? '';
-    return trim($s, '-');
-}
-
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 
@@ -105,6 +99,7 @@ if ($method === 'POST') {
 
     $payload = build_payload($body, false);
     $payload['id'] = $newId;
+    $payload['slug'] = unique_slug(db(), $payload['nombre'], $newId);
 
     $cols = array_keys($payload);
     $place = array_map(fn($c) => ":$c", $cols);
@@ -124,6 +119,24 @@ if ($method === 'PUT') {
     $body = json_input();
     $payload = build_payload($body, true);
     if (!$payload) json_error('Sin campos para actualizar', 400);
+
+    // Obtener el slug actual en la DB
+    $stmtCheck = db()->prepare('SELECT slug FROM plantas WHERE id = :id LIMIT 1');
+    $stmtCheck->execute([':id' => $id]);
+    $currentSlug = $stmtCheck->fetchColumn();
+
+    // Solo autogeneramos el slug en PUT si el slug actual en la DB está vacío o es NULL
+    if (empty($currentSlug)) {
+        $nombreParaSlug = $payload['nombre'] ?? '';
+        if ($nombreParaSlug === '') {
+            $stmtName = db()->prepare('SELECT nombre FROM plantas WHERE id = :id LIMIT 1');
+            $stmtName->execute([':id' => $id]);
+            $nombreParaSlug = $stmtName->fetchColumn() ?: '';
+        }
+        if ($nombreParaSlug !== '') {
+            $payload['slug'] = unique_slug(db(), $nombreParaSlug, $id);
+        }
+    }
 
     $sets = [];
     $params = [':id' => $id];
