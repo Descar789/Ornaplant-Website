@@ -49,11 +49,8 @@ export async function getPlant(id) {
   }
 }
 
-export async function incrementViews(id) {
-  if (!id) return;
-  return apiFetch(`/plantas.php?id=${encodeURIComponent(id)}&action=incrementar_vistas`, {
-    method: 'PATCH',
-  });
+export async function getGlobalVisits() {
+  return apiFetch('/visitas.php');
 }
 
 // ── PLANTAS (admin, requieren JWT) ───────────────────────────────

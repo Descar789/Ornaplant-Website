@@ -339,7 +339,7 @@
   <script type="module">
     import {
       getPlants, savePlant, updatePlant, deletePlant, uploadImage,
-      adminLogin, adminLogout, isAdminLogged, getAdminEmail,
+      adminLogin, adminLogout, isAdminLogged, getAdminEmail, getGlobalVisits,
     } from './api.js';
 
     // ── Auth (JWT propio) ─────────────────────────────────────────
@@ -403,11 +403,20 @@
     // ── Panel init ────────────────────────────────────────────────
     let plantList = [];
     let editingId = null;
+    let globalVisits = 0;
 
     async function init() {
       document.getElementById('plantList').innerHTML = '<div style="text-align:center;padding:2rem;color:#69776d;">Cargando...</div>';
       try {
-        plantList = await getPlants();
+        const [plantsData, visitsData] = await Promise.all([
+          getPlants(),
+          getGlobalVisits().catch(err => {
+            console.error("[admin] Error cargando visitas globales:", err);
+            return { total: 0 };
+          })
+        ]);
+        plantList = plantsData;
+        globalVisits = (visitsData && visitsData.total) || 0;
       } catch (e) {
         document.getElementById('plantList').innerHTML = '<div style="text-align:center;padding:2rem;color:#991b1b;">Error al cargar plantas.</div>';
         return;
@@ -421,18 +430,16 @@
       const byCat = {};
       let disponibles = 0;
       let agotadas = 0;
-      let totalVistas = 0;
       plantList.forEach(p => {
         byCat[p.categoria] = (byCat[p.categoria] || 0) + 1;
         if (p.disponibilidad === 'disponible') disponibles++;
         if (p.disponibilidad === 'agotado') agotadas++;
-        totalVistas += (p.vistas || 0);
       });
       const stats = [
         { icon: 'local_florist', num: total, label: 'Total plantas' },
         { icon: 'check_circle', num: disponibles, label: 'Disponibles' },
         { icon: 'cancel', num: agotadas, label: 'Agotadas' },
-        { icon: 'visibility', num: totalVistas, label: 'Vistas totales' },
+        { icon: 'visibility', num: globalVisits, label: 'Visitas generales' },
         { icon: 'category', num: Object.keys(byCat).length, label: 'Categorías' },
       ];
       document.getElementById('statsGrid').innerHTML = stats.map(s => `
@@ -492,7 +499,7 @@
           <div>
             <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.9375rem;color:#223029;">${p.nombre}</div>
             <div style="font-size:0.8rem;color:#69776d;font-style:italic;">${p.nombreCientifico}</div>
-            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria} · <span class="material-symbols-outlined" style="font-size:0.7rem;vertical-align:middle;">visibility</span> ${p.vistas || 0}${p.sku ? ` · <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">${p.sku}</span>` : ''}</div>
+            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria}${p.sku ? ` · <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">${p.sku}</span>` : ''}</div>
           </div>
           <div style="display:flex;align-items:center;gap:0.625rem;flex-shrink:0;">
             <select class="disp-select ${dispStyle(p.disponibilidad)}" onchange="updateDisp('${p.id}',this.value)" aria-label="Disponibilidad de ${p.nombre}">

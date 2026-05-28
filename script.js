@@ -70,4 +70,17 @@
   } else {
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
   }
+
+  // ── Registro de Visita Global (Pageviews) ────────────────
+  (function trackGlobalVisit() {
+    try {
+      const scriptEl = document.querySelector('script[src*="script.js"]');
+      if (!scriptEl) return;
+      const src = scriptEl.getAttribute('src');
+      const absUrl = new URL(src, window.location.href);
+      const apiBase = absUrl.origin + absUrl.pathname.substring(0, absUrl.pathname.lastIndexOf('/')) + '/api';
+      fetch(apiBase + '/visitas.php', { method: 'POST' })
+        .catch(() => {});
+    } catch (e) {}
+  })();
 })();
