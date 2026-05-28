@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/favicon-32.png">
-  <title>Catálogo — ORNAPLANT</title>
-  <meta name="description" content="Explora nuestro catálogo de plantas ornamentales en Cuautla, Morelos. Filtra por categoría, luz, riego y más.">
+  <title>Catálogo de Plantas Ornamentales en Cuautla | ORNAPLANT</title>
+  <meta name="description" content="Explora el catálogo de plantas ornamentales en Cuautla de ORNAPLANT, la primera comercializadora de plantas ornamentales en Morelos desde 1992.">
   <link rel="canonical" href="https://ornaplant.com.mx/catalogo.html">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ornaplant.com.mx/catalogo.html">
-  <meta property="og:title" content="Catálogo — ORNAPLANT">
-  <meta property="og:description" content="Explora nuestro catálogo de plantas ornamentales en Cuautla, Morelos. Filtra por categoría, luz, riego y más.">
+  <meta property="og:title" content="Catálogo de Plantas Ornamentales en Cuautla | ORNAPLANT">
+  <meta property="og:description" content="Explora el catálogo de plantas ornamentales en Cuautla de ORNAPLANT, la primera comercializadora de plantas ornamentales en Morelos desde 1992.">
   <meta property="og:image" content="https://ornaplant.com.mx/assets/logo-final-ornaplant.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Catálogo — ORNAPLANT">
-  <meta name="twitter:description" content="Explora nuestro catálogo de plantas ornamentales en Cuautla, Morelos. Filtra por categoría, luz, riego y más.">
+  <meta name="twitter:title" content="Catálogo de Plantas Ornamentales en Cuautla | ORNAPLANT">
+  <meta name="twitter:description" content="Explora el catálogo de plantas ornamentales en Cuautla de ORNAPLANT, la primera comercializadora de plantas ornamentales en Morelos desde 1992.">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -268,9 +268,9 @@
         const img = (p.imagenes && p.imagenes[0]) || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop';
         const tags = (p.etiquetas || []).slice(0, 2).map(t => `<span class="badge badge-green">${t}</span>`).join('');
         return `
-          <a href="planta.php?id=${encodeURIComponent(p.id)}" class="card plant-card" aria-label="Ver detalle de ${p.nombre}">
+          <a href="/planta/${encodeURIComponent(p.id)}" class="card plant-card" aria-label="Ver detalle de ${p.nombre}">
             <div class="plant-card-img">
-              <img src="${img}" alt="${p.nombre}" loading="lazy" width="400" height="300">
+              <img src="${img}" alt="Planta ornamental ${p.nombre} - Vivero ORNAPLANT Cuautla" loading="lazy" width="400" height="300">
               <span class="badge ${dispCls[p.disponibilidad] || 'badge-green'}">${dispLbl[p.disponibilidad] || p.disponibilidad}</span>
             </div>
             <div class="plant-card-body">

@@ -329,9 +329,9 @@
         : [...shuffledPop, ...shuffle(resto).slice(0, 4 - shuffledPop.length)];
 
       grid.innerHTML = featured.map(p => `
-        <a href="planta.php?id=${encodeURIComponent(p.id)}" class="card plant-card reveal" aria-label="Ver ${p.nombre}">
+        <a href="/planta/${encodeURIComponent(p.id)}" class="card plant-card reveal" aria-label="Ver ${p.nombre}">
           <div class="plant-card-img">
-            <img src="${(p.imagenes && p.imagenes[0]) || ''}" alt="${p.nombre}" loading="lazy" width="400" height="300">
+            <img src="${(p.imagenes && p.imagenes[0]) || ''}" alt="Planta ornamental ${p.nombre} - Vivero ORNAPLANT Cuautla" loading="lazy" width="400" height="300">
             <span class="badge ${disp[p.disponibilidad] || 'badge-green'}">${dispL[p.disponibilidad] || p.disponibilidad}</span>
           </div>
           <div class="plant-card-body">
