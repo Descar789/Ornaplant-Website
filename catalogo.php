@@ -102,12 +102,12 @@ try {
 
   <header class="site-header" id="header">
     <nav class="navbar container">
-      <a class="nav-brand" href="/index.html">
+      <a class="nav-brand" href="/">
         <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="44" class="brand-symbol-img">
         <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
       </a>
       <ul class="nav-menu" id="navMenu" role="list">
-        <li><a href="/index.html">Inicio</a></li>
+        <li><a href="/">Inicio</a></li>
         <li><a href="/nosotros.html">Sobre Nosotros</a></li>
         <li><a href="/catalogo.html">Catálogo</a></li>
         <li><a href="/sucursales.html">Sucursales</a></li>
@@ -277,7 +277,7 @@ try {
         <div class="footer-col">
           <h4>Navegación</h4>
           <ul>
-            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/">Inicio</a></li>
             <li><a href="/nosotros.html">Sobre Nosotros</a></li>
             <li><a href="/catalogo.html">Catálogo</a></li>
           </ul>

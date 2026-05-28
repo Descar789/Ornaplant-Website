@@ -45,11 +45,19 @@
     backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
 
-  // ── Active nav link (by current filename) ───────────────
-  const page = window.location.pathname.split('/').pop() || 'index.html';
+  // ── Active nav link (by current filename or path) ────────
+  let path = window.location.pathname;
+  if (path.endsWith('/')) path += 'index.html';
+  let page = path.split('/').pop();
+  if (path.includes('/catalogo/') || path.includes('/planta/')) {
+    page = 'catalogo.html';
+  }
   document.querySelectorAll('.nav-menu a').forEach(a => {
-    const href = a.getAttribute('href');
-    if (href === page || (page === '' && href === 'index.html')) a.classList.add('active');
+    let href = a.getAttribute('href') || '';
+    if (href.startsWith('/')) href = href.substring(1);
+    if (href === '' || href === '/') href = 'index.html';
+    const cleanHref = href.split('/').pop();
+    if (cleanHref === page) a.classList.add('active');
   });
 
   // ── Scroll-reveal ────────────────────────────────────────

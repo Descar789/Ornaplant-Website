@@ -20,7 +20,7 @@ $paginas = [
 
 $plantas = [];
 try {
-    $stmt = db()->query('SELECT id, creado_en FROM plantas ORDER BY creado_en DESC');
+    $stmt = db()->query('SELECT id, slug, creado_en FROM plantas ORDER BY creado_en DESC');
     $plantas = $stmt->fetchAll();
 } catch (Throwable $e) {
     $plantas = [];
@@ -39,10 +39,12 @@ foreach ($paginas as $p) {
 }
 
 foreach ($plantas as $row) {
-    $slug = rawurlencode((string)$row['id']);
+    $slugRaw = (string)($row['slug'] ?? '');
+    $idRaw = (string)$row['id'];
+    $loc = $slugRaw !== '' ? "$base/catalogo/" . rawurlencode($slugRaw) : "$base/planta/" . rawurlencode($idRaw);
     $lastmod = $row['creado_en'] ? substr((string)$row['creado_en'], 0, 10) : $today;
     echo "  <url>\n";
-    echo "    <loc>$base/planta/$slug</loc>\n";
+    echo "    <loc>$loc</loc>\n";
     echo "    <lastmod>$lastmod</lastmod>\n";
     echo "    <changefreq>weekly</changefreq>\n";
     echo "    <priority>0.7</priority>\n";
