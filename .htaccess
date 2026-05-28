@@ -12,6 +12,9 @@ RewriteRule ^api/ - [L]
 # /sitemap.xml → sitemap.php (Google espera .xml)
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
+# URL bonita: /catalogo/{slug} → planta.php?slug={slug}
+RewriteRule ^catalogo/([^/.]+)/?$ planta.php?slug=$1 [QSA,L]
+
 # URL bonita: /planta/{slug} → planta.php?id={slug}
 RewriteRule ^planta/([^/]+)/?$ planta.php?id=$1 [QSA,L]
 
