@@ -120,8 +120,8 @@ if (!$planta) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="assets/favicon-32.png">
-  <link rel="apple-touch-icon" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" href="<?= $base ?>/assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="<?= $base ?>/assets/favicon-32.png">
   <title><?= $titulo ?></title>
   <meta name="description" content="<?= $descripcion ?>">
   <link rel="canonical" href="<?= htmlspecialchars($canonical, ENT_QUOTES, 'UTF-8') ?>">
@@ -140,7 +140,7 @@ if (!$planta) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="<?= $base ?>/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -184,17 +184,17 @@ if (!$planta) {
 
   <header class="site-header" id="header">
     <nav class="navbar container">
-      <a class="nav-brand" href="/">
-        <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="44" class="brand-symbol-img">
-        <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
+      <a class="nav-brand" href="<?= $base ?>/">
+        <img src="<?= $base ?>/assets/logo-symbol-web.png" alt="" aria-hidden="true" height="44" class="brand-symbol-img">
+        <img src="<?= $base ?>/assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
       </a>
       <ul class="nav-menu" id="navMenu" role="list">
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/nosotros.html">Sobre Nosotros</a></li>
-        <li><a href="/catalogo.html">Catálogo</a></li>
-        <li><a href="/sucursales.html">Sucursales</a></li>
-        <li><a href="/horarios.html">Horarios</a></li>
-        <li><a href="/contacto.html" class="nav-cta">Contacto</a></li>
+        <li><a href="<?= $base ?>/">Inicio</a></li>
+        <li><a href="<?= $base ?>/nosotros.html">Sobre Nosotros</a></li>
+        <li><a href="<?= $base ?>/catalogo.html">Catálogo</a></li>
+        <li><a href="<?= $base ?>/sucursales.html">Sucursales</a></li>
+        <li><a href="<?= $base ?>/horarios.html">Horarios</a></li>
+        <li><a href="<?= $base ?>/contacto.html" class="nav-cta">Contacto</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
         <span class="material-symbols-outlined" id="navIcon">menu</span>
@@ -208,7 +208,7 @@ if (!$planta) {
         <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">search_off</span>
         <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:2rem;font-weight:700;color:#223029;">Planta no encontrada</h2>
         <p style="color:var(--muted);margin-bottom:1.5rem;">No encontramos la planta que buscas.</p>
-        <a href="/catalogo.html" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
+        <a href="<?= $base ?>/catalogo.html" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
       </div>
     <?php else: ?>
       <?php
@@ -216,7 +216,6 @@ if (!$planta) {
       $mainImage = !empty($rawImgs[0]) ? $rawImgs[0] : 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop';
       $skuLine = $planta['sku'] ? "\n- SKU: " . $planta['sku'] : '';
       $waMsg = rawurlencode("Hola ORNAPLANT, me interesa la siguiente planta:\n- Nombre: {$planta['nombre']}{$skuLine}\n¿Está disponible?");
-      $vistas = (int)($planta['vistas'] ?? 0) + 1;
       
       $dispCls = ['disponible' => 'disp-available', 'bajo pedido' => 'disp-order', 'agotado' => 'disp-sold'];
       $dispLbl = ['disponible' => 'Disponible', 'bajo pedido' => 'Bajo pedido', 'agotado' => 'Agotado'];
@@ -227,9 +226,9 @@ if (!$planta) {
       <div class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
         <!-- RUTA DE NAVEGACIÓN -->
         <nav class="breadcrumb" aria-label="Ruta de navegación" style="margin-bottom:1.5rem;">
-          <a href="/catalogo.html">Catálogo</a>
+          <a href="<?= $base ?>/catalogo.html">Catálogo</a>
           <span class="sep" aria-hidden="true">/</span>
-          <a href="/catalogo.html?categoria=<?= urlencode(strtolower($planta['categoria'])) ?>"><?= htmlspecialchars(ucfirst($planta['categoria'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a>
+          <a href="<?= $base ?>/catalogo.html?categoria=<?= urlencode(strtolower($planta['categoria'])) ?>"><?= htmlspecialchars(ucfirst($planta['categoria'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a>
           <span class="sep" aria-hidden="true">/</span>
           <span aria-current="page"><?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?></span>
         </nav>
@@ -277,10 +276,6 @@ if (!$planta) {
               <?php if (!empty($planta['sku'])): ?>
                 <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.07em;color:#9ec4b0;margin-top:0.25rem;">SKU: <?= htmlspecialchars($planta['sku'], ENT_QUOTES, 'UTF-8') ?></p>
               <?php endif; ?>
-              <p style="display:flex;align-items:center;gap:0.25rem;font-size:0.8rem;color:#69776d;margin-top:0.375rem;">
-                <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span>
-                <?= $vistas ?> vista<?= $vistas !== 1 ? 's' : '' ?>
-              </p>
             </div>
 
             <!-- GRID 2x2 CARE CARDS -->
@@ -354,12 +349,12 @@ if (!$planta) {
           <div style="background:var(--green-100);padding:1.5rem;border-radius:12px;margin-top:1.5rem;border:1px solid rgba(51,92,75,0.16);">
             <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.05rem;font-weight:700;color:#223029;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;"><span class="material-symbols-outlined" style="color:#396452;">storefront</span>Disponible en nuestras sucursales en Cuautla</h3>
             <p style="color:#69776d;font-size:0.925rem;margin-bottom:0.75rem;">Esta variedad de planta ornamental se comercializa directamente en nuestras dos sucursales en Cuautla, Morelos. Atendemos pedidos a menudeo, medio mayoreo y mayoreo.</p>
-            <a href="/sucursales.html" style="color:#396452;font-weight:700;font-size:0.925rem;text-decoration:underline;display:inline-flex;align-items:center;gap:0.25rem;">Ver ubicación de sucursales<span class="material-symbols-outlined" style="font-size:0.9rem;">arrow_forward</span></a>
+            <a href="<?= $base ?>/sucursales.html" style="color:#396452;font-weight:700;font-size:0.925rem;text-decoration:underline;display:inline-flex;align-items:center;gap:0.25rem;">Ver ubicación de sucursales<span class="material-symbols-outlined" style="font-size:0.9rem;">arrow_forward</span></a>
           </div>
         </div>
 
         <div style="margin-top:2.5rem;">
-          <a href="/catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
+          <a href="<?= $base ?>/catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
             <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
             Volver al catálogo
           </a>
@@ -372,23 +367,23 @@ if (!$planta) {
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <img src="assets/logo-horizontal-web.png" alt="ORNAPLANT">
+          <img src="<?= $base ?>/assets/logo-horizontal-web.png" alt="ORNAPLANT">
           <p>Comercializadora de plantas ornamentales en Morelos. Desde 1992.</p>
         </div>
         <div class="footer-col">
           <h4>Navegación</h4>
           <ul>
-            <li><a href="/">Inicio</a></li>
-            <li><a href="/nosotros.html">Sobre Nosotros</a></li>
-            <li><a href="/catalogo.html">Catálogo</a></li>
+            <li><a href="<?= $base ?>/">Inicio</a></li>
+            <li><a href="<?= $base ?>/nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="<?= $base ?>/catalogo.html">Catálogo</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Visítanos</h4>
           <ul>
-            <li><a href="/sucursales.html">Sucursales</a></li>
-            <li><a href="/horarios.html">Horarios</a></li>
-            <li><a href="/contacto.html">Contacto</a></li>
+            <li><a href="<?= $base ?>/sucursales.html">Sucursales</a></li>
+            <li><a href="<?= $base ?>/horarios.html">Horarios</a></li>
+            <li><a href="<?= $base ?>/contacto.html">Contacto</a></li>
             <li><a href="mailto:informesornaplant@hotmail.com">Enviar email</a></li>
           </ul>
         </div>
@@ -405,7 +400,7 @@ if (!$planta) {
   </button>
 
   <script>
-    // MEJORA PROGRESIVA (INTERACTIVIDAD DE GALERÍA Y REGISTRO DE VISTAS)
+    // MEJORA PROGRESIVA (INTERACTIVIDAD DE GALERÍA)
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Galería: click en miniatura cambia la imagen principal
       document.querySelectorAll('.gallery-thumb').forEach(t => {
@@ -418,14 +413,8 @@ if (!$planta) {
           t.classList.add('active');
         });
       });
-
-      // 2. Incrementar vistas asíncronamente en segundo plano
-      <?php if ($planta): ?>
-        fetch('/api/plantas.php?id=<?= urlencode($planta['id']) ?>&action=incrementar_vistas', { method: 'PATCH' })
-          .catch(() => {});
-      <?php endif; ?>
     });
   </script>
-  <script src="script.js"></script>
+  <script src="<?= $base ?>/script.js"></script>
 </body>
 </html>
