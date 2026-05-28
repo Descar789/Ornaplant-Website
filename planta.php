@@ -37,7 +37,10 @@ if ($slugParam !== '') {
     }
 }
 
-$base = rtrim(BASE_URL, '/');
+// Calcular ruta base dinámica automática para activos y enlaces portables
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+$baseDir = dirname($scriptName);
+$base = ($baseDir === '/' || $baseDir === '\\') ? '' : rtrim(str_replace('\\', '/', $baseDir), '/');
 
 if (!$planta) {
     http_response_code(404);
