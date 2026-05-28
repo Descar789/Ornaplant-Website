@@ -3,50 +3,83 @@ declare(strict_types=1);
 require_once __DIR__ . '/api/config.php';
 require_once __DIR__ . '/api/db.php';
 
-$id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
+$slugParam = isset($_GET['slug']) ? trim((string)$_GET['slug']) : '';
+$idParam   = isset($_GET['id'])   ? trim((string)$_GET['id'])   : '';
+
 $planta = null;
 
-if ($id !== '') {
-    $stmt = db()->prepare('SELECT * FROM plantas WHERE id = :id LIMIT 1');
-    $stmt->execute([':id' => $id]);
+if ($slugParam !== '') {
+    $stmt = db()->prepare('SELECT * FROM plantas WHERE slug = :slug LIMIT 1');
+    $stmt->execute([':slug' => $slugParam]);
     $row = $stmt->fetch();
     if ($row) {
-        foreach (['etiquetas','variaciones','imagenes'] as $f) {
+        foreach (['etiquetas', 'variaciones', 'imagenes'] as $f) {
             $row[$f] = $row[$f] ? json_decode($row[$f], true) : [];
             if (!is_array($row[$f])) $row[$f] = [];
         }
         $planta = $row;
     }
+} elseif ($idParam !== '') {
+    $stmt = db()->prepare('SELECT * FROM plantas WHERE id = :id LIMIT 1');
+    $stmt->execute([':id' => $idParam]);
+    $row = $stmt->fetch();
+    if ($row) {
+        foreach (['etiquetas', 'variaciones', 'imagenes'] as $f) {
+            $row[$f] = $row[$f] ? json_decode($row[$f], true) : [];
+            if (!is_array($row[$f])) $row[$f] = [];
+        }
+        $planta = $row;
+        // Redirección 301 a la URL canónica del catálogo
+        if ($planta && !empty($planta['slug'])) {
+            header('Location: ' . BASE_URL . '/catalogo/' . rawurlencode($planta['slug']), true, 301);
+            exit;
+        }
+    }
 }
 
 if (!$planta) {
     http_response_code(404);
-}
+    $base = rtrim(BASE_URL, '/');
+    $titulo = 'Planta no encontrada — ORNAPLANT';
+    $descripcion = 'No encontramos la planta que buscas en ORNAPLANT, Cuautla, Morelos.';
+    $canonical = $base . '/catalogo.html';
+    $ogImage = $base . '/assets/logo-final-ornaplant.png';
+    $schema = null;
+} else {
+    $base = rtrim(BASE_URL, '/');
+    $canonical = $base . '/catalogo/' . rawurlencode($planta['slug']);
+    
+    // Title canónico: "[Planta] en Cuautla — ORNAPLANT"
+    $titulo = htmlspecialchars($planta['nombre'] . ' en Cuautla — ORNAPLANT', ENT_QUOTES, 'UTF-8');
+    
+    $descRaw = trim(preg_replace('/\s+/', ' ', (string)($planta['descripcion'] ?? '')));
+    if (mb_strlen($descRaw) > 160) {
+        $descRaw = mb_substr($descRaw, 0, 157) . '...';
+    }
+    // Meta Description con diferenciadores de autoridad
+    $descripcion = htmlspecialchars(
+        $descRaw !== '' ? $descRaw : "Venta de {$planta['nombre']} en Cuautla por ORNAPLANT, la primera comercializadora de plantas ornamentales en Morelos desde 1992.", 
+        ENT_QUOTES, 
+        'UTF-8'
+    );
 
-$base = rtrim(BASE_URL, '/');
-$canonical = $planta
-    ? $base . '/planta/' . rawurlencode($planta['id'])
-    : $base . '/planta.php';
+    $imagenes = $planta['imagenes'] ?? [];
+    $ogImage = !empty($imagenes[0]) ? (string)$imagenes[0] : $base . '/assets/logo-final-ornaplant.png';
+    $ogImage = htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8');
 
-$titulo = $planta
-    ? htmlspecialchars($planta['nombre'] . ' — ORNAPLANT', ENT_QUOTES, 'UTF-8')
-    : 'Planta no encontrada — ORNAPLANT';
+    // Mapeo dinámico y honesto de "Usos Recomendados"
+    $usosMapa = [
+        'interior'   => 'Ideal para la decoración de salas, oficinas y espacios cerrados con luz indirecta. Aporta frescura y purifica el aire de tus espacios de forma natural.',
+        'exterior'   => 'Excelente para jardines, terrazas, fachadas y áreas de sol directo. Muy resistente a las condiciones climáticas cálidas locales de Morelos.',
+        'suculenta'  => 'Perfecta para macetas decorativas de colección, rocallas y arreglos de bajo mantenimiento que requieran poca frecuencia de riego.',
+        'ornamental' => 'Muy utilizada en el paisajismo comercial y residencial para aportar texturas visuales, follajes elegantes y contrastes cromáticos vibrantes.',
+        'árbol'      => 'Recomendado para sombreado natural, reforestación de áreas amplias, alineación de caminos y proyectos paisajísticos de gran escala.',
+        'medicinal'  => 'Valorada tradicionalmente por sus usos culinarios, aromáticos o medicinales. Ideal para huertos caseros y jardineras urbanas.',
+    ];
+    $categoriaKey = strtolower($planta['categoria'] ?? 'ornamental');
+    $usoPlanta = $usosMapa[$categoriaKey] ?? 'Ideal para embellecer y aportar un toque natural, fresco y elegante a cualquier espacio de tu hogar o proyecto paisajístico.';
 
-$descRaw = $planta ? (string)($planta['descripcion'] ?? '') : 'Planta ornamental no encontrada.';
-$descRaw = trim(preg_replace('/\s+/', ' ', $descRaw));
-if (mb_strlen($descRaw) > 160) {
-    $descRaw = mb_substr($descRaw, 0, 157) . '...';
-}
-$descripcion = htmlspecialchars($descRaw !== '' ? $descRaw : 'Planta ornamental en ORNAPLANT, Cuautla, Morelos.', ENT_QUOTES, 'UTF-8');
-
-$imagenes = $planta['imagenes'] ?? [];
-$ogImage = !empty($imagenes[0])
-    ? (string)$imagenes[0]
-    : $base . '/assets/logo-final-ornaplant.png';
-$ogImage = htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8');
-
-$schema = null;
-if ($planta) {
+    // Marcado estructurado Product JSON-LD (Offers sin precio simulado para evitar penalizaciones)
     $availMap = [
         'disponible'  => 'https://schema.org/InStock',
         'bajo pedido' => 'https://schema.org/PreOrder',
@@ -73,13 +106,17 @@ if ($planta) {
             'url'           => $canonical,
             'priceCurrency' => 'MXN',
             'availability'  => $availMap[$planta['disponibilidad']] ?? 'https://schema.org/InStock',
-            'seller'        => ['@type' => 'Organization', 'name' => 'ORNAPLANT SA DE CV'],
-        ],
+            'seller'        => [
+                '@type' => 'Organization', 
+                'name' => 'ORNAPLANT SA DE CV',
+                'url' => 'https://ornaplant.com.mx/'
+            ]
+        ]
     ];
 }
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,25 +178,23 @@ if ($planta) {
     .breadcrumb a:hover { color: var(--green-800, #396452); }
     .breadcrumb .sep { font-size: 0.75rem; color: var(--muted, #69776d); opacity: 0.5; }
     .not-found { min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column; gap: 1rem; }
-    /* SEO fallback content (oculto visualmente, indexable) */
-    .seo-fallback { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
   </style>
 </head>
 <body class="tailwind-page">
 
   <header class="site-header" id="header">
     <nav class="navbar container">
-      <a class="nav-brand" href="index.html">
+      <a class="nav-brand" href="/index.html">
         <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="44" class="brand-symbol-img">
         <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
       </a>
       <ul class="nav-menu" id="navMenu" role="list">
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="nosotros.html">Sobre Nosotros</a></li>
-        <li><a href="catalogo.html">Catálogo</a></li>
-        <li><a href="sucursales.html">Sucursales</a></li>
-        <li><a href="horarios.html">Horarios</a></li>
-        <li><a href="contacto.html" class="nav-cta">Contacto</a></li>
+        <li><a href="/index.html">Inicio</a></li>
+        <li><a href="/nosotros.html">Sobre Nosotros</a></li>
+        <li><a href="/catalogo.html">Catálogo</a></li>
+        <li><a href="/sucursales.html">Sucursales</a></li>
+        <li><a href="/horarios.html">Horarios</a></li>
+        <li><a href="/contacto.html" class="nav-cta">Contacto</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
         <span class="material-symbols-outlined" id="navIcon">menu</span>
@@ -167,32 +202,170 @@ if ($planta) {
     </nav>
   </header>
 
-  <main id="plantDetail" style="background:var(--cream);">
-    <?php if ($planta): ?>
-    <div class="seo-fallback">
-      <h1><?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?></h1>
-      <p><em><?= htmlspecialchars($planta['nombre_cientifico'] ?? '', ENT_QUOTES, 'UTF-8') ?></em></p>
-      <p><?= htmlspecialchars((string)($planta['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
-      <ul>
-        <li>Categoría: <?= htmlspecialchars($planta['categoria'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
-        <li>Luz: <?= htmlspecialchars($planta['luz'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
-        <li>Riego: <?= htmlspecialchars($planta['riego'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
-        <li>Cuidado: <?= htmlspecialchars($planta['cuidado'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
-        <li>Disponibilidad: <?= htmlspecialchars($planta['disponibilidad'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
-        <li>Mascotas: <?= htmlspecialchars($planta['mascotas'] ?? '', ENT_QUOTES, 'UTF-8') ?></li>
-      </ul>
-    </div>
-    <?php endif; ?>
+  <main id="plantDetail" style="background:var(--cream);" class="tailwind-page">
+    <?php if (!$planta): ?>
+      <div class="container not-found" style="padding:5rem 0;">
+        <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">search_off</span>
+        <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:2rem;font-weight:700;color:#223029;">Planta no encontrada</h2>
+        <p style="color:var(--muted);margin-bottom:1.5rem;">No encontramos la planta que buscas.</p>
+        <a href="/catalogo.html" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
+      </div>
+    <?php else: ?>
+      <?php
+      $rawImgs = $planta['imagenes'] ?? [];
+      $mainImage = !empty($rawImgs[0]) ? $rawImgs[0] : 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop';
+      $skuLine = $planta['sku'] ? "\n- SKU: " . $planta['sku'] : '';
+      $waMsg = rawurlencode("Hola ORNAPLANT, me interesa la siguiente planta:\n- Nombre: {$planta['nombre']}{$skuLine}\n¿Está disponible?");
+      $vistas = (int)($planta['vistas'] ?? 0) + 1;
+      
+      $dispCls = ['disponible' => 'disp-available', 'bajo pedido' => 'disp-order', 'agotado' => 'disp-sold'];
+      $dispLbl = ['disponible' => 'Disponible', 'bajo pedido' => 'Bajo pedido', 'agotado' => 'Agotado'];
+      $luzIcon = ['sol directo' => 'wb_sunny', 'luz indirecta' => 'light_mode', 'media sombra' => 'partly_cloudy_day', 'sombra' => 'cloud'];
+      $cuidadoIcon = ['fácil' => 'sentiment_satisfied', 'intermedia' => 'sentiment_neutral', 'difícil' => 'sentiment_dissatisfied'];
+      ?>
 
-    <div class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
-      <div id="plantContent">
-        <div style="text-align:center;padding:4rem 0;color:var(--muted);">
-          <span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 1rem;color:var(--earth-200);">hourglass_empty</span>
-          <p>Cargando planta...</p>
+      <div class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
+        <!-- RUTA DE NAVEGACIÓN -->
+        <nav class="breadcrumb" aria-label="Ruta de navegación" style="margin-bottom:1.5rem;">
+          <a href="/catalogo.html">Catálogo</a>
+          <span class="sep" aria-hidden="true">/</span>
+          <a href="/catalogo.html?categoria=<?= urlencode(strtolower($planta['categoria'])) ?>"><?= htmlspecialchars(ucfirst($planta['categoria'] ?? ''), ENT_QUOTES, 'UTF-8') ?></a>
+          <span class="sep" aria-hidden="true">/</span>
+          <span aria-current="page"><?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?></span>
+        </nav>
+
+        <!-- LAYOUT DE 12 COLUMNAS -->
+        <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2.5rem;align-items:start;" id="plantGridBlock">
+          
+          <!-- GALERÍA (COL 1-8) -->
+          <div style="grid-column:span 8;" class="flex flex-col gap-2" id="galleryCol">
+            <div class="gallery-main" id="mainImgWrap">
+              <img id="mainImg" src="<?= htmlspecialchars($mainImage, ENT_QUOTES, 'UTF-8') ?>" alt="Planta ornamental <?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?> - Vivero ORNAPLANT Cuautla" width="800" height="600" loading="eager">
+            </div>
+            
+            <?php if (count($rawImgs) > 1): ?>
+              <!-- MINIATURAS -->
+              <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;">
+                <?php foreach ($rawImgs as $idx => $img): ?>
+                  <button type="button" class="gallery-thumb <?= $idx === 0 ? 'active' : '' ?>" data-src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" style="width:72px;height:54px;padding:0;border:none;">
+                    <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="Miniatura de <?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?>" width="72" height="54" loading="lazy">
+                  </button>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+
+            <p style="display:flex;align-items:center;gap:0.375rem;font-size:0.75rem;color:#69776d;font-style:italic;margin-top:0.25rem;">
+              <span class="material-symbols-outlined" style="font-size:0.95rem;color:#9ec4b0;">info</span>
+              La imagen es de referencia y puede variar del producto físico en el vivero.
+            </p>
+          </div>
+
+          <!-- DETALLE (COL 9-12) -->
+          <div style="grid-column:span 4;" class="flex flex-col gap-5" id="infoCol">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
+              <span style="padding:0.25rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;font-family:'Plus Jakarta Sans',sans-serif;" class="<?= $dispCls[$planta['disponibilidad']] ?? 'disp-available' ?>"><?= $dispLbl[$planta['disponibilidad']] ?? $planta['disponibilidad'] ?></span>
+              <?php if (!empty($planta['etiquetas'])): ?>
+                <?php foreach ($planta['etiquetas'] as $tag): ?>
+                  <span class="pill"><?= htmlspecialchars((string)$tag, ENT_QUOTES, 'UTF-8') ?></span>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+
+            <div>
+              <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.75rem,3.5vw,2.25rem);font-weight:800;line-height:1.1;color:#223029;margin-bottom:0.375rem;"><?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?></h1>
+              <p style="font-style:italic;color:#69776d;font-size:0.9375rem;"><?= htmlspecialchars($planta['nombre_cientifico'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+              <?php if (!empty($planta['sku'])): ?>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.07em;color:#9ec4b0;margin-top:0.25rem;">SKU: <?= htmlspecialchars($planta['sku'], ENT_QUOTES, 'UTF-8') ?></p>
+              <?php endif; ?>
+              <p style="display:flex;align-items:center;gap:0.25rem;font-size:0.8rem;color:#69776d;margin-top:0.375rem;">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span>
+                <?= $vistas ?> vista<?= $vistas !== 1 ? 's' : '' ?>
+              </p>
+            </div>
+
+            <!-- GRID 2x2 CARE CARDS -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;" role="list" aria-label="Especificaciones de cuidado">
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;"><?= $luzIcon[strtolower($planta['luz'])] ?? 'wb_sunny' ?></span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Luz</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;"><?= htmlspecialchars($planta['luz'] ?? 'luz indirecta', ENT_QUOTES, 'UTF-8') ?></p>
+              </div>
+              
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">water_drop</span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Riego</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;"><?= htmlspecialchars($planta['riego'] ?? 'medio', ENT_QUOTES, 'UTF-8') ?></p>
+              </div>
+
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;"><?= $cuidadoIcon[strtolower($planta['cuidado'])] ?? 'eco' ?></span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Cuidado</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;"><?= htmlspecialchars($planta['cuidado'] ?? 'fácil', ENT_QUOTES, 'UTF-8') ?></p>
+              </div>
+
+              <div class="care-card" role="listitem">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:<?= strtolower($planta['mascotas']) === 'tóxica' ? '#b43c6d' : '#396452' ?>;">pets</span>
+                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Mascotas</span>
+                </div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:<?= strtolower($planta['mascotas']) === 'tóxica' ? '#b43c6d' : '#166534' ?>;text-transform:capitalize;"><?= strtolower($planta['mascotas']) === 'tóxica' ? '⚠ Tóxica' : 'No tóxica' ?></p>
+              </div>
+            </div>
+
+            <?php if (!empty($planta['variaciones'])): ?>
+              <!-- TAMAÑOS -->
+              <div>
+                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;margin-bottom:0.625rem;">Tamaños disponibles</p>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                  <?php foreach ($planta['variaciones'] as $var): ?>
+                    <span style="padding:0.375rem 0.875rem;border:1.5px solid rgba(51,92,75,0.16);border-radius:6px;font-size:0.875rem;font-weight:600;color:#396452;background:white;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize;"><?= htmlspecialchars((string)$var, ENT_QUOTES, 'UTF-8') ?></span>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+            <?php endif; ?>
+
+            <!-- CTA WHATSAPP -->
+            <a href="https://wa.me/527351025527?text=<?= $waMsg ?>" class="whatsapp-cta" target="_blank" rel="noopener noreferrer" aria-label="Consultar disponibilidad de <?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?> por WhatsApp">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.07 21.47a.75.75 0 00.918.918l4.356-1.371A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.25a8.245 8.245 0 01-4.21-1.16l-.3-.178-3.108.978.99-3.042-.197-.31A8.25 8.25 0 1120.25 12a8.26 8.26 0 01-8.251 8.25z"/>
+              </svg>
+              Consultar disponibilidad
+            </a>
+
+            <p style="font-size:0.8125rem;color:#69776d;text-align:center;">Respuesta en horario de atención · Sin precio en línea</p>
+          </div>
+        </div>
+
+        <!-- SECCIONES ACORDEÓN SSR (DESCRIPCIÓN Y USOS RECOMENDADOS) -->
+        <div style="margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(51,92,75,0.16);">
+          <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:0.75rem;">Descripción</h2>
+          <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;margin-bottom:2rem;"><?= htmlspecialchars((string)$planta['descripcion'], ENT_QUOTES, 'UTF-8') ?></p>
+
+          <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:0.75rem;">Usos Recomendados en Paisajismo</h2>
+          <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;margin-bottom:2rem;"><?= htmlspecialchars($usoPlanta, ENT_QUOTES, 'UTF-8') ?></p>
+          
+          <div style="background:var(--green-100);padding:1.5rem;border-radius:12px;margin-top:1.5rem;border:1px solid rgba(51,92,75,0.16);">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.05rem;font-weight:700;color:#223029;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;"><span class="material-symbols-outlined" style="color:#396452;">storefront</span>Disponible en nuestras sucursales en Cuautla</h3>
+            <p style="color:#69776d;font-size:0.925rem;margin-bottom:0.75rem;">Esta variedad de planta ornamental se comercializa directamente en nuestras dos sucursales en Cuautla, Morelos. Atendemos pedidos a menudeo, medio mayoreo y mayoreo.</p>
+            <a href="/sucursales.html" style="color:#396452;font-weight:700;font-size:0.925rem;text-decoration:underline;display:inline-flex;align-items:center;gap:0.25rem;">Ver ubicación de sucursales<span class="material-symbols-outlined" style="font-size:0.9rem;">arrow_forward</span></a>
+          </div>
+        </div>
+
+        <div style="margin-top:2.5rem;">
+          <a href="/catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+            Volver al catálogo
+          </a>
         </div>
       </div>
-    </div>
-
+    <?php endif; ?>
   </main>
 
   <footer class="site-footer">
@@ -205,17 +378,17 @@ if ($planta) {
         <div class="footer-col">
           <h4>Navegación</h4>
           <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="nosotros.html">Sobre Nosotros</a></li>
-            <li><a href="catalogo.html">Catálogo</a></li>
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="/catalogo.html">Catálogo</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Visítanos</h4>
           <ul>
-            <li><a href="sucursales.html">Sucursales</a></li>
-            <li><a href="horarios.html">Horarios</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="/sucursales.html">Sucursales</a></li>
+            <li><a href="/horarios.html">Horarios</a></li>
+            <li><a href="/contacto.html">Contacto</a></li>
             <li><a href="mailto:informesornaplant@hotmail.com">Enviar email</a></li>
           </ul>
         </div>
@@ -231,182 +404,27 @@ if ($planta) {
     <span class="material-symbols-outlined">keyboard_arrow_up</span>
   </button>
 
-  <script type="module">
-    import { getPlant, incrementViews } from './api.js';
-    import { WHATSAPP_NUMBER } from './config.js';
+  <script>
+    // MEJORA PROGRESIVA (INTERACTIVIDAD DE GALERÍA Y REGISTRO DE VISTAS)
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Galería: click en miniatura cambia la imagen principal
+      document.querySelectorAll('.gallery-thumb').forEach(t => {
+        t.addEventListener('click', () => {
+          const mainImg = document.getElementById('mainImg');
+          if (mainImg) {
+            mainImg.src = t.dataset.src;
+          }
+          document.querySelectorAll('.gallery-thumb').forEach(x => x.classList.remove('active'));
+          t.classList.add('active');
+        });
+      });
 
-    (async function () {
-      const dispCls = { disponible: 'disp-available', 'bajo pedido': 'disp-order', agotado: 'disp-sold' };
-      const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
-      const luzIcon = { 'sol directo': 'wb_sunny', 'luz indirecta': 'light_mode', 'media sombra': 'partly_cloudy_day', 'sombra': 'cloud' };
-      const cuidadoIcon = { 'fácil': 'sentiment_satisfied', 'intermedia': 'sentiment_neutral', 'difícil': 'sentiment_dissatisfied' };
-
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id') || <?= json_encode($planta['id'] ?? '') ?>;
-      const content = document.getElementById('plantContent');
-
-      if (!id) {
-        content.innerHTML = `
-          <div class="not-found">
-            <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">search_off</span>
-            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;">Planta no encontrada</h2>
-            <p style="color:var(--muted);">No encontramos la planta que buscas.</p>
-            <a href="catalogo.html" class="btn btn-primary"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
-          </div>`;
-        return;
-      }
-
-      let planta;
-      try {
-        planta = await getPlant(id);
-      } catch {
-        content.innerHTML = `
-          <div class="not-found">
-            <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">cloud_off</span>
-            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;">Error de conexión</h2>
-            <p style="color:var(--muted);">No pudimos cargar la planta. Intenta recargar.</p>
-          </div>`;
-        return;
-      }
-
-      if (!planta) {
-        content.innerHTML = `
-          <div class="not-found">
-            <span class="material-symbols-outlined" style="font-size:4rem;color:var(--earth-200);">search_off</span>
-            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;">Planta no encontrada</h2>
-            <p style="color:var(--muted);">No encontramos la planta que buscas.</p>
-            <a href="catalogo.html" class="btn btn-primary"><span class="material-symbols-outlined">arrow_back</span>Volver al catálogo</a>
-          </div>`;
-        return;
-      }
-
-      const rawImgs = planta.imagenes || [];
-      const mainImage = rawImgs[0] || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop';
-      const skuLine = planta.sku ? `\n- SKU: ${planta.sku}` : '';
-      const waMsg = encodeURIComponent(`Hola ORNAPLANT, me interesa la siguiente planta:\n- Nombre: ${planta.nombre}${skuLine}\n¿Está disponible?`);
-      const vistas = (planta.vistas || 0) + 1;
-
-      content.innerHTML = `
-        <nav class="breadcrumb" aria-label="Ruta de navegación" style="margin-bottom:1.5rem;">
-          <a href="catalogo.html">Catálogo</a>
-          <span class="sep" aria-hidden="true">/</span>
-          <a href="catalogo.html">${planta.categoria ? planta.categoria.charAt(0).toUpperCase()+planta.categoria.slice(1) : ''}</a>
-          <span class="sep" aria-hidden="true">/</span>
-          <span aria-current="page">${planta.nombre}</span>
-        </nav>
-
-        <div class="lg:grid lg:grid-cols-12 lg:gap-10" style="display:grid;grid-template-columns:repeat(12,1fr);gap:2.5rem;align-items:start;">
-
-          <div style="grid-column:1/span 8;" class="flex flex-col gap-2">
-            <div class="gallery-main" id="mainImgWrap">
-              <img id="mainImg" src="${mainImage}" alt="${planta.nombre}" width="800" height="600" loading="eager">
-            </div>
-            <p style="display:flex;align-items:center;gap:0.375rem;font-size:0.75rem;color:#69776d;font-style:italic;margin-top:0.25rem;">
-              <span class="material-symbols-outlined" style="font-size:0.95rem;color:#9ec4b0;">info</span>
-              La imagen es solo de referencia y no representa el producto almacenado.
-            </p>
-          </div>
-
-          <div style="grid-column:span 4;" class="flex flex-col gap-5">
-
-            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
-              <span style="padding:0.25rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;font-family:'Plus Jakarta Sans',sans-serif;" class="${dispCls[planta.disponibilidad] || 'disp-available'}">${dispLbl[planta.disponibilidad] || planta.disponibilidad}</span>
-              ${(planta.etiquetas || []).map(t => `<span class="pill">${t}</span>`).join('')}
-            </div>
-
-            <div>
-              <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.75rem,3.5vw,2.25rem);font-weight:800;line-height:1.1;color:#223029;margin-bottom:0.375rem;">${planta.nombre}</h1>
-              <p style="font-style:italic;color:#69776d;font-size:0.9375rem;">${planta.nombreCientifico}</p>
-              ${planta.sku ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.07em;color:#9ec4b0;margin-top:0.25rem;">SKU: ${planta.sku}</p>` : ''}
-              <p style="display:flex;align-items:center;gap:0.25rem;font-size:0.8rem;color:#69776d;margin-top:0.375rem;">
-                <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span>
-                ${vistas} vista${vistas !== 1 ? 's' : ''}
-              </p>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;" role="list" aria-label="Especificaciones de cuidado">
-              <div class="care-card" role="listitem">
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
-                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">${luzIcon[planta.luz] || 'wb_sunny'}</span>
-                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Luz</span>
-                </div>
-                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;">${planta.luz}</p>
-              </div>
-              <div class="care-card" role="listitem">
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
-                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">water_drop</span>
-                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Riego</span>
-                </div>
-                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;">${planta.riego}</p>
-              </div>
-              <div class="care-card" role="listitem">
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
-                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:#396452;">${cuidadoIcon[planta.cuidado] || 'eco'}</span>
-                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Cuidado</span>
-                </div>
-                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#223029;text-transform:capitalize;">${planta.cuidado}</p>
-              </div>
-              <div class="care-card" role="listitem">
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.375rem;">
-                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:${planta.mascotas==='tóxica'?'#b43c6d':'#396452'};">pets</span>
-                  <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;">Mascotas</span>
-                </div>
-                <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;color:${planta.mascotas==='tóxica'?'#b43c6d':'#166534'};text-transform:capitalize;">${planta.mascotas === 'tóxica' ? '⚠ Tóxica' : 'No tóxica'}</p>
-              </div>
-            </div>
-
-            <div>
-              <p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#69776d;margin-bottom:0.625rem;">Tamaños disponibles</p>
-              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-                ${(planta.variaciones || []).map(v => `<span style="padding:0.375rem 0.875rem;border:1.5px solid rgba(51,92,75,0.16);border-radius:6px;font-size:0.875rem;font-weight:600;color:#396452;background:white;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize;">${v}</span>`).join('')}
-              </div>
-            </div>
-
-            <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" class="whatsapp-cta" target="_blank" rel="noopener noreferrer" aria-label="Consultar disponibilidad de ${planta.nombre} por WhatsApp">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                <path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.07 21.47a.75.75 0 00.918.918l4.356-1.371A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.25a8.245 8.245 0 01-4.21-1.16l-.3-.178-3.108.978.99-3.042-.197-.31A8.25 8.25 0 1120.25 12a8.26 8.26 0 01-8.251 8.25z"/>
-              </svg>
-              Consultar disponibilidad
-            </a>
-
-            <p style="font-size:0.8125rem;color:#69776d;text-align:center;">Respuesta en horario de atención · Sin precio en línea</p>
-
-          </div>
-        </div>
-
-        <div style="margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(51,92,75,0.16);">
-          <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:700;color:#223029;margin-bottom:1rem;">Descripción</h2>
-          <p style="color:#69776d;font-size:1rem;line-height:1.75;max-width:72ch;">${planta.descripcion}</p>
-        </div>
-
-        <div style="margin-top:2.5rem;">
-          <a href="catalogo.html" class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:0.375rem;">
-            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
-            Volver al catálogo
-          </a>
-        </div>`;
-
-      const gallery = content.querySelector('[style*="grid-column:1/span 8"]');
-      const info = content.querySelector('[style*="grid-column:span 4"]');
-      const mainGrid = gallery && gallery.parentElement;
-      function fixLayout() {
-        if (!mainGrid) return;
-        if (window.innerWidth < 1024) {
-          mainGrid.style.gridTemplateColumns = '1fr';
-          if (gallery) gallery.style.gridColumn = '1';
-          if (info) info.style.gridColumn = '1';
-        } else {
-          mainGrid.style.gridTemplateColumns = 'repeat(12,1fr)';
-          if (gallery) gallery.style.gridColumn = '1/span 8';
-          if (info) info.style.gridColumn = 'span 4';
-        }
-      }
-      fixLayout();
-      window.addEventListener('resize', fixLayout);
-
-      incrementViews(id).catch(() => {});
-    })();
+      // 2. Incrementar vistas asíncronamente en segundo plano
+      <?php if ($planta): ?>
+        fetch('/api/plantas.php?id=<?= urlencode($planta['id']) ?>&action=incrementar_vistas', { method: 'PATCH' })
+          .catch(() => {});
+      <?php endif; ?>
+    });
   </script>
   <script src="script.js"></script>
 </body>
