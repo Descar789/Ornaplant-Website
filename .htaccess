@@ -6,6 +6,13 @@ RewriteEngine On
 RewriteCond %{THE_REQUEST} \s/+index\.html[\s?] [NC]
 RewriteRule ^index\.html$ / [R=301,L]
 
+# 301: /catalogo.php → /catalogo.html (evitar duplicado)
+RewriteCond %{THE_REQUEST} \s/+catalogo\.php[\s?] [NC]
+RewriteRule ^catalogo\.php$ /catalogo.html [R=301,L]
+
+# Enmascarar catalogo.html para servir catalogo.php de forma interna
+RewriteRule ^catalogo\.html$ catalogo.php [L]
+
 # No tocar /api/ (deja pasar tal cual)
 RewriteRule ^api/ - [L]
 

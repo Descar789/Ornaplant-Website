@@ -1,3 +1,17 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/api/config.php';
+require_once __DIR__ . '/api/db.php';
+
+$plantasIniciales = [];
+try {
+    $pdo = db();
+    $stmt = $pdo->query('SELECT id, slug, nombre, nombre_cientifico, categoria, luz, riego, cuidado, disponibilidad, etiquetas, imagenes, sku FROM plantas ORDER BY creado_en DESC LIMIT 24');
+    $plantasIniciales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    error_log('[catalogo] ' . $e->getMessage());
+}
+?>
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
@@ -88,17 +102,17 @@
 
   <header class="site-header" id="header">
     <nav class="navbar container">
-      <a class="nav-brand" href="index.html">
+      <a class="nav-brand" href="/index.html">
         <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" height="44" class="brand-symbol-img">
         <img src="assets/logo-palabras-web.png" alt="ORNAPLANT" height="28">
       </a>
       <ul class="nav-menu" id="navMenu" role="list">
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="nosotros.html">Sobre Nosotros</a></li>
-        <li><a href="catalogo.html">Catálogo</a></li>
-        <li><a href="sucursales.html">Sucursales</a></li>
-        <li><a href="horarios.html">Horarios</a></li>
-        <li><a href="contacto.html" class="nav-cta">Contacto</a></li>
+        <li><a href="/index.html">Inicio</a></li>
+        <li><a href="/nosotros.html">Sobre Nosotros</a></li>
+        <li><a href="/catalogo.html">Catálogo</a></li>
+        <li><a href="/sucursales.html">Sucursales</a></li>
+        <li><a href="/horarios.html">Horarios</a></li>
+        <li><a href="/contacto.html" class="nav-cta">Contacto</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
         <span class="material-symbols-outlined" id="navIcon">menu</span>
@@ -191,15 +205,59 @@
           <!-- PLANT GRID -->
           <div>
             <div class="catalog-toolbar">
-              <span class="catalog-count" id="resultCount" aria-live="polite">10 plantas</span>
+              <span class="catalog-count" id="resultCount" aria-live="polite"><?= count($plantasIniciales) ?> plantas</span>
               <div class="catalog-search">
                 <span class="si" aria-hidden="true"><span class="material-symbols-outlined">search</span></span>
                 <input type="search" id="searchInput" placeholder="Buscar por nombre..." aria-label="Buscar plantas">
               </div>
             </div>
+
+            <!-- RENDER SSR INICIAL (PHP) -->
             <div class="grid-auto" id="plantGrid" aria-label="Resultados del catálogo">
-              <!-- Rendered by JS -->
+              <?php foreach ($plantasIniciales as $p): ?>
+                <?php
+                $rawImgs = $p['imagenes'] ? json_decode($p['imagenes'], true) : [];
+                if (!is_array($rawImgs)) $rawImgs = [];
+                $img = !empty($rawImgs[0]) ? $rawImgs[0] : 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop';
+
+                $slugRaw = (string)($p['slug'] ?? '');
+                $idRaw = (string)$p['id'];
+                // Mapeo dinámico y retrocompatible de enlaces a detalle
+                $link = $slugRaw !== '' ? '/catalogo/' . rawurlencode($slugRaw) : '/planta/' . rawurlencode($idRaw);
+
+                $tags = $p['etiquetas'] ? json_decode($p['etiquetas'], true) : [];
+                if (!is_array($tags)) $tags = [];
+                $tagsStr = '';
+                if (!empty($tags)) {
+                    $tagsStr = implode('', array_map(fn($t) => '<span class="badge badge-green">' . htmlspecialchars((string)$t, ENT_QUOTES, 'UTF-8') . '</span>', array_slice($tags, 0, 2)));
+                }
+
+                $dispCls = ['disponible' => 'badge-available', 'bajo pedido' => 'badge-order', 'agotado' => 'badge-sold'];
+                $dispLbl = ['disponible' => 'Disponible', 'bajo pedido' => 'Bajo pedido', 'agotado' => 'Agotado'];
+                $disp = strtolower($p['disponibilidad'] ?? 'disponible');
+                ?>
+                <a href="<?= htmlspecialchars($link, ENT_QUOTES, 'UTF-8') ?>" class="card plant-card" aria-label="Ver detalle de <?= htmlspecialchars($p['nombre'], ENT_QUOTES, 'UTF-8') ?>">
+                  <div class="plant-card-img">
+                    <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="Planta ornamental <?= htmlspecialchars($p['nombre'], ENT_QUOTES, 'UTF-8') ?> - Vivero ORNAPLANT Cuautla" loading="lazy" width="400" height="300">
+                    <span class="badge <?= $dispCls[$disp] ?? 'badge-green' ?>"><?= htmlspecialchars($dispLbl[$disp] ?? (string)$p['disponibilidad'], ENT_QUOTES, 'UTF-8') ?></span>
+                  </div>
+                  <div class="plant-card-body">
+                    <div class="plant-card-tags"><?= $tagsStr ?></div>
+                    <div class="plant-card-name"><?= htmlspecialchars($p['nombre'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="plant-card-sci"><?= htmlspecialchars($p['nombre_cientifico'] ?? '', ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php if (!empty($p['sku'])): ?>
+                      <div class="plant-card-sku"><?= htmlspecialchars($p['sku'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php endif; ?>
+                    <div class="plant-card-meta">
+                      <span class="plant-card-meta-item"><span class="material-symbols-outlined">wb_sunny</span><?= htmlspecialchars($p['luz'] ?? 'luz indirecta', ENT_QUOTES, 'UTF-8') ?></span>
+                      <span class="plant-card-meta-item"><span class="material-symbols-outlined">water_drop</span><?= htmlspecialchars($p['riego'] ?? 'medio', ENT_QUOTES, 'UTF-8') ?></span>
+                      <span class="plant-card-meta-item"><span class="material-symbols-outlined">eco</span><?= htmlspecialchars($p['cuidado'] ?? 'fácil', ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                  </div>
+                </a>
+              <?php endforeach; ?>
             </div>
+
             <nav class="pagination" id="pagination" aria-label="Paginación del catálogo" hidden></nav>
           </div>
 
@@ -219,17 +277,17 @@
         <div class="footer-col">
           <h4>Navegación</h4>
           <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="nosotros.html">Sobre Nosotros</a></li>
-            <li><a href="catalogo.html">Catálogo</a></li>
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/nosotros.html">Sobre Nosotros</a></li>
+            <li><a href="/catalogo.html">Catálogo</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Visítanos</h4>
           <ul>
-            <li><a href="sucursales.html">Sucursales</a></li>
-            <li><a href="horarios.html">Horarios</a></li>
-            <li><a href="contacto.html">Contacto</a></li>
+            <li><a href="/sucursales.html">Sucursales</a></li>
+            <li><a href="/horarios.html">Horarios</a></li>
+            <li><a href="/contacto.html">Contacto</a></li>
             <li><a href="mailto:informesornaplant@hotmail.com">Enviar email</a></li>
           </ul>
         </div>
@@ -254,21 +312,15 @@
       const dispLbl = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
 
       const grid = document.getElementById('plantGrid');
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><span class="material-symbols-outlined">hourglass_empty</span><h3>Cargando catálogo...</h3></div>`;
-
-      let plantas;
-      try {
-        plantas = await getPlants();
-      } catch {
-        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><span class="material-symbols-outlined">cloud_off</span><h3>Error al cargar</h3><p>Intenta recargar la página.</p></div>`;
-        return;
-      }
+      let plantas = [];
 
       function plantCard(p) {
         const img = (p.imagenes && p.imagenes[0]) || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop';
         const tags = (p.etiquetas || []).slice(0, 2).map(t => `<span class="badge badge-green">${t}</span>`).join('');
+        // Client-side enrutado canónico unificado
+        const href = p.slug ? `/catalogo/${encodeURIComponent(p.slug)}` : `/planta/${encodeURIComponent(p.id)}`;
         return `
-          <a href="/planta/${encodeURIComponent(p.id)}" class="card plant-card" aria-label="Ver detalle de ${p.nombre}">
+          <a href="${href}" class="card plant-card" aria-label="Ver detalle de ${p.nombre}">
             <div class="plant-card-img">
               <img src="${img}" alt="Planta ornamental ${p.nombre} - Vivero ORNAPLANT Cuautla" loading="lazy" width="400" height="300">
               <span class="badge ${dispCls[p.disponibilidad] || 'badge-green'}">${dispLbl[p.disponibilidad] || p.disponibilidad}</span>
@@ -292,6 +344,7 @@
       let currentList = [];
       const ROWS_PER_PAGE = 3;
       const pagEl = document.getElementById('pagination');
+      let hasRenderedClient = false;
 
       function getColumns() {
         const cs = getComputedStyle(grid).gridTemplateColumns;
@@ -319,6 +372,7 @@
       }
 
       function render() {
+        hasRenderedClient = true;
         const list = currentList;
         const count = document.getElementById('resultCount');
         count.textContent = `${list.length} planta${list.length !== 1 ? 's' : ''}`;
@@ -383,7 +437,7 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
           const s = pageSize();
-          if (s !== lastSize) { lastSize = s; render(); }
+          if (hasRenderedClient && s !== lastSize) { lastSize = s; render(); }
         }, 150);
       });
 
@@ -431,10 +485,14 @@
         });
       }
 
-      // Initial render
-      currentList = plantas;
-      lastSize = pageSize();
-      render();
+      // Mejora progresiva e hidratación inicial
+      try {
+        plantas = await getPlants();
+        currentList = plantas;
+        lastSize = pageSize();
+      } catch (e) {
+        // En caso de fallo de red, el grid SSR inicial de PHP ya está pintado y permanece visible
+      }
     })();
   </script>
   <script src="script.js"></script>
