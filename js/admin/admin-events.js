@@ -1,4 +1,4 @@
-import { getPlants, updatePlantInList, setSearchTerm, setCurrentPage, getCurrentPage, dispStyle } from './admin-state.js';
+import { getPlants, updatePlantInList, setSearchTerm, setCurrentPage, getCurrentPage, dispStyle, setFilterCat, setFilterDisp, setFilterSuc, setSort } from './admin-state.js';
 import { renderList } from './admin-ui-list.js';
 import { renderStats } from './admin-ui-stats.js';
 import { openModal, closeModal, savePlantUI, handleDeleteClick, handleImageUpload } from './admin-form.js';
@@ -44,6 +44,18 @@ export function setupEvents() {
   document.addEventListener('input', (e) => {
     if (e.target.id === 'adminSearch') {
       setSearchTerm(e.target.value.trim());
+      renderList();
+    }
+  });
+
+  // Filters + sort
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'filterCat')  { setFilterCat(e.target.value);  renderList(); return; }
+    if (e.target.id === 'filterDisp') { setFilterDisp(e.target.value); renderList(); return; }
+    if (e.target.id === 'filterSuc')  { setFilterSuc(e.target.value);  renderList(); return; }
+    if (e.target.id === 'sortSelect') {
+      const [field, dir] = e.target.value.split(':');
+      setSort(field, dir);
       renderList();
     }
   });

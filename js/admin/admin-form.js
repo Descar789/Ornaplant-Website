@@ -114,7 +114,11 @@ export async function savePlantUI() {
     renderStats();
     renderList();
   } catch (e) {
-    showToast('Error al guardar: ' + e.message, 'error');
+    if (e.status === 409 && e.field === 'sku') {
+      showFieldError('f-sku', 'SKU ya registrado en el servidor.');
+    } else {
+      showToast('Error al guardar: ' + e.message, 'error');
+    }
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">save</span> Guardar';

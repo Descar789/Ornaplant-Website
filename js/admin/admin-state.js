@@ -31,3 +31,24 @@ export function removePlantFromList(id) {
 export function dispStyle(d) {
   return d === 'disponible' ? 'disponible' : d === 'bajo pedido' ? 'bajo-pedido' : 'agotado';
 }
+
+// ── Filtros y orden ───────────────────────────────────────────────
+let filterCat  = '';
+let filterDisp = '';
+let filterSuc  = '';
+let sortField  = 'nombre';
+let sortDir    = 'asc';
+
+export function getFilterCat()  { return filterCat; }
+export function setFilterCat(v)  { filterCat  = v; adminCurrentPage = 1; }
+export function getFilterDisp() { return filterDisp; }
+export function setFilterDisp(v) { filterDisp = v; adminCurrentPage = 1; }
+export function getFilterSuc()  { return filterSuc; }
+export function setFilterSuc(v)  { filterSuc  = v; adminCurrentPage = 1; }
+export function getSortField()  { return sortField; }
+export function getSortDir()    { return sortDir; }
+export function setSort(field, dir) { sortField = field; sortDir = dir; adminCurrentPage = 1; }
+export function resetFilters() {
+  filterCat = ''; filterDisp = ''; filterSuc = '';
+  sortField = 'nombre'; sortDir = 'asc'; adminCurrentPage = 1;
+}

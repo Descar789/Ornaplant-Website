@@ -9,6 +9,15 @@ require_once __DIR__ . '/../slug.php';
 
 require_admin();
 
+function handle_duplicate(PDOException $e): void {
+    if (($e->errorInfo[1] ?? 0) !== 1062) return;
+    $msg = $e->getMessage();
+    if (str_contains($msg, 'uk_sku') || str_contains($msg, "'sku'")) {
+        json_response(['error' => 'SKU duplicado', 'field' => 'sku'], 409);
+    }
+    json_error('ID duplicado', 409);
+}
+
 const ENUMS = [
     'categoria'      => ['interior', 'exterior', 'suculenta', 'ornamental', 'árbol', 'medicinal'],
     'luz'            => ['sol directo', 'luz indirecta', 'media sombra', 'sombra'],
@@ -108,7 +117,7 @@ if ($method === 'POST') {
         $stmt = db()->prepare($sql);
         $stmt->execute(array_combine($place, array_values($payload)));
     } catch (PDOException $e) {
-        if ($e->errorInfo[1] ?? 0 === 1062) json_error('ID o SKU duplicado', 409);
+        handle_duplicate($e);
         throw $e;
     }
     json_response(['id' => $newId, 'ok' => true], 201);
@@ -145,8 +154,13 @@ if ($method === 'PUT') {
         $params[":$col"] = $val;
     }
     $sql = 'UPDATE plantas SET ' . implode(',', $sets) . ' WHERE id = :id';
-    $stmt = db()->prepare($sql);
-    $stmt->execute($params);
+    try {
+        $stmt = db()->prepare($sql);
+        $stmt->execute($params);
+    } catch (PDOException $e) {
+        handle_duplicate($e);
+        throw $e;
+    }
     json_response(['ok' => true, 'actualizado' => $stmt->rowCount()]);
 }
 

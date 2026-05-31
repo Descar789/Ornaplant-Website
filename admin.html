@@ -172,12 +172,42 @@
             Agregar planta
           </button>
         </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
           <div class="admin-search">
             <span class="si"><span class="material-symbols-outlined">search</span></span>
             <input type="search" id="adminSearch" placeholder="Buscar por nombre, etiqueta o SKU..." aria-label="Buscar plantas">
           </div>
           <span id="adminCount" style="font-size:0.8125rem;color:#69776d;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;" aria-live="polite"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+          <select id="filterCat" aria-label="Filtrar por categoría" style="padding:0.375rem 0.625rem;border:1px solid rgba(51,92,75,0.16);border-radius:8px;font-size:0.8125rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#223029;background:white;cursor:pointer;">
+            <option value="">Todas las categorías</option>
+            <option value="ornamental">Ornamental</option>
+            <option value="suculenta">Suculenta</option>
+            <option value="árbol">Árbol</option>
+            <option value="interior">Interior</option>
+            <option value="exterior">Exterior</option>
+            <option value="medicinal">Medicinal</option>
+          </select>
+          <select id="filterDisp" aria-label="Filtrar por disponibilidad" style="padding:0.375rem 0.625rem;border:1px solid rgba(51,92,75,0.16);border-radius:8px;font-size:0.8125rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#223029;background:white;cursor:pointer;">
+            <option value="">Todas las disponibilidades</option>
+            <option value="disponible">Disponible</option>
+            <option value="bajo pedido">Bajo pedido</option>
+            <option value="agotado">Agotado</option>
+          </select>
+          <select id="filterSuc" aria-label="Filtrar por sucursal" style="padding:0.375rem 0.625rem;border:1px solid rgba(51,92,75,0.16);border-radius:8px;font-size:0.8125rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#223029;background:white;cursor:pointer;">
+            <option value="">Todas las sucursales</option>
+            <option value="ambas">Ambas</option>
+            <option value="matriz">Matriz</option>
+            <option value="embarques">Embarques</option>
+          </select>
+          <select id="sortSelect" aria-label="Ordenar por" style="padding:0.375rem 0.625rem;border:1px solid rgba(51,92,75,0.16);border-radius:8px;font-size:0.8125rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;color:#223029;background:white;cursor:pointer;margin-left:auto;">
+            <option value="nombre:asc">Nombre A→Z</option>
+            <option value="nombre:desc">Nombre Z→A</option>
+            <option value="sku:asc">SKU A→Z</option>
+            <option value="vistas:desc">Más vistas</option>
+            <option value="vistas:asc">Menos vistas</option>
+          </select>
         </div>
         <div style="background:white;border:1px solid rgba(51,92,75,0.16);border-radius:12px;overflow:hidden;">
           <div id="plantList"><!-- rendered by JS --></div>

@@ -20,7 +20,10 @@ async function apiFetch(path, opts = {}) {
   const data = ct.includes('application/json') ? await res.json().catch(() => null) : null;
   if (!res.ok) {
     const msg = (data && data.error) || `HTTP ${res.status}`;
-    throw new Error(msg);
+    const err = new Error(msg);
+    err.status = res.status;
+    if (data && data.field) err.field = data.field;
+    throw err;
   }
   return data;
 }
