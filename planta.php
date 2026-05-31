@@ -181,6 +181,10 @@ if (!$planta) {
     .breadcrumb a:hover { color: var(--green-800, #396452); }
     .breadcrumb .sep { font-size: 0.75rem; color: var(--muted, #69776d); opacity: 0.5; }
     .not-found { min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column; gap: 1rem; }
+    @media (max-width: 1024px) {
+      #plantGridBlock { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+      #galleryCol, #infoCol { grid-column: 1 / -1 !important; }
+    }
   </style>
 </head>
 <body class="tailwind-page">

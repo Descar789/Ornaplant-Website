@@ -1,0 +1,93 @@
+<h2>Análisis Crítico del Plan de Codex</h2>
+<p class="subtitle">Lo que está bien, lo que falla, lo que falta</p>
+
+<div class="section">
+  <h3 style="color:#166534;">✓ Sólido en el plan de Codex</h3>
+  <ul style="line-height:1.8;color:#4b5d53;">
+    <li>Modularizar JS — correcto en dirección, problemático en escala</li>
+    <li>Quitar <code>onclick</code> / <code>window.*</code> — crítico, bien identificado</li>
+    <li>Rollback de disponibilidad — bien descrito</li>
+    <li>SKU único en DB — correcto</li>
+    <li>Logs de auditoría en PHP — arquitectura correcta</li>
+    <li>Soft delete con <code>deleted_at</code> — concepto correcto</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3 style="color:#991b1b;">✗ Problemas reales en el plan de Codex</h3>
+
+  <div style="display:grid;gap:.75rem;margin-top:.75rem;">
+
+    <article style="border-left:3px solid #f87171;padding:.75rem 1rem;background:#fff5f5;border-radius:0 8px 8px 0;">
+      <strong>7 módulos para 700 líneas — sobreingeniería</strong>
+      <p style="margin:.25rem 0 0;color:#4b5d53;font-size:.9rem;">
+        <code>admin-state.js</code>, <code>admin-render.js</code>, <code>admin-events.js</code>, <code>admin-form.js</code>, <code>admin-auth.js</code>, <code>admin-toast.js</code>, <code>main.js</code> —
+        son 7 archivos para un panel interno de una sola página. El proyecto no tiene bundler.
+        <strong>3 módulos son suficientes y mantenibles.</strong>
+      </p>
+    </article>
+
+    <article style="border-left:3px solid #f87171;padding:.75rem 1rem;background:#fff5f5;border-radius:0 8px 8px 0;">
+      <strong>Fase 1 fuerza hacer el XSS dos veces</strong>
+      <p style="margin:.25rem 0 0;color:#4b5d53;font-size:.9rem;">
+        Fase 1 pide "escapar campos" en los template literals actuales.
+        Fase 2 propone cambiar el renderizado. Resultado: fix XSS en template literal → tirar el template literal → fix XSS de nuevo en DOM.
+        <strong>Hay que consolidar ambos en Fase 1.</strong>
+      </p>
+    </article>
+
+    <article style="border-left:3px solid #f87171;padding:.75rem 1rem;background:#fff5f5;border-radius:0 8px 8px 0;">
+      <strong><code>admin-service.js</code> — decisión ambigua sin resolver</strong>
+      <p style="margin:.25rem 0 0;color:#4b5d53;font-size:.9rem;">
+        Codex dice "no duplicar api.js" pero coloca lógica de save/delete en <code>admin-form.js</code>.
+        ¿Quién llama a <code>savePlant()</code>, el form o un service? El plan no lo define.
+        <strong>Mantener <code>api.js</code> como única capa HTTP, punto.</strong>
+      </p>
+    </article>
+
+    <article style="border-left:3px solid #f87171;padding:.75rem 1rem;background:#fff5f5;border-radius:0 8px 8px 0;">
+      <strong>Fase 3 bloqueada por decisión de negocio no tomada</strong>
+      <p style="margin:.25rem 0 0;color:#4b5d53;font-size:.9rem;">
+        "Definir política de archivos huérfanos antes de implementar."
+        Codex identifica el bloqueador pero lo mete dentro de la fase.
+        <strong>Ese bloqueador debe resolverse ANTES de planificar Fase 3.</strong>
+      </p>
+    </article>
+
+    <article style="border-left:3px solid #f87171;padding:.75rem 1rem;background:#fff5f5;border-radius:0 8px 8px 0;">
+      <strong>Fase 4 tiene alcance ilimitado para un admin de vivero pequeño</strong>
+      <p style="margin:.25rem 0 0;color:#4b5d53;font-size:.9rem;">
+        Soft delete toca 6 archivos PHP más vista de papelera.
+        Audit logs agrega tabla nueva + logging en cada endpoint + UI de logs.
+        Para 1-2 usuarios internos, esto es scope creep masivo.
+        <strong>Fase 4 debe ser opcional/futuro, no comprometida.</strong>
+      </p>
+    </article>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3 style="color:#854d0e;">⚠ Bugs que Codex no detectó</h3>
+  <div style="display:grid;gap:.5rem;margin-top:.75rem;">
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:.5rem .75rem;align-items:start;font-size:.9rem;">
+      <code style="background:#fef3c7;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;">api.js:66</code>
+      <span>POST→PUT retry usa <code>includes('duplicad')</code> — string matching frágil que puede fallar silenciosamente</span>
+
+      <code style="background:#fef3c7;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;">isAdminLogged()</code>
+      <span>No verifica <code>exp</code> del JWT — panel aparece brevemente antes del 401</span>
+
+      <code style="background:#fef3c7;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;">accessDenied</code>
+      <span>Pantalla nunca se muestra — dead code desde migración de Firebase</span>
+
+      <code style="background:#fef3c7;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;">adminAvatar</code>
+      <span>img con <code>src=""</code> que nunca se rellena — request vacío al servidor</span>
+
+      <code style="background:#fef3c7;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;">ENUMS cuidado</code>
+      <span>PHP tiene <code>'intermedio'</code> Y <code>'intermedia'</code> — registros viejos en DB probablemente con valor inválido</span>
+
+      <code style="background:#fef3c7;padding:.1rem .4rem;border-radius:4px;white-space:nowrap;">ID generation</code>
+      <span>Frontend genera IDs con <code>normalize('NFD')</code>, PHP con <code>slugify()</code> — pueden divergir en plantas con acentos</span>
+    </div>
+  </div>
+</div>

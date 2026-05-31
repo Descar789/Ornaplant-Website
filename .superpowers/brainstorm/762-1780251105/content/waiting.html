@@ -1,0 +1,45 @@
+<main style="max-width:960px;margin:0 auto;padding:3rem 1.5rem;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#203b31;">
+  <p style="font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:#56816d;font-weight:700;margin:0 0 .5rem;">Plan actualizado</p>
+  <h1 style="font-size:2rem;line-height:1.15;margin:.25rem 0 1rem;">Refactor del Panel Admin - Ornaplant</h1>
+  <p style="font-size:1rem;line-height:1.6;color:#4b5d53;margin:0 0 1.5rem;">
+    El plan fue ajustado con el feedback de Claude: menos modulos, Fase 1 mas precisa,
+    create/update explicitos, backend dueno del ID, expiracion JWT y Fase 4 como futuro opcional.
+    Fuente canonica: <code>docs/superpowers/plans/2026-05-31--admin-panel-refactor.md</code>.
+  </p>
+
+  <section style="display:grid;gap:1rem;">
+    <article style="border:1px solid rgba(51,92,75,.16);border-radius:8px;padding:1rem;background:#fff;">
+      <h2 style="font-size:1rem;margin:0 0 .5rem;">1. Arquitectura compacta</h2>
+      <p style="margin:0;color:#4b5d53;line-height:1.55;">
+        Usar <code>main.js</code>, <code>state.js</code>, <code>ui.js</code> y <code>actions.js</code>.
+        No crear siete archivos para una pagina interna sin bundler.
+      </p>
+    </article>
+
+    <article style="border:1px solid rgba(51,92,75,.16);border-radius:8px;padding:1rem;background:#fff;">
+      <h2 style="font-size:1rem;margin:0 0 .5rem;">2. Bugs reales entran en Fase 1</h2>
+      <p style="margin:0;color:#4b5d53;line-height:1.55;">
+        Separar crear/editar, dejar el ID al backend, validar expiracion JWT, quitar UI muerta y normalizar
+        <code>cuidado=intermedio</code>.
+      </p>
+    </article>
+
+    <article style="border:1px solid rgba(51,92,75,.16);border-radius:8px;padding:1rem;background:#fff;">
+      <h2 style="font-size:1rem;margin:0 0 .5rem;">3. Multi-imagen espera decision</h2>
+      <p style="margin:0;color:#4b5d53;line-height:1.55;">
+        Antes de implementar hay que decidir politica de archivos huerfanos, borrado fisico y formato de nombres.
+      </p>
+    </article>
+
+    <article style="border:1px solid rgba(51,92,75,.16);border-radius:8px;padding:1rem;background:#fff;">
+      <h2 style="font-size:1rem;margin:0 0 .5rem;">4. Futuro opcional</h2>
+      <p style="margin:0;color:#4b5d53;line-height:1.55;">
+        Logs, soft delete, papelera y dashboard no son parte del refactor base. Se implementan solo con necesidad operativa real.
+      </p>
+    </article>
+  </section>
+
+  <p style="margin-top:1.5rem;color:#69776d;font-size:.9rem;">
+    Detalle completo: <code>ai-collaboration/refactor-admin-panel.md</code>
+  </p>
+</main>

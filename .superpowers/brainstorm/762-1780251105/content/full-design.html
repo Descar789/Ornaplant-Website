@@ -1,0 +1,156 @@
+<h2>Diseño Completo — Admin Panel Refactor</h2>
+<p class="subtitle">2 fases · 3 módulos · sin multi-imagen · sin Fase 4</p>
+
+<div class="section">
+  <h3>Arquitectura de módulos</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.75rem;">
+
+    <div style="border:1px solid #fca5a5;border-radius:8px;padding:1rem;background:#fff5f5;">
+      <div class="label" style="color:#991b1b;">ANTES — monolito</div>
+      <div style="font-family:monospace;font-size:.85rem;line-height:1.9;margin-top:.5rem;color:#4b5d53;">
+        admin.html<br>
+        <span style="color:#991b1b;">  740 líneas</span><br>
+        <span style="color:#991b1b;">  HTML + CSS + JS mezclados</span><br>
+        <span style="color:#991b1b;">  window.* globals</span><br>
+        <span style="color:#991b1b;">  onclick inline</span><br>
+        <span style="color:#991b1b;">  innerHTML con datos del user</span><br>
+        <span style="color:#991b1b;">  JWT exp no verificado</span><br>
+        api.js → savePlant() <span style="color:#991b1b;">(POST→PUT hack)</span>
+      </div>
+    </div>
+
+    <div style="border:1px solid #86efac;border-radius:8px;padding:1rem;background:#f0fdf4;">
+      <div class="label" style="color:#166534;">DESPUÉS — modular</div>
+      <div style="font-family:monospace;font-size:.85rem;line-height:1.9;margin-top:.5rem;color:#4b5d53;">
+        admin.html <span style="color:#166534;">(HTML + CSS solo)</span><br>
+        js/admin/<br>
+        <span style="color:#166534;">  auth.js</span> ← login/logout/exp<br>
+        <span style="color:#166534;">  panel.js</span> ← estado/render/CRUD<br>
+        <span style="color:#166534;">  toast.js</span> ← notificaciones<br>
+        api.js → <span style="color:#166534;">createPlant / updatePlant</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>Fase 1 — Base Segura <span style="font-size:.8rem;font-weight:400;color:#69776d;">(sin cambios visibles para el usuario)</span></h3>
+  <div style="display:grid;gap:.5rem;margin-top:.75rem;">
+    <div style="display:grid;grid-template-columns:1.5rem 1fr;gap:.5rem;align-items:start;font-size:.9rem;line-height:1.5;">
+
+      <span style="color:#396452;font-weight:700;">1.</span>
+      <div><strong>Modularizar JS</strong> → <code>js/admin/auth.js</code>, <code>panel.js</code>, <code>toast.js</code><br>
+      <span style="color:#69776d;">admin.html importa solo auth.js · auth.js importa panel.js post-login</span></div>
+
+      <span style="color:#396452;font-weight:700;">2.</span>
+      <div><strong>Quitar onclick/onchange/window.*</strong> → addEventListener desde módulos<br>
+      <span style="color:#69776d;">Delegación de eventos en panel.js para filas dinámicas</span></div>
+
+      <span style="color:#396452;font-weight:700;">3.</span>
+      <div><strong>XSS fix + DOM construction</strong> — una sola vez, no dos<br>
+      <span style="color:#69776d;">createPlantRow(p) devuelve HTMLElement con textContent para todos los campos</span></div>
+
+      <span style="color:#396452;font-weight:700;">4.</span>
+      <div><strong>JWT exp check</strong> en <code>isAdminLogged()</code><br>
+      <span style="color:#69776d;">Decodificar payload, comparar exp con Date.now()/1000 — sin librería</span></div>
+
+      <span style="color:#396452;font-weight:700;">5.</span>
+      <div><strong>api.js: createPlant + updatePlant explícitos</strong> — eliminar savePlant()<br>
+      <span style="color:#69776d;">POST siempre crea. PUT siempre actualiza. Sin string matching de error.</span></div>
+
+      <span style="color:#396452;font-weight:700;">6.</span>
+      <div><strong>Rollback de disponibilidad</strong> + toast de error<br>
+      <span style="color:#69776d;">Guardar prev, actualizar UI, si falla → restaurar prev + renderList() + toast</span></div>
+
+      <span style="color:#396452;font-weight:700;">7.</span>
+      <div><strong>Eliminar dead code</strong>: pantalla accessDenied, img adminAvatar</div>
+
+      <span style="color:#396452;font-weight:700;">8.</span>
+      <div><strong>Migración DB</strong>: <code>UPDATE plantas SET cuidado='intermedio' WHERE cuidado='intermedia'</code><br>
+      PHP: quitar 'intermedia' del array ENUMS</div>
+
+      <span style="color:#396452;font-weight:700;">9.</span>
+      <div><strong>README</strong>: quitar Firebase/Cloudinary/tester, documentar PHP+MySQL+JWT+uploads</div>
+
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;background:#f0fdf4;border-radius:8px;padding:.75rem 1rem;font-size:.85rem;">
+    <strong>Criterios Fase 1:</strong> sin onclick/onchange/window.* · CRUD completo funciona · rollback revierte · exp check activo · dead code removido · README actualizado
+  </div>
+</div>
+
+<div class="section">
+  <h3>Fase 2 — UX del Catálogo <span style="font-size:.8rem;font-weight:400;color:#69776d;">(visible para el admin)</span></h3>
+  <div style="display:grid;gap:.5rem;margin-top:.75rem;">
+    <div style="display:grid;grid-template-columns:1.5rem 1fr;gap:.5rem;align-items:start;font-size:.9rem;line-height:1.5;">
+
+      <span style="color:#396452;font-weight:700;">1.</span>
+      <div><strong>Toast system</strong> reemplaza todos los alert()/confirm()<br>
+      <span style="color:#69776d;">toast.js ya existente de Fase 1 · éxito verde · error rojo · info neutro · auto-dismiss 3s · role="alert"</span></div>
+
+      <span style="color:#396452;font-weight:700;">2.</span>
+      <div><strong>Validación inline</strong> — errores debajo del campo, no alert<br>
+      <span style="color:#69776d;">nombre/descripción requeridos · SKU: formato + unicidad vs plantList · se limpia al escribir</span></div>
+
+      <span style="color:#396452;font-weight:700;">3.</span>
+      <div><strong>Confirmar eliminación</strong> sin confirm()<br>
+      <span style="color:#69776d;">Botón delete: primer click → estado "¿Confirmar?" · segundo click → elimina · click afuera → reset</span></div>
+
+      <span style="color:#396452;font-weight:700;">4.</span>
+      <div><strong>Filtros + orden</strong> — barra sobre la lista<br>
+      <span style="color:#69776d;">Filtros: categoría · sucursal · disponibilidad · Orden: nombre/SKU/vistas · resetea página al cambiar</span></div>
+
+      <span style="color:#396452;font-weight:700;">5.</span>
+      <div><strong>SKU UNIQUE en MySQL</strong> + error claro en frontend<br>
+      <span style="color:#69776d;"><code>ADD UNIQUE KEY uk_sku (sku)</code> · PHP devuelve <code>{"error":"SKU duplicado","field":"sku"}</code> · error aparece bajo el campo</span></div>
+
+      <span style="color:#396452;font-weight:700;">6.</span>
+      <div><strong>ID siempre generado por server</strong><br>
+      <span style="color:#69776d;">Quitar normalize('NFD')... del frontend · POST envía datos sin id · PHP responde con id asignado</span></div>
+
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;background:#f0fdf4;border-radius:8px;padding:.75rem 1rem;font-size:.85rem;">
+    <strong>Criterios Fase 2:</strong> cero alert()/confirm() · errores por campo · filtros+búsqueda+paginación juntos · SKU único en DB · ID generado por server
+  </div>
+</div>
+
+<div class="section">
+  <h3>Flujo de datos</h3>
+  <div style="font-family:monospace;font-size:.82rem;line-height:1.8;background:#f8f7f1;border-radius:8px;padding:1rem;color:#4b5d53;">
+    admin.html carga → auth.js init()<br>
+    &nbsp;&nbsp;token existe + no expirado → panel.js initPanel()<br>
+    &nbsp;&nbsp;token ausente o expirado → mostrar login<br>
+    <br>
+    Login: signIn() → api.adminLogin() → sessionStorage → initPanel()<br>
+    <br>
+    initPanel(): Promise.all([getPlants, getGlobalVisits])<br>
+    &nbsp;&nbsp;→ renderStats() + renderList()<br>
+    <br>
+    Crear: openModal(null) → validar → api.createPlant(data)<br>
+    &nbsp;&nbsp;→ server devuelve {id} → plantList.push → toast success<br>
+    <br>
+    Editar: openModal(id) → validar → api.updatePlant(id, data)<br>
+    &nbsp;&nbsp;→ plantList[idx] actualizado → toast success<br>
+    <br>
+    Borrar: 2-click confirm → api.deletePlant(id)<br>
+    &nbsp;&nbsp;→ plantList.filter → toast success<br>
+    <br>
+    Disponibilidad: optimistic update → api.updatePlant()<br>
+    &nbsp;&nbsp;falla → rollback valor + renderList() + toast error
+  </div>
+</div>
+
+<div class="section">
+  <h3>Fuera de alcance (no comprometido)</h3>
+  <ul style="color:#69776d;font-size:.9rem;line-height:1.8;">
+    <li>Multi-imagen (Fase 3 eliminada)</li>
+    <li>Soft delete / papelera</li>
+    <li>Audit logs / admin_logs table</li>
+    <li>Dashboard analytics avanzado</li>
+    <li>Gestión de múltiples usuarios admin</li>
+  </ul>
+</div>
