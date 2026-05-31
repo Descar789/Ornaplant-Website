@@ -96,7 +96,13 @@ export function renderList() {
 
     clone.querySelector('.plant-nombre').textContent    = p.nombre || '';
     clone.querySelector('.plant-cientifico').textContent = p.nombreCientifico || '';
-    clone.querySelector('.plant-meta').textContent      = `${p.categoria || ''}${p.sku ? ` · ${p.sku}` : ''}`;
+
+    const catEl = clone.querySelector('.plant-cat-badge');
+    catEl.textContent = p.categoria || '';
+
+    const metaEl = clone.querySelector('.plant-meta');
+    if (p.sku) { metaEl.textContent = p.sku; metaEl.style.display = 'block'; }
+    else { metaEl.style.display = 'none'; }
 
     const select = clone.querySelector('.disp-select');
     select.className = `disp-select ${dispStyle(p.disponibilidad)}`;
