@@ -57,7 +57,6 @@
     .disp-select.bajo-pedido { background: #fef9c3; color: #854d0e; }
     .disp-select.agotado { background: #fee2e2; color: #991b1b; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    /* Search bar */
     .admin-search {
       position: relative; flex: 1; min-width: 220px; max-width: 420px;
     }
@@ -73,7 +72,6 @@
       color: #69776d; pointer-events: none; display: inline-flex;
     }
     .admin-search .si .material-symbols-outlined { font-size: 1.125rem; }
-    /* Pagination */
     .admin-pagination {
       display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
       gap: 0.375rem; padding: 1rem; border-top: 1px solid rgba(51,92,75,0.1); background: #fafaf6;
@@ -116,13 +114,13 @@
         <div style="display:flex;flex-direction:column;gap:0.875rem;">
           <div>
             <label class="form-label" for="loginEmail">Correo electrónico</label>
-            <input class="form-input" id="loginEmail" type="email" autocomplete="email" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter')signInWithEmail()">
+            <input class="form-input" id="loginEmail" type="email" autocomplete="email" placeholder="correo@ejemplo.com">
           </div>
           <div>
             <label class="form-label" for="loginPassword">Contraseña</label>
-            <input class="form-input" id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')signInWithEmail()">
+            <input class="form-input" id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••">
           </div>
-          <button id="emailSignInBtn" onclick="signInWithEmail()"
+          <button id="emailSignInBtn"
             style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 1.5rem;background:#396452;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.9375rem;color:white;cursor:pointer;transition:background 150ms;margin-top:0.25rem;">
             <span class="material-symbols-outlined" style="font-size:1.125rem;">login</span>
             Iniciar sesión
@@ -130,20 +128,6 @@
         </div>
         <p id="loginError" style="display:none;margin-top:1rem;font-size:0.8125rem;color:#991b1b;background:#fee2e2;border-radius:8px;padding:0.625rem 0.875rem;text-align:left;line-height:1.5;"></p>
       </div>
-    </div>
-  </div>
-
-  <!-- AUTH: ACCESS DENIED -->
-  <div id="accessDenied" style="display:none;min-height:100vh;background:#f8f7f1;align-items:center;justify-content:center;text-align:center;padding:2rem;">
-    <div style="max-width:480px;">
-      <span class="material-symbols-outlined" style="font-size:4rem;color:#ddd2bf;display:block;margin:0 auto 1.5rem;">block</span>
-      <h1 style="font-size:1.5rem;margin-bottom:0.75rem;color:#223029;">Sin acceso al panel</h1>
-      <p id="deniedEmail" style="color:#69776d;margin-bottom:0.5rem;font-size:0.9375rem;font-weight:600;"></p>
-      <p style="color:#69776d;margin-bottom:2rem;font-size:0.875rem;line-height:1.6;">Tu cuenta no tiene permisos de administrador. Contacta al responsable del sitio si crees que esto es un error.</p>
-      <button onclick="doSignOut()" style="display:inline-flex;align-items:center;gap:0.5rem;background:#203b31;color:white;padding:0.75rem 1.5rem;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;border:none;cursor:pointer;font-size:0.9375rem;">
-        <span class="material-symbols-outlined" style="font-size:1rem;">logout</span>
-        Cerrar sesión e intentar con otra cuenta
-      </button>
     </div>
   </div>
 
@@ -159,15 +143,12 @@
           <span style="font-size:0.7rem;background:rgba(86,129,109,0.3);color:#9ec4b0;padding:0.15rem 0.5rem;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">LIVE</span>
         </div>
         <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;justify-content:flex-end;">
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <img id="adminAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);object-fit:cover;display:none;flex-shrink:0;">
-            <span id="adminEmail" style="font-size:0.8125rem;color:rgba(255,255,255,0.65);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-          </div>
+          <span id="adminEmail" style="font-size:0.8125rem;color:rgba(255,255,255,0.65);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
           <a href="index.html" class="btn-admin btn-ghost-a" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);">
             <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span>
             Ver sitio
           </a>
-          <button onclick="doSignOut()" class="btn-admin btn-ghost-a" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);" aria-label="Cerrar sesión">
+          <button class="btn-admin btn-ghost-a" data-action="sign-out" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);" aria-label="Cerrar sesión">
             <span class="material-symbols-outlined" style="font-size:1rem;">logout</span>
           </button>
         </div>
@@ -186,7 +167,7 @@
       <section aria-labelledby="plants-heading">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem;">
           <h2 id="plants-heading" style="font-size:1.25rem;font-weight:700;color:#223029;">Plantas</h2>
-          <button class="btn-admin btn-primary-a" id="addPlantBtn" onclick="openModal()">
+          <button class="btn-admin btn-primary-a" id="addPlantBtn">
             <span class="material-symbols-outlined" style="font-size:1.125rem;">add</span>
             Agregar planta
           </button>
@@ -213,7 +194,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3 id="modalTitle" style="font-size:1.125rem;font-weight:700;">Agregar planta</h3>
-        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;padding:0.25rem;border-radius:6px;color:#69776d;" aria-label="Cerrar modal">
+        <button data-action="close-modal" style="background:none;border:none;cursor:pointer;padding:0.25rem;border-radius:6px;color:#69776d;" aria-label="Cerrar modal">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -224,8 +205,8 @@
             <input class="form-input" id="f-nombre" type="text" required>
           </div>
           <div>
-            <label class="form-label" for="f-sci">Nombre científico *</label>
-            <input class="form-input" id="f-sci" type="text" required>
+            <label class="form-label" for="f-sci">Nombre científico</label>
+            <input class="form-input" id="f-sci" type="text">
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
@@ -275,7 +256,7 @@
             <label class="form-label" for="f-cuidado">Cuidado *</label>
             <select class="form-select" id="f-cuidado">
               <option value="fácil">Fácil</option>
-              <option value="intermedia">Intermedio</option>
+              <option value="intermedio">Intermedio</option>
               <option value="difícil">Difícil</option>
             </select>
           </div>
@@ -308,16 +289,16 @@
         <div>
           <label class="form-label" for="f-sku">SKU</label>
           <input class="form-input" id="f-sku" type="text" maxlength="10" placeholder="ej. CEM06P120"
-            oninput="this.value=this.value.toUpperCase()" autocomplete="off" spellcheck="false">
+            autocomplete="off" spellcheck="false">
         </div>
         <div>
-          <label class="form-label">Imagen *</label>
+          <label class="form-label">Imagen</label>
           <p style="font-size:0.75rem;color:#69776d;margin-bottom:0.5rem;line-height:1.4;">JPG, PNG o WebP, máximo 5MB. Se guarda en el hosting con el nombre del SKU.</p>
           <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
             <label class="btn-admin btn-ghost-a" style="cursor:pointer;position:relative;">
               <span class="material-symbols-outlined" style="font-size:1rem;">upload</span>
               Subir imagen
-              <input type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleImageUpload(this,0)">
+              <input type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
             </label>
             <span id="uploadStatus0" style="font-size:0.8rem;color:#69776d;"></span>
           </div>
@@ -327,8 +308,8 @@
         </div>
       </div>
       <div style="padding:1rem 1.5rem;border-top:1px solid rgba(51,92,75,0.12);display:flex;justify-content:flex-end;gap:0.75rem;">
-        <button class="btn-admin btn-ghost-a" onclick="closeModal()">Cancelar</button>
-        <button class="btn-admin btn-primary-a" id="saveBtn" onclick="savePlantUI()">
+        <button class="btn-admin btn-ghost-a" data-action="close-modal">Cancelar</button>
+        <button class="btn-admin btn-primary-a" id="saveBtn">
           <span class="material-symbols-outlined" style="font-size:1rem;">save</span>
           Guardar
         </button>
@@ -336,405 +317,31 @@
     </div>
   </div>
 
-  <script type="module">
-    import {
-      getPlants, savePlant, updatePlant, deletePlant, uploadImage,
-      adminLogin, adminLogout, isAdminLogged, getAdminEmail, getGlobalVisits,
-    } from './api.js';
+  <!-- Plant row template — filled by admin-ui-list.js via textContent (XSS-safe) -->
+  <template id="plant-row-template">
+    <div class="plant-row" data-id="">
+      <img class="plant-thumb" src="" alt="" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200'">
+      <div>
+        <div class="plant-nombre" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.9375rem;color:#223029;"></div>
+        <div class="plant-cientifico" style="font-size:0.8rem;color:#69776d;font-style:italic;"></div>
+        <div class="plant-meta" style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.625rem;flex-shrink:0;">
+        <select class="disp-select" aria-label="">
+          <option value="disponible">Disponible</option>
+          <option value="bajo pedido">Bajo pedido</option>
+          <option value="agotado">Agotado</option>
+        </select>
+        <button class="btn-admin btn-ghost-a edit-btn" aria-label="" style="padding:0.375rem 0.625rem;">
+          <span class="material-symbols-outlined" style="font-size:1rem;">edit</span>
+        </button>
+        <button class="btn-admin btn-danger delete-btn" aria-label="" style="padding:0.375rem 0.625rem;">
+          <span class="material-symbols-outlined" style="font-size:1rem;">delete</span>
+        </button>
+      </div>
+    </div>
+  </template>
 
-    // ── Auth (JWT propio) ─────────────────────────────────────────
-    let panelInitialized = false;
-    // URL temporal de la imagen recién subida (antes de guardar la planta).
-    let pendingImageUrl = '';
-
-    function showScreen(id) {
-      const screens = ['authLoading', 'loginScreen', 'accessDenied', 'adminPanel'];
-      screens.forEach(s => {
-        const el = document.getElementById(s);
-        if (el) el.style.display = 'none';
-      });
-      const target = document.getElementById(id);
-      if (!target) return;
-      target.style.display = id === 'adminPanel' ? 'block' : 'flex';
-    }
-
-    async function signInWithEmail() {
-      const btn = document.getElementById('emailSignInBtn');
-      const errEl = document.getElementById('loginError');
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      btn.disabled = true;
-      btn.style.opacity = '0.7';
-      errEl.style.display = 'none';
-      try {
-        await adminLogin(email, password);
-        bootPanel();
-      } catch (e) {
-        errEl.textContent = (e && e.message) || 'Correo o contraseña incorrectos.';
-        errEl.style.display = 'block';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-      }
-    }
-
-    function doSignOut() {
-      panelInitialized = false;
-      adminLogout();
-      showScreen('loginScreen');
-    }
-
-    function bootPanel() {
-      const emailEl = document.getElementById('adminEmail');
-      if (emailEl) emailEl.textContent = getAdminEmail();
-      showScreen('adminPanel');
-      if (!panelInitialized) {
-        panelInitialized = true;
-        init();
-      }
-    }
-
-    // Estado inicial al cargar
-    if (isAdminLogged()) {
-      bootPanel();
-    } else {
-      showScreen('loginScreen');
-    }
-
-    // ── Panel init ────────────────────────────────────────────────
-    let plantList = [];
-    let editingId = null;
-    let globalVisits = 0;
-
-    async function init() {
-      document.getElementById('plantList').innerHTML = '<div style="text-align:center;padding:2rem;color:#69776d;">Cargando...</div>';
-      try {
-        const [plantsData, visitsData] = await Promise.all([
-          getPlants(),
-          getGlobalVisits().catch(err => {
-            console.error("[admin] Error cargando visitas globales:", err);
-            return { total: 0 };
-          })
-        ]);
-        plantList = plantsData;
-        globalVisits = (visitsData && visitsData.total) || 0;
-      } catch (e) {
-        document.getElementById('plantList').innerHTML = '<div style="text-align:center;padding:2rem;color:#991b1b;">Error al cargar plantas.</div>';
-        return;
-      }
-      renderStats();
-      renderList();
-    }
-
-    function renderStats() {
-      const total = plantList.length;
-      const byCat = {};
-      let disponibles = 0;
-      let agotadas = 0;
-      plantList.forEach(p => {
-        byCat[p.categoria] = (byCat[p.categoria] || 0) + 1;
-        if (p.disponibilidad === 'disponible') disponibles++;
-        if (p.disponibilidad === 'agotado') agotadas++;
-      });
-      const stats = [
-        { icon: 'local_florist', num: total, label: 'Total plantas' },
-        { icon: 'check_circle', num: disponibles, label: 'Disponibles' },
-        { icon: 'cancel', num: agotadas, label: 'Agotadas' },
-        { icon: 'visibility', num: globalVisits, label: 'Visitas generales' },
-        { icon: 'category', num: Object.keys(byCat).length, label: 'Categorías' },
-      ];
-      document.getElementById('statsGrid').innerHTML = stats.map(s => `
-        <div class="stat-card" style="display:flex;align-items:center;gap:1rem;">
-          <span class="material-symbols-outlined" style="color:#56816d;font-size:1.75rem;">${s.icon}</span>
-          <div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.75rem;font-weight:800;color:#223029;line-height:1;">${s.num}</div>
-            <div style="font-size:0.8125rem;color:#69776d;">${s.label}</div>
-          </div>
-        </div>`).join('');
-    }
-
-    function dispStyle(d) {
-      return d === 'disponible' ? 'disponible' : d === 'bajo pedido' ? 'bajo-pedido' : 'agotado';
-    }
-
-    let adminSearchTerm = '';
-    let adminCurrentPage = 1;
-    const ADMIN_PAGE_SIZE = 10;
-
-    function getFilteredPlants() {
-      const q = adminSearchTerm.toLowerCase();
-      if (!q) return plantList;
-      return plantList.filter(p => {
-        if ((p.nombre || '').toLowerCase().includes(q)) return true;
-        if ((p.nombreCientifico || '').toLowerCase().includes(q)) return true;
-        if ((p.sku || '').toLowerCase().includes(q)) return true;
-        if (Array.isArray(p.etiquetas) && p.etiquetas.some(t => (t || '').toLowerCase().includes(q))) return true;
-        return false;
-      });
-    }
-
-    function renderList() {
-      const list = document.getElementById('plantList');
-      const pagEl = document.getElementById('adminPagination');
-      const countEl = document.getElementById('adminCount');
-      if (plantList.length === 0) {
-        list.innerHTML = `<div style="text-align:center;padding:3rem;color:#69776d;"><span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 0.75rem;color:#ddd2bf;">inbox</span><p>No hay plantas. Agrega la primera.</p></div>`;
-        if (pagEl) { pagEl.hidden = true; pagEl.innerHTML = ''; }
-        if (countEl) countEl.textContent = '';
-        return;
-      }
-      const filtered = getFilteredPlants();
-      if (countEl) countEl.textContent = `${filtered.length} de ${plantList.length}`;
-      if (filtered.length === 0) {
-        list.innerHTML = `<div style="text-align:center;padding:3rem;color:#69776d;"><span class="material-symbols-outlined" style="font-size:3rem;display:block;margin:0 auto 0.75rem;color:#ddd2bf;">search_off</span><p>Sin resultados para "${escHtml(adminSearchTerm)}"</p></div>`;
-        if (pagEl) { pagEl.hidden = true; pagEl.innerHTML = ''; }
-        return;
-      }
-      const totalPages = Math.max(1, Math.ceil(filtered.length / ADMIN_PAGE_SIZE));
-      if (adminCurrentPage > totalPages) adminCurrentPage = totalPages;
-      const start = (adminCurrentPage - 1) * ADMIN_PAGE_SIZE;
-      const slice = filtered.slice(start, start + ADMIN_PAGE_SIZE);
-      list.innerHTML = slice.map(p => `
-        <div class="plant-row" data-id="${p.id}">
-          <img class="plant-thumb" src="${(p.imagenes && p.imagenes[0]) || ''}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=200'">
-          <div>
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.9375rem;color:#223029;">${p.nombre}</div>
-            <div style="font-size:0.8rem;color:#69776d;font-style:italic;">${p.nombreCientifico}</div>
-            <div style="font-size:0.75rem;color:#69776d;margin-top:0.25rem;text-transform:capitalize;">${p.categoria}${p.sku ? ` · <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">${p.sku}</span>` : ''}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:0.625rem;flex-shrink:0;">
-            <select class="disp-select ${dispStyle(p.disponibilidad)}" onchange="updateDisp('${p.id}',this.value)" aria-label="Disponibilidad de ${p.nombre}">
-              <option value="disponible" ${p.disponibilidad==='disponible'?'selected':''}>Disponible</option>
-              <option value="bajo pedido" ${p.disponibilidad==='bajo pedido'?'selected':''}>Bajo pedido</option>
-              <option value="agotado" ${p.disponibilidad==='agotado'?'selected':''}>Agotado</option>
-            </select>
-            <button class="btn-admin btn-ghost-a" onclick="openModal('${p.id}')" aria-label="Editar ${p.nombre}" style="padding:0.375rem 0.625rem;">
-              <span class="material-symbols-outlined" style="font-size:1rem;">edit</span>
-            </button>
-            <button class="btn-admin btn-danger" onclick="deletePlantUI('${p.id}')" aria-label="Eliminar ${p.nombre}" style="padding:0.375rem 0.625rem;">
-              <span class="material-symbols-outlined" style="font-size:1rem;">delete</span>
-            </button>
-          </div>
-        </div>`).join('');
-      renderAdminPagination(totalPages);
-    }
-
-    function renderAdminPagination(totalPages) {
-      const pagEl = document.getElementById('adminPagination');
-      if (!pagEl) return;
-      if (totalPages <= 1) { pagEl.hidden = true; pagEl.innerHTML = ''; return; }
-      pagEl.hidden = false;
-      const WINDOW = 3;
-      const pages = new Set();
-      pages.add(1);
-      pages.add(totalPages);
-      for (let i = adminCurrentPage - WINDOW; i <= adminCurrentPage + WINDOW; i++) {
-        if (i >= 1 && i <= totalPages) pages.add(i);
-      }
-      const sorted = [...pages].sort((a, b) => a - b);
-      const parts = [];
-      parts.push(`<button type="button" data-page="${adminCurrentPage - 1}" ${adminCurrentPage === 1 ? 'disabled' : ''} aria-label="Página anterior"><span class="material-symbols-outlined">chevron_left</span></button>`);
-      let prev = 0;
-      for (const p of sorted) {
-        if (prev && p - prev > 1) parts.push(`<span class="ellipsis" aria-hidden="true">…</span>`);
-        parts.push(`<button type="button" data-page="${p}" class="${p === adminCurrentPage ? 'is-active' : ''}" ${p === adminCurrentPage ? 'aria-current="page"' : ''}>${p}</button>`);
-        prev = p;
-      }
-      parts.push(`<button type="button" data-page="${adminCurrentPage + 1}" ${adminCurrentPage === totalPages ? 'disabled' : ''} aria-label="Página siguiente"><span class="material-symbols-outlined">chevron_right</span></button>`);
-      pagEl.innerHTML = parts.join('');
-    }
-
-    document.addEventListener('click', e => {
-      const btn = e.target.closest('#adminPagination button[data-page]');
-      if (!btn || btn.disabled) return;
-      const p = parseInt(btn.dataset.page, 10);
-      if (!p || p === adminCurrentPage) return;
-      adminCurrentPage = p;
-      renderList();
-      const heading = document.getElementById('plants-heading');
-      if (heading) {
-        const top = heading.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top, behavior: 'smooth' });
-      }
-    });
-
-    document.addEventListener('input', e => {
-      if (e.target && e.target.id === 'adminSearch') {
-        adminSearchTerm = e.target.value.trim();
-        adminCurrentPage = 1;
-        renderList();
-      }
-    });
-
-    async function updateDisp(id, val) {
-      const p = plantList.find(x => x.id === id);
-      if (!p) return;
-      p.disponibilidad = val;
-      const sel = document.querySelector(`[data-id="${id}"] .disp-select`);
-      if (sel) sel.className = `disp-select ${dispStyle(val)}`;
-      renderStats();
-      try {
-        await updatePlant(id, { disponibilidad: val });
-      } catch { alert('Error al actualizar disponibilidad.'); }
-    }
-
-    async function deletePlantUI(id) {
-      if (!confirm('¿Eliminar esta planta? Esta acción no se puede deshacer.')) return;
-      try {
-        await deletePlant(id);
-        plantList = plantList.filter(p => p.id !== id);
-        renderStats();
-        renderList();
-      } catch { alert('Error al eliminar la planta.'); }
-    }
-
-    function openModal(id = null) {
-      editingId = id;
-      pendingImageUrl = '';
-      document.getElementById('uploadStatus0').textContent = '';
-      document.getElementById('imgPreview0').style.display = 'none';
-      const title = document.getElementById('modalTitle');
-      if (id) {
-        title.textContent = 'Editar planta';
-        const p = plantList.find(x => x.id === id);
-        if (!p) return;
-        document.getElementById('f-nombre').value = p.nombre;
-        document.getElementById('f-sci').value = p.nombreCientifico;
-        document.getElementById('f-cat').value = p.categoria;
-        document.getElementById('f-disp').value = p.disponibilidad;
-        document.getElementById('f-desc').value = p.descripcion;
-        document.getElementById('f-luz').value = p.luz;
-        document.getElementById('f-riego').value = p.riego;
-        document.getElementById('f-cuidado').value = p.cuidado;
-        document.getElementById('f-suc').value = p.sucursal || 'ambas';
-        document.getElementById('f-mascotas').value = p.mascotas;
-        document.getElementById('f-etiquetas').value = (p.etiquetas || []).join(', ');
-        document.getElementById('f-variaciones').value = (p.variaciones || []).join(', ');
-        document.getElementById('f-sku').value = p.sku || '';
-        const url = (p.imagenes || [])[0] || '';
-        pendingImageUrl = url;
-        if (url) {
-          document.getElementById('imgPreviewEl0').src = url;
-          document.getElementById('imgPreview0').style.display = 'block';
-        }
-      } else {
-        title.textContent = 'Agregar planta';
-        ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-sku'].forEach(fid => document.getElementById(fid).value = '');
-        document.getElementById('f-cat').value = 'ornamental';
-        document.getElementById('f-disp').value = 'disponible';
-        document.getElementById('f-luz').value = 'luz indirecta';
-        document.getElementById('f-riego').value = 'medio';
-        document.getElementById('f-cuidado').value = 'fácil';
-        document.getElementById('f-suc').value = 'ambas';
-        document.getElementById('f-mascotas').value = 'no tóxica';
-      }
-      document.getElementById('plantModal').style.display = 'flex';
-      document.getElementById('f-nombre').focus();
-    }
-
-    function closeModal() {
-      document.getElementById('plantModal').style.display = 'none';
-      editingId = null;
-    }
-
-    async function savePlantUI() {
-      const nombre = document.getElementById('f-nombre').value.trim();
-      if (!nombre) { alert('El nombre es requerido.'); return; }
-      const sku = document.getElementById('f-sku').value.trim().toUpperCase();
-      if (sku) {
-        const conflict = plantList.find(p => p.id !== editingId && p.sku === sku);
-        if (conflict) { alert(`El SKU "${sku}" ya está en uso por "${conflict.nombre}".`); return; }
-      }
-      const btn = document.getElementById('saveBtn');
-      btn.disabled = true;
-      btn.textContent = 'Guardando...';
-      const imgs = [pendingImageUrl].filter(Boolean);
-      const data = {
-        nombre,
-        nombreCientifico: document.getElementById('f-sci').value.trim(),
-        categoria: document.getElementById('f-cat').value,
-        disponibilidad: document.getElementById('f-disp').value,
-        descripcion: document.getElementById('f-desc').value.trim(),
-        luz: document.getElementById('f-luz').value,
-        riego: document.getElementById('f-riego').value,
-        cuidado: document.getElementById('f-cuidado').value,
-        sucursal: document.getElementById('f-suc').value,
-        mascotas: document.getElementById('f-mascotas').value,
-        etiquetas: document.getElementById('f-etiquetas').value.split(',').map(s => s.trim()).filter(Boolean),
-        variaciones: document.getElementById('f-variaciones').value.split(',').map(s => s.trim()).filter(Boolean),
-        imagenes: imgs.length ? imgs : ['https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop'],
-        sku: sku || null,
-      };
-      const id = editingId || nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-      try {
-        await savePlant(id, data);
-        const idx = plantList.findIndex(p => p.id === id);
-        if (idx > -1) plantList[idx] = { ...plantList[idx], ...data };
-        else plantList.push({ id, ...data });
-        closeModal();
-        renderStats();
-        renderList();
-      } catch (e) {
-        alert('Error al guardar: ' + e.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">save</span> Guardar';
-      }
-    }
-
-    async function handleImageUpload(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const status = document.getElementById('uploadStatus0');
-      const sku = (document.getElementById('f-sku').value || '').trim().toUpperCase();
-      if (!sku) {
-        status.textContent = 'Define primero el SKU.';
-        status.style.color = '#991b1b';
-        input.value = '';
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        status.textContent = 'Imagen mayor a 5MB.';
-        status.style.color = '#991b1b';
-        input.value = '';
-        return;
-      }
-      status.textContent = 'Subiendo...';
-      status.style.color = '#69776d';
-      try {
-        const url = await uploadImage(file, sku);
-        // cache-bust por si se sobrescribió la misma URL
-        const display = `${url}?t=${Date.now()}`;
-        pendingImageUrl = url;
-        document.getElementById('imgPreviewEl0').src = display;
-        document.getElementById('imgPreview0').style.display = 'block';
-        status.textContent = 'Subida ✓';
-        status.style.color = '#166534';
-      } catch (e) {
-        status.textContent = 'Error: ' + (e && e.message ? e.message : 'falló subida');
-        status.style.color = '#991b1b';
-      }
-    }
-
-    function escHtml(s) {
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    // ── Expose globals for inline onclick handlers ────────────────
-    window.signInWithEmail = signInWithEmail;
-    window.doSignOut = doSignOut;
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-    window.savePlantUI = savePlantUI;
-    window.deletePlantUI = deletePlantUI;
-    window.updateDisp = updateDisp;
-    window.handleImageUpload = handleImageUpload;
-
-    // Modal close on overlay click / Escape
-    document.getElementById('plantModal').addEventListener('click', e => {
-      if (e.target === document.getElementById('plantModal')) closeModal();
-    });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  </script>
+  <script type="module" src="js/admin/main.js"></script>
 </body>
 </html>

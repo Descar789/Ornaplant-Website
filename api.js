@@ -54,24 +54,12 @@ export async function getGlobalVisits() {
 }
 
 // ── PLANTAS (admin, requieren JWT) ───────────────────────────────
-export async function savePlant(id, data) {
-  const payload = { ...data, id };
-  try {
-    return await apiFetch('/admin/plantas.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(payload),
-    });
-  } catch (e) {
-    if (String(e.message).toLowerCase().includes('duplicad')) {
-      return apiFetch(`/admin/plantas.php?id=${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-        body: JSON.stringify(data),
-      });
-    }
-    throw e;
-  }
+export async function createPlant(data) {
+  return apiFetch('/admin/plantas.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(data),
+  });
 }
 
 export async function updatePlant(id, data) {

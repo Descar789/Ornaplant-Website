@@ -1,10 +1,45 @@
-import { isAdminLogged } from '../api.js';
-import { showScreen } from './admin-auth.js';
+import { isLoggedAndValid, showScreen, setupAuthEvents, getEmail } from './admin-auth.js';
+import { setupEvents } from './admin-events.js';
+import { setPlants, setGlobalVisits } from './admin-state.js';
+import { renderList } from './admin-ui-list.js';
+import { renderStats } from './admin-ui-stats.js';
+import { getPlants as fetchPlants, getGlobalVisits as fetchVisits } from '../api.js';
+
+let panelBooted = false;
+
+async function bootPanel() {
+  if (panelBooted) return;
+  panelBooted = true;
+
+  const emailEl = document.getElementById('adminEmail');
+  if (emailEl) emailEl.textContent = getEmail();
+
+  showScreen('adminPanel');
+  setupEvents();
+
+  const listContainer = document.getElementById('plantList');
+  if (listContainer) listContainer.innerHTML = '<div style="text-align:center;padding:2rem;color:#69776d;">Cargando plantas...</div>';
+
+  try {
+    const [plants, visits] = await Promise.all([
+      fetchPlants(),
+      fetchVisits().catch(() => ({ total: 0 })),
+    ]);
+    setPlants(plants);
+    setGlobalVisits((visits && visits.total) || 0);
+    renderStats();
+    renderList();
+  } catch {
+    if (listContainer) listContainer.innerHTML = '<div style="text-align:center;padding:2rem;color:#991b1b;">Error al cargar datos.</div>';
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (isAdminLogged()) {
-    showScreen('adminPanel');
-    // boot panel logic will go here
+  setupAuthEvents();
+  document.addEventListener('admin:login-success', bootPanel);
+
+  if (isLoggedAndValid()) {
+    bootPanel();
   } else {
     showScreen('loginScreen');
   }
