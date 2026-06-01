@@ -46,11 +46,11 @@ if (!$planta) {
     http_response_code(404);
     $titulo = 'Planta no encontrada — ORNAPLANT';
     $descripcion = 'No encontramos la planta que buscas en ORNAPLANT, Cuautla, Morelos.';
-    $canonical = $base . '/catalogo.html';
-    $ogImage = $base . '/assets/logo-final-ornaplant.png';
+    $canonical = BASE_URL . '/catalogo.html';
+    $ogImage = BASE_URL . '/assets/logo-final-ornaplant.png';
     $schema = null;
 } else {
-    $canonical = $base . (!empty($planta['slug']) ? '/catalogo/' . rawurlencode($planta['slug']) : '/planta/' . rawurlencode($planta['id']));
+    $canonical = BASE_URL . (!empty($planta['slug']) ? '/catalogo/' . rawurlencode($planta['slug']) : '/planta/' . rawurlencode($planta['id']));
     
     // Title canónico: "[Planta] en Cuautla — ORNAPLANT"
     $titulo = htmlspecialchars($planta['nombre'] . ' en Cuautla — ORNAPLANT', ENT_QUOTES, 'UTF-8');
@@ -67,7 +67,7 @@ if (!$planta) {
     );
 
     $imagenes = $planta['imagenes'] ?? [];
-    $ogImage = !empty($imagenes[0]) ? (string)$imagenes[0] : $base . '/assets/logo-final-ornaplant.png';
+    $ogImage = !empty($imagenes[0]) ? (string)$imagenes[0] : BASE_URL . '/assets/logo-final-ornaplant.png';
     $ogImage = htmlspecialchars($ogImage, ENT_QUOTES, 'UTF-8');
 
     // Mapeo dinámico y honesto de "Usos Recomendados"
