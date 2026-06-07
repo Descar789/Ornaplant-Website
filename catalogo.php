@@ -97,6 +97,7 @@ try {
     }
     .pagination .pagination-nav .material-symbols-outlined { font-size: 1.125rem; }
   </style>
+  <script type="module" src="js/analytics.js?v=1"></script>
 </head>
 <body>
 

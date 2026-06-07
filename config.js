@@ -14,3 +14,5 @@ export const API_URL = isLocal
   : 'https://ornaplant.com.mx/api';
 
 export const WHATSAPP_NUMBER = '527351024413';
+
+export const GA_MEASUREMENT_ID = '';

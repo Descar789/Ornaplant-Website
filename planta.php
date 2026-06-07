@@ -186,6 +186,7 @@ if (!$planta) {
       #galleryCol, #infoCol { grid-column: 1 / -1 !important; }
     }
   </style>
+  <script type="module" src="<?= $base ?>/js/analytics.js?v=1"></script>
 </head>
 <body class="tailwind-page">
 
