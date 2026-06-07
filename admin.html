@@ -86,6 +86,69 @@
     .stat-icon .material-symbols-outlined { font-size: 1.25rem; color: #396452; }
     .stat-num { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 1.5rem; font-weight: 800; color: #1a3028; line-height: 1; }
     .stat-label { font-size: 0.75rem; color: #6b8c7a; margin-top: 2px; }
+    .visits-detail-btn {
+      background: none;
+      border: none;
+      color: #56816d;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0 0 0 0.25rem;
+      text-decoration: underline;
+      vertical-align: baseline;
+    }
+    .visits-detail-btn:hover { color: #203b31; }
+    .visits-modal-list {
+      max-height: 420px;
+      overflow-y: auto;
+      padding: 0 1.5rem 1.5rem;
+    }
+    .visits-row {
+      align-items: center;
+      border-bottom: 1px solid #f0f5f2;
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.625rem 0;
+    }
+    .visits-row:last-child { border-bottom: none; }
+    .visits-rank {
+      color: #a0b9ad;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 800;
+      min-width: 1.5rem;
+    }
+    .visits-thumb {
+      background: #eef4ec;
+      border-radius: 8px;
+      flex-shrink: 0;
+      height: 36px;
+      object-fit: cover;
+      width: 36px;
+    }
+    .visits-info { flex: 1; min-width: 0; }
+    .visits-name {
+      color: #1a3028;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .visits-count {
+      color: #396452;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .visits-empty {
+      color: #7da592;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
 
     /* ── TOOLBAR ─────────────────────────────────────────────── */
     .toolbar-select {
@@ -496,6 +559,19 @@
           Guardar
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Detalle de Visitas -->
+  <div class="modal-overlay" id="visitasModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="visitasModalTitle">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h3 id="visitasModalTitle" style="font-size:1.125rem;font-weight:700;margin:0;color:#1a3028;">Visitas por planta</h3>
+        <button data-action="close-visitas-modal" style="background:none;border:none;cursor:pointer;padding:0.25rem;border-radius:6px;color:#7da592;" aria-label="Cerrar detalle de visitas">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="visitasModalList" class="visits-modal-list"></div>
     </div>
   </div>
 

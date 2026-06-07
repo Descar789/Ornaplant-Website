@@ -71,15 +71,33 @@
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
   }
 
-  // ── Registro de Visita Global (Pageviews) ────────────────
+  function getApiBase() {
+    const scriptEl = document.querySelector('script[src*="script.js"]');
+    if (!scriptEl) return '';
+    const src = scriptEl.getAttribute('src');
+    const absUrl = new URL(src, window.location.href);
+    return absUrl.origin + absUrl.pathname.substring(0, absUrl.pathname.lastIndexOf('/')) + '/api';
+  }
+
+  // Registro de Visita Global (Pageviews)
   (function trackGlobalVisit() {
     try {
-      const scriptEl = document.querySelector('script[src*="script.js"]');
-      if (!scriptEl) return;
-      const src = scriptEl.getAttribute('src');
-      const absUrl = new URL(src, window.location.href);
-      const apiBase = absUrl.origin + absUrl.pathname.substring(0, absUrl.pathname.lastIndexOf('/')) + '/api';
+      const apiBase = getApiBase();
+      if (!apiBase) return;
       fetch(apiBase + '/visitas.php', { method: 'POST' })
+        .catch(() => {});
+    } catch (e) {}
+  })();
+
+  // Registro de Visita por Planta (detalle)
+  (function trackPlantVisit() {
+    try {
+      const plantId = window.__ORNAPLANT_PLANT_ID__;
+      if (!plantId) return;
+      const apiBase = getApiBase();
+      if (!apiBase) return;
+      const url = apiBase + '/plantas.php?id=' + encodeURIComponent(plantId) + '&action=incrementar_vistas';
+      fetch(url, { method: 'PATCH' })
         .catch(() => {});
     } catch (e) {}
   })();

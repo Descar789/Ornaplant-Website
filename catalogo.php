@@ -383,6 +383,7 @@ try {
       .pcv2-body { padding: 0.75rem 0.75rem 1rem; }
     }
   </style>
+  <script type="module" src="js/analytics.js?v=1"></script>
 </head>
 <body>
 

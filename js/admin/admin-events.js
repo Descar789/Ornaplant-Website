@@ -1,6 +1,6 @@
 import { getPlants, updatePlantInList, setSearchTerm, setCurrentPage, getCurrentPage, dispStyle, setFilterCat, setFilterDisp, setFilterSuc, setSort } from './admin-state.js';
 import { renderList } from './admin-ui-list.js';
-import { renderStats } from './admin-ui-stats.js';
+import { renderStats, openVisitasModal, closeVisitasModal } from './admin-ui-stats.js';
 import { openModal, closeModal, savePlantUI, handleDeleteClick, handleImageUpload } from './admin-form.js';
 import { doSignOut } from './admin-auth.js';
 import { updatePlant } from '../../api.js?v=2';
@@ -89,6 +89,10 @@ export function setupEvents() {
       return;
     }
 
+    // Visits detail modal
+    if (e.target.closest('[data-action="open-visitas-modal"]')) { openVisitasModal(); return; }
+    if (e.target.closest('[data-action="close-visitas-modal"]') || e.target.id === 'visitasModal') { closeVisitasModal(); return; }
+
     // Close modal (button or overlay click)
     if (e.target.closest('[data-action="close-modal"]') || e.target.id === 'plantModal') { closeModal(); return; }
 
@@ -99,5 +103,10 @@ export function setupEvents() {
     if (e.target.closest('[data-action="sign-out"]')) { doSignOut(); return; }
   });
 
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeVisitasModal();
+    }
+  });
 }

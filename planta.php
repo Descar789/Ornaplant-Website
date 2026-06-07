@@ -186,6 +186,7 @@ if (!$planta) {
       #galleryCol, #infoCol { grid-column: 1 / -1 !important; }
     }
   </style>
+  <script type="module" src="<?= $base ?>/js/analytics.js?v=1"></script>
 </head>
 <body class="tailwind-page">
 
@@ -422,6 +423,11 @@ if (!$planta) {
       });
     });
   </script>
+  <?php if ($planta && !empty($planta['id'])): ?>
+  <script>
+    window.__ORNAPLANT_PLANT_ID__ = <?= json_encode((string)$planta['id'], JSON_UNESCAPED_SLASHES) ?>;
+  </script>
+  <?php endif; ?>
   <script src="<?= $base ?>/script.js"></script>
 </body>
 </html>
