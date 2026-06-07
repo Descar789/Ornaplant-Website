@@ -1,16 +1,23 @@
 const CONSENT_KEY = 'ornaplant_cookie_consent';
 
+function getStored() {
+  try { return localStorage.getItem(CONSENT_KEY); } catch { return null; }
+}
+function setStored(value) {
+  try { localStorage.setItem(CONSENT_KEY, value); } catch { /* silent */ }
+}
+
 export function hasConsent() {
-  return localStorage.getItem(CONSENT_KEY) === 'accepted';
+  return getStored() === 'accepted';
 }
 
 function accept() {
-  localStorage.setItem(CONSENT_KEY, 'accepted');
+  setStored('accepted');
   window.dispatchEvent(new CustomEvent('ornaplant:consent-ready'));
 }
 
 function decline() {
-  localStorage.setItem(CONSENT_KEY, 'declined');
+  setStored('declined');
 }
 
 function injectBanner() {
@@ -18,6 +25,7 @@ function injectBanner() {
   banner.id = 'cookie-banner';
   banner.setAttribute('role', 'region');
   banner.setAttribute('aria-label', 'Aviso de cookies');
+  banner.setAttribute('aria-live', 'polite');
   banner.style.cssText = [
     'position:fixed', 'bottom:0', 'left:0', 'right:0', 'z-index:10000',
     'background:#1a3028', 'color:#eef4ec',
@@ -28,6 +36,7 @@ function injectBanner() {
   ].join(';');
 
   const text = document.createElement('p');
+  text.id = 'cookie-banner-text';
   text.style.cssText = 'margin:0;flex:1;min-width:0;line-height:1.5;';
   text.textContent = 'Usamos cookies de análisis para mejorar el sitio.';
 
@@ -40,12 +49,14 @@ function injectBanner() {
   acceptBtn.type = 'button';
   acceptBtn.textContent = 'Aceptar';
   acceptBtn.style.cssText = btnBase + 'background:#396452;color:#eef4ec;border:none;';
+  acceptBtn.setAttribute('aria-describedby', 'cookie-banner-text');
   acceptBtn.addEventListener('click', () => { accept(); banner.remove(); });
 
   const declineBtn = document.createElement('button');
   declineBtn.type = 'button';
   declineBtn.textContent = 'Rechazar';
   declineBtn.style.cssText = btnBase + 'background:none;color:#eef4ec;border:1px solid #56816d;';
+  declineBtn.setAttribute('aria-describedby', 'cookie-banner-text');
   declineBtn.addEventListener('click', () => { decline(); banner.remove(); });
 
   actions.append(acceptBtn, declineBtn);
@@ -53,7 +64,7 @@ function injectBanner() {
   document.body.appendChild(banner);
 }
 
-const stored = localStorage.getItem(CONSENT_KEY);
+const stored = getStored();
 if (!stored) {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', injectBanner);
