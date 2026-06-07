@@ -384,6 +384,7 @@ try {
     }
   </style>
   <script type="module" src="js/analytics.js?v=1"></script>
+  <script type="module" src="js/cookie-consent.js?v=1"></script>
 </head>
 <body>
 

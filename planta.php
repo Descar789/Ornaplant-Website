@@ -187,6 +187,7 @@ if (!$planta) {
     }
   </style>
   <script type="module" src="<?= $base ?>/js/analytics.js?v=1"></script>
+  <script type="module" src="<?= $base ?>/js/cookie-consent.js?v=1"></script>
 </head>
 <body class="tailwind-page">
 
