@@ -1,0 +1,26 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-07-cookie-consent.md",
+  "tasks": [
+    {
+      "id": 5,
+      "subject": "Task 1: Crear js/cookie-consent.js",
+      "status": "pending",
+      "description": "**Goal:** Crear módulo que inyecta banner de consentimiento y exporta hasConsent().\n\n**Files:**\n- Create: `js/cookie-consent.js`\n\n**Acceptance Criteria:**\n- [ ] `node --check js/cookie-consent.js` pasa\n- [ ] Banner aparece cuando localStorage vacío\n- [ ] Aceptar guarda 'accepted' y dispara ornaplant:consent-ready\n- [ ] Rechazar guarda 'declined' y remueve banner\n\n```json:metadata\n{\"files\": [\"js/cookie-consent.js\"], \"verifyCommand\": \"node --check js/cookie-consent.js\", \"acceptanceCriteria\": [\"node --check pasa\", \"banner aparece sin localStorage\", \"Aceptar guarda accepted y dispara evento\", \"Rechazar guarda declined\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 2: Actualizar js/analytics.js",
+      "status": "pending",
+      "blockedBy": [5],
+      "description": "**Goal:** Hacer que analytics.js importe hasConsent() y solo cargue GA si hay consentimiento.\n\n**Files:**\n- Modify: `js/analytics.js`\n\n**Acceptance Criteria:**\n- [ ] `node --check js/analytics.js` pasa\n- [ ] Importa hasConsent de ./cookie-consent.js\n- [ ] loadGA solo se llama si hasConsent() o al recibir ornaplant:consent-ready\n\n```json:metadata\n{\"files\": [\"js/analytics.js\"], \"verifyCommand\": \"node --check js/analytics.js\", \"acceptanceCriteria\": [\"node --check pasa\", \"importa cookie-consent.js\", \"loadGA gateado en consent\"]}\n```"
+    },
+    {
+      "id": 7,
+      "subject": "Task 3: Script tags en páginas + verificación final",
+      "status": "pending",
+      "blockedBy": [6],
+      "description": "**Goal:** Agregar cookie-consent.js a las 8 páginas públicas y verificar cobertura completa.\n\n**Files:**\n- Modify: index.html, contacto.html, horarios.html, nosotros.html, servicios.html, sucursales.html, catalogo.php, planta.php\n\n**Acceptance Criteria:**\n- [ ] 8 páginas públicas cargan cookie-consent.js\n- [ ] admin.html no carga cookie-consent.js\n- [ ] QA manual: banner aparece, aceptar/rechazar funcionan, admin sin banner\n\n```json:metadata\n{\"files\": [\"index.html\",\"contacto.html\",\"horarios.html\",\"nosotros.html\",\"servicios.html\",\"sucursales.html\",\"catalogo.php\",\"planta.php\"], \"verifyCommand\": \"rg -n \\\"cookie-consent\\\\.js\\\" index.html contacto.html horarios.html nosotros.html servicios.html sucursales.html catalogo.php planta.php admin.html\", \"acceptanceCriteria\": [\"8 páginas públicas cargan cookie-consent.js\", \"admin.html no carga cookie-consent.js\", \"QA manual pasa\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-07T00:00:00.000Z"
+}
