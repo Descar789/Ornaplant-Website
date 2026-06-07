@@ -3,7 +3,7 @@ import { renderList } from './admin-ui-list.js';
 import { renderStats } from './admin-ui-stats.js';
 import { openModal, closeModal, savePlantUI, handleDeleteClick, handleImageUpload } from './admin-form.js';
 import { doSignOut } from './admin-auth.js';
-import { updatePlant } from '../api.js';
+import { updatePlant } from '../../api.js?v=2';
 import { showToast } from './admin-toast.js';
 
 export function setupEvents() {

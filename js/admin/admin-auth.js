@@ -1,4 +1,4 @@
-import { adminLogin, adminLogout, getAdminEmail } from '../api.js';
+import { adminLogin, adminLogout, getAdminEmail } from '../../api.js?v=2';
 
 function isTokenExpired() {
   const token = sessionStorage.getItem('ornaplant_token');

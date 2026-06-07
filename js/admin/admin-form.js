@@ -1,4 +1,4 @@
-import { createPlant, updatePlant, deletePlant, uploadImage } from '../api.js';
+import { createPlant, updatePlant, deletePlant, uploadImage } from '../../api.js?v=2';
 import { getPlants, addPlantToList, updatePlantInList, removePlantFromList } from './admin-state.js';
 import { renderList } from './admin-ui-list.js';
 import { renderStats } from './admin-ui-stats.js';

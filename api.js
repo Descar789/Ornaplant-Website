@@ -1,6 +1,6 @@
 // api.js — cliente HTTP a la API REST PHP (MySQL backend).
 
-import { API_URL } from './config.js';
+import { API_URL } from './config.js?v=2';
 
 const TOKEN_KEY = 'ornaplant_token';
 

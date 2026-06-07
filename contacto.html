@@ -251,7 +251,7 @@
   </button>
 
   <script type="module">
-    import { WHATSAPP_NUMBER } from './config.js';
+    import { WHATSAPP_NUMBER } from './config.js?v=2';
     const waMsg = encodeURIComponent('Hola, me gustaría obtener información sobre sus plantas y disponibilidad. ¡Gracias!');
     document.getElementById('whatsappBtn').href = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}`;
   </script>

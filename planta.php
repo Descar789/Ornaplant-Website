@@ -227,7 +227,7 @@ if (!$planta) {
       $dispCls = ['disponible' => 'disp-available', 'bajo pedido' => 'disp-order', 'agotado' => 'disp-sold'];
       $dispLbl = ['disponible' => 'Disponible', 'bajo pedido' => 'Bajo pedido', 'agotado' => 'Agotado'];
       $luzIcon = ['sol directo' => 'wb_sunny', 'luz indirecta' => 'light_mode', 'media sombra' => 'partly_cloudy_day', 'sombra' => 'cloud'];
-      $cuidadoIcon = ['fácil' => 'sentiment_satisfied', 'intermedia' => 'sentiment_neutral', 'difícil' => 'sentiment_dissatisfied'];
+      $cuidadoIcon = ['fácil' => 'sentiment_satisfied', 'intermedio' => 'sentiment_neutral', 'difícil' => 'sentiment_dissatisfied'];
       ?>
 
       <div class="container" style="padding-top:2.5rem;padding-bottom:5rem;">
