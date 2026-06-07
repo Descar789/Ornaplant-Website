@@ -28,3 +28,6 @@ Thumbs.db
 
 # Local tools
 nano-banana-2-mcp/
+
+# Git worktrees
+.worktrees/
