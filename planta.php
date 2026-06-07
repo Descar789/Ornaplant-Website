@@ -423,6 +423,11 @@ if (!$planta) {
       });
     });
   </script>
+  <?php if ($planta && !empty($planta['id'])): ?>
+  <script>
+    window.__ORNAPLANT_PLANT_ID__ = <?= json_encode((string)$planta['id'], JSON_UNESCAPED_SLASHES) ?>;
+  </script>
+  <?php endif; ?>
   <script src="<?= $base ?>/script.js"></script>
 </body>
 </html>
