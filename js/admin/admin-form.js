@@ -23,6 +23,7 @@ export function openModal(id = null) {
     setVal('f-sci', p.nombreCientifico);
     setVal('f-cat', p.categoria);
     setVal('f-disp', p.disponibilidad);
+    setVal('f-revision', p.revision_estado || 'no revisada');
     setVal('f-desc', p.descripcion);
     setVal('f-luz', p.luz);
     setVal('f-riego', p.riego);
@@ -32,6 +33,7 @@ export function openModal(id = null) {
     setVal('f-etiquetas', (p.etiquetas || []).join(', '));
     setVal('f-variaciones', (p.variaciones || []).join(', '));
     setVal('f-sku', p.sku || '');
+    renderImgHistorial(p.imagenes_historial);
     const url = (p.imagenes || [])[0] || '';
     if (url) {
       pendingImageUrl = url;
@@ -42,11 +44,13 @@ export function openModal(id = null) {
     ['f-nombre','f-sci','f-desc','f-etiquetas','f-variaciones','f-sku'].forEach(id => setVal(id, ''));
     setVal('f-cat', 'ornamental');
     setVal('f-disp', 'disponible');
+    setVal('f-revision', 'no revisada');
     setVal('f-luz', 'luz indirecta');
     setVal('f-riego', 'medio');
     setVal('f-cuidado', 'fácil');
     setVal('f-suc', 'ambas');
     setVal('f-mascotas', 'no tóxica');
+    renderImgHistorial([]);
   }
 
   const skuInput = document.getElementById('f-sku');
@@ -86,6 +90,7 @@ export async function savePlantUI() {
     nombreCientifico: document.getElementById('f-sci').value.trim(),
     categoria:        document.getElementById('f-cat').value,
     disponibilidad:   document.getElementById('f-disp').value,
+    revision_estado:  document.getElementById('f-revision').value,
     descripcion:      desc,
     luz:              document.getElementById('f-luz').value,
     riego:            document.getElementById('f-riego').value,
@@ -197,6 +202,25 @@ export async function handleImageUpload(input) {
     statusEl.textContent = 'Error: ' + (e?.message || 'falló subida');
     statusEl.style.color = '#991b1b';
   }
+}
+
+function renderImgHistorial(urls) {
+  const wrap = document.getElementById('imgHistorial0');
+  const list = document.getElementById('imgHistorialList0');
+  if (!wrap || !list) return;
+  list.innerHTML = '';
+  if (!Array.isArray(urls) || urls.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  urls.forEach(url => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'Foto anterior';
+    img.style.cssText = 'width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #e8efeb;';
+    list.appendChild(img);
+  });
+  wrap.style.display = 'block';
 }
 
 function setVal(id, val) {
