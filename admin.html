@@ -187,9 +187,20 @@
       cursor: pointer; border: none; outline: none; appearance: none; -webkit-appearance: none;
       text-align: center; min-width: 90px;
     }
-    .disp-select.disponible  { background: #dcfce7; color: #166534; }
-    .disp-select.bajo-pedido { background: #fef9c3; color: #854d0e; }
-    .disp-select.agotado     { background: #fee2e2; color: #991b1b; }
+    .disp-select.disponible   { background: #dcfce7; color: #166534; }
+    .disp-select.de-temporada { background: #fef9c3; color: #854d0e; }
+    .disp-select.agotado      { background: #fee2e2; color: #991b1b; }
+
+    /* Revision interna: select pill, mismo patron visual que disp-select */
+    .revision-select {
+      padding: 0.25rem 0.625rem; border-radius: 100px;
+      font-size: 0.75rem; font-family: 'Plus Jakarta Sans',sans-serif; font-weight: 700;
+      cursor: pointer; border: none; outline: none; appearance: none; -webkit-appearance: none;
+      text-align: center; min-width: 100px;
+    }
+    .revision-select.no-revisada { background: #f1f5f3; color: #69776d; }
+    .revision-select.correcta    { background: #dcfce7; color: #166534; }
+    .revision-select.incorrecta  { background: #fee2e2; color: #991b1b; }
 
     /* ── BUTTONS ─────────────────────────────────────────────── */
     .btn-icon {
@@ -409,7 +420,7 @@
         justify-content: center;
         width: 100%;
       }
-      .disp-select { flex: 1; max-width: 160px; }
+      .disp-select, .revision-select { flex: 1; max-width: 160px; }
       /* Encabezado de inventario: botones a lo ancho, centrados */
       #plants-heading + div { width: 100%; justify-content: center; }
       .toolbar-select { flex: 1; min-width: 0; }
@@ -567,6 +578,10 @@
                   <span class="material-symbols-outlined" style="font-size:1.125rem;">manage_accounts</span>
                   Perfiles
                 </button>
+                <button class="btn-ghost owner-only" data-action="open-reset-revision-modal" hidden>
+                  <span class="material-symbols-outlined" style="font-size:1.125rem;">restart_alt</span>
+                  Reiniciar revision
+                </button>
                 <button class="btn-primary" id="addPlantBtn">
                   <span class="material-symbols-outlined">add</span>
                   Agregar Planta
@@ -596,7 +611,7 @@
               <select id="filterDisp" class="toolbar-select" aria-label="Filtrar por disponibilidad">
                 <option value="">Disponibilidad</option>
                 <option value="disponible">Disponible</option>
-                <option value="bajo pedido">Bajo pedido</option>
+                <option value="de temporada">De temporada</option>
                 <option value="agotado">Agotado</option>
               </select>
               <select id="filterSuc" class="toolbar-select" aria-label="Filtrar por sucursal">
@@ -708,7 +723,7 @@
             <label class="form-label" for="f-disp">Disponibilidad *</label>
             <select class="form-select" id="f-disp">
               <option value="disponible">Disponible</option>
-              <option value="bajo pedido">Bajo pedido</option>
+              <option value="de temporada">De temporada</option>
               <option value="agotado">Agotado</option>
             </select>
           </div>
@@ -720,6 +735,15 @@
               <option value="embarques">Embarques</option>
             </select>
           </div>
+        </div>
+        <p class="form-section"><span class="material-symbols-outlined">fact_check</span> Revision interna (no visible al cliente)</p>
+        <div>
+          <label class="form-label" for="f-revision">Estado de revision</label>
+          <select class="form-select" id="f-revision">
+            <option value="no revisada">No revisada</option>
+            <option value="correcta">Correcta</option>
+            <option value="incorrecta">Incorrecta</option>
+          </select>
         </div>
         <div>
           <label class="form-label" for="f-etiquetas">Etiquetas (separadas por coma)</label>
@@ -747,6 +771,10 @@
           </div>
           <div id="imgPreview0" style="display:none;margin-top:0.625rem;">
             <img id="imgPreviewEl0" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid #e8efeb;" alt="Preview">
+          </div>
+          <div id="imgHistorial0" style="display:none;margin-top:0.75rem;">
+            <p style="font-size:0.75rem;color:#7da592;margin-bottom:0.375rem;font-weight:600;">Fotos anteriores</p>
+            <div id="imgHistorialList0" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
           </div>
         </div>
       </div>
@@ -832,6 +860,32 @@
     </div>
   </div>
 
+  <!-- MODAL: Reiniciar revision masiva (solo dueno) -->
+  <div class="modal-overlay" id="resetRevisionModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="resetRevisionModalTitle">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="resetRevisionModalTitle" style="font-size:1.125rem;font-weight:700;margin:0;color:#1a3028;">Reiniciar revision</h3>
+        <button data-action="close-reset-revision-modal" style="background:none;border:none;cursor:pointer;padding:0.25rem;border-radius:6px;color:#7da592;" aria-label="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div style="padding:1.5rem;">
+        <p style="font-size:0.875rem;color:#69776d;line-height:1.5;margin:0 0 1rem;">
+          Esto pone el estado de revision de <strong>todas</strong> las plantas en "No revisada". No se puede deshacer. La disponibilidad del catalogo no se ve afectada.
+        </p>
+        <label class="form-label" for="reset-revision-confirm">Escribe <strong>REINICIAR</strong> para confirmar</label>
+        <input class="form-input" id="reset-revision-confirm" type="text" autocomplete="off" spellcheck="false">
+      </div>
+      <div style="padding:1rem 1.5rem;border-top:1px solid #e8efeb;display:flex;justify-content:flex-end;gap:0.75rem;">
+        <button class="btn-ghost" data-action="close-reset-revision-modal">Cancelar</button>
+        <button class="btn-primary" id="confirmResetRevisionBtn" disabled style="background:#991b1b;opacity:0.5;">
+          <span class="material-symbols-outlined" style="font-size:1rem;">restart_alt</span>
+          Reiniciar todas
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- User row template (XSS-safe) -->
   <template id="user-row-template">
     <div class="user-row" data-id="">
@@ -865,8 +919,13 @@
         </select>
         <select class="disp-select" aria-label="">
           <option value="disponible">Disponible</option>
-          <option value="bajo pedido">Bajo pedido</option>
+          <option value="de temporada">De temporada</option>
           <option value="agotado">Agotado</option>
+        </select>
+        <select class="revision-select" aria-label="">
+          <option value="no revisada">No revisada</option>
+          <option value="correcta">Correcta</option>
+          <option value="incorrecta">Incorrecta</option>
         </select>
         <button class="btn-icon btn-edit edit-btn" aria-label="">
           <span class="material-symbols-outlined">edit</span>
