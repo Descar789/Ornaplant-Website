@@ -5,6 +5,8 @@ import { openModal, closeModal, savePlantUI, handleDeleteClick, handleImageUploa
 import { doSignOut } from './admin-auth.js';
 import { updatePlant } from '../../api.js?v=2';
 import { showToast } from './admin-toast.js';
+import { toggleNav, closeNav, toggleAccountMenu, closeAccountMenu, isAccountMenuOpen } from './admin-nav.js';
+import { openUsersModal, closeUsersModal, createUserUI, handleUserDeleteClick, togglePassword } from './admin-users.js';
 
 export function setupEvents() {
   // Availability change — optimistic with rollback
@@ -30,6 +32,28 @@ export function setupEvents() {
       renderList();
       renderStats();
       showToast('Error al actualizar disponibilidad.', 'error');
+    }
+  });
+
+  // Sucursal en línea — optimista con rollback
+  document.addEventListener('change', async (e) => {
+    const sel = e.target.closest('.suc-select');
+    if (!sel) return;
+    const row = sel.closest('.plant-row');
+    if (!row) return;
+    const id = row.dataset.id;
+    const val = sel.value;
+    const plant = getPlants().find(p => p.id === id);
+    if (!plant) return;
+    const prev = plant.sucursal;
+
+    updatePlantInList(id, { sucursal: val });
+    try {
+      await updatePlant(id, { sucursal: val });
+    } catch {
+      updatePlantInList(id, { sucursal: prev });
+      sel.value = prev || 'ambas';
+      showToast('Error al actualizar sucursal.', 'error');
     }
   });
 
@@ -61,6 +85,31 @@ export function setupEvents() {
   });
 
   document.addEventListener('click', (e) => {
+    // Account menu toggle + cerrar al hacer click fuera
+    if (e.target.closest('#accountTrigger')) { toggleAccountMenu(); return; }
+    if (isAccountMenuOpen() && !e.target.closest('#accountDropdown')) closeAccountMenu();
+
+    // Drawer móvil
+    if (e.target.closest('[data-action="toggle-nav"]')) { toggleNav(); return; }
+    if (e.target.closest('[data-action="close-nav"]')) { closeNav(); return; }
+
+    // Gestión de perfiles
+    if (e.target.closest('[data-action="open-users-modal"]')) {
+      closeAccountMenu(); closeNav(); openUsersModal(); return;
+    }
+    if (e.target.closest('[data-action="close-users-modal"]') || e.target.id === 'usersModal') { closeUsersModal(); return; }
+    if (e.target.closest('[data-action="toggle-password"]')) { togglePassword(e.target.closest('[data-action="toggle-password"]')); return; }
+    if (e.target.closest('#createUserBtn')) { createUserUI(); return; }
+    const userDel = e.target.closest('.user-del-btn');
+    if (userDel) {
+      const uid = userDel.closest('.user-row')?.dataset.id;
+      if (uid) handleUserDeleteClick(uid, userDel);
+      return;
+    }
+
+    // Cerrar drawer al elegir un item de la sidebar (sin bloquear otros handlers)
+    if (e.target.closest('.admin-sidebar .nav-item:not([disabled])')) { closeNav(); }
+
     // Pagination
     const pgBtn = e.target.closest('#adminPagination button[data-page]');
     if (pgBtn && !pgBtn.disabled) {
@@ -107,6 +156,9 @@ export function setupEvents() {
     if (e.key === 'Escape') {
       closeModal();
       closeVisitasModal();
+      closeUsersModal();
+      closeAccountMenu();
+      closeNav();
     }
   });
 }

@@ -1,4 +1,5 @@
-import { isLoggedAndValid, showScreen, setupAuthEvents, getEmail } from './admin-auth.js';
+import { isLoggedAndValid, showScreen, setupAuthEvents } from './admin-auth.js';
+import { renderAccountUI } from './admin-nav.js';
 import { setupEvents } from './admin-events.js';
 import { setPlants, setGlobalVisits } from './admin-state.js';
 import { renderList } from './admin-ui-list.js';
@@ -11,8 +12,7 @@ async function bootPanel() {
   if (panelBooted) return;
   panelBooted = true;
 
-  const emailEl = document.getElementById('adminEmail');
-  if (emailEl) emailEl.textContent = getEmail();
+  renderAccountUI();
 
   showScreen('adminPanel');
   setupEvents();

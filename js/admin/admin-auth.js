@@ -1,4 +1,4 @@
-import { adminLogin, adminLogout, getAdminEmail } from '../../api.js?v=2';
+import { adminLogin, adminLogout, getAdminEmail, getAdminRole, getAdminNombre } from '../../api.js?v=2';
 
 function isTokenExpired() {
   const token = sessionStorage.getItem('ornaplant_token');
@@ -35,6 +35,18 @@ export function doSignOut() {
 
 export function getEmail() {
   return getAdminEmail();
+}
+
+export function getRole() {
+  return getAdminRole();
+}
+
+export function getNombre() {
+  return getAdminNombre();
+}
+
+export function isOwner() {
+  return getAdminRole() === 'owner';
 }
 
 export function setupAuthEvents() {

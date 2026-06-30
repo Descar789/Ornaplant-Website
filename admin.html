@@ -262,6 +262,137 @@
     .btn-ghost:hover { background: #eef4ec; }
     .btn-danger-sm { background: #fee2e2; color: #991b1b; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-family: 'Plus Jakarta Sans',sans-serif; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: background 150ms; display: inline-flex; align-items: center; gap: 0.375rem; }
     .btn-danger-sm:hover { background: #fecaca; }
+
+    /* ── MOBILE DRAWER + HAMBURGER ───────────────────────────── */
+    .hamburger-btn {
+      display: none; width: 40px; height: 40px; border: none; background: none;
+      border-radius: 8px; cursor: pointer; color: #396452;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: #eef4ec; }
+    .hamburger-btn:focus-visible { outline: 2px solid #56816d; outline-offset: 2px; }
+    .nav-overlay {
+      position: fixed; inset: 0; background: rgba(20,40,32,0.45);
+      z-index: 150; opacity: 0; pointer-events: none; transition: opacity 200ms ease;
+    }
+    @media (max-width: 768px) {
+      .hamburger-btn { display: inline-flex; }
+      /* Sidebar becomes off-canvas drawer */
+      .admin-sidebar {
+        display: flex !important;
+        position: fixed; top: 0; left: 0; height: 100dvh; width: 260px;
+        z-index: 200; transform: translateX(-100%);
+        transition: transform 240ms cubic-bezier(0.4,0,0.2,1);
+        box-shadow: 0 0 40px rgba(0,0,0,0.3);
+      }
+      body.nav-open .admin-sidebar { transform: translateX(0); }
+      body.nav-open .nav-overlay { opacity: 1; pointer-events: auto; }
+    }
+    @media (min-width: 769px) { .nav-overlay { display: none; } }
+
+    /* ── ACCOUNT MENU (dropdown) ─────────────────────────────── */
+    .account-menu { position: relative; }
+    .account-trigger {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: none; border: 1px solid transparent; border-radius: 10px;
+      padding: 0.3rem 0.5rem; cursor: pointer; transition: background 150ms, border-color 150ms;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .account-trigger:hover { background: #f4f9f5; border-color: #e8efeb; }
+    .account-trigger:focus-visible { outline: 2px solid #56816d; outline-offset: 2px; }
+    .account-avatar {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: #396452; color: white; font-weight: 800; font-size: 0.8125rem;
+      display: flex; align-items: center; justify-content: center; text-transform: uppercase;
+    }
+    .account-trigger .account-name {
+      font-size: 0.8125rem; font-weight: 700; color: #1a3028; max-width: 160px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .account-trigger .chev { color: #7da592; font-size: 1.125rem; transition: transform 200ms; }
+    .account-trigger[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    @media (max-width: 540px) { .account-trigger .account-name { display: none; } }
+    .account-dropdown {
+      position: absolute; right: 0; top: calc(100% + 0.5rem); width: 248px;
+      background: white; border: 1px solid #e8efeb; border-radius: 12px;
+      box-shadow: 0 16px 40px rgba(32,59,49,0.16); z-index: 60; overflow: hidden;
+      animation: fadein 140ms ease-out;
+    }
+    .account-dropdown-head { padding: 0.875rem 1rem; border-bottom: 1px solid #f0f5f2; }
+    .account-dropdown-head .ad-email { font-size: 0.8125rem; font-weight: 700; color: #1a3028; word-break: break-all; }
+    .account-item {
+      display: flex; align-items: center; gap: 0.625rem; width: 100%;
+      padding: 0.6875rem 1rem; background: none; border: none; text-align: left;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: #223029; cursor: pointer; text-decoration: none; transition: background 120ms;
+    }
+    .account-item:hover { background: #f4f9f5; }
+    .account-item .material-symbols-outlined { font-size: 1.125rem; color: #56816d; }
+    .account-item-danger { color: #991b1b; border-top: 1px solid #f0f5f2; }
+    .account-item-danger .material-symbols-outlined { color: #991b1b; }
+
+    /* ── ROLE BADGE ──────────────────────────────────────────── */
+    .role-badge {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      padding: 0.1rem 0.5rem; border-radius: 100px; margin-top: 0.25rem;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.6875rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.02em;
+    }
+    .role-badge .material-symbols-outlined { font-size: 0.875rem; }
+    .role-badge.owner  { background: #f3e8f0; color: #b43c6d; }
+    .role-badge.editor { background: #eef4ec; color: #396452; }
+
+    /* ── FORM SECTIONS (modal) ───────────────────────────────── */
+    .form-section {
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.75rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.04em; color: #7da592;
+      margin: 0.25rem 0 -0.25rem; display: flex; align-items: center; gap: 0.375rem;
+    }
+    .form-section .material-symbols-outlined { font-size: 1rem; }
+    .form-section:first-child { margin-top: 0; }
+
+    /* ── INLINE SUCURSAL SELECT (row) ────────────────────────── */
+    .suc-select {
+      padding: 0.25rem 0.5rem; border-radius: 8px; border: 1px solid #d9e8df;
+      font-size: 0.7rem; font-family: 'Plus Jakarta Sans',sans-serif; font-weight: 600;
+      color: #396452; background: #f9fcfa; cursor: pointer; outline: none;
+      appearance: none; -webkit-appearance: none; text-align: center; min-width: 78px;
+    }
+    .suc-select:focus { border-color: #56816d; box-shadow: 0 0 0 2px rgba(86,129,109,0.12); }
+    @media (max-width: 540px) { .suc-select { display: none; } }
+
+    /* ── PASSWORD FIELD ──────────────────────────────────────── */
+    .pw-wrap { position: relative; }
+    .pw-toggle {
+      position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: #7da592; padding: 0.25rem;
+      display: flex; align-items: center; border-radius: 6px;
+    }
+    .pw-toggle:hover { color: #396452; }
+
+    /* ── USERS LIST (perfiles modal) ─────────────────────────── */
+    .user-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 0; border-bottom: 1px solid #f0f5f2;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: #eef4ec; color: #396452; font-weight: 800; font-size: 0.875rem;
+      display: flex; align-items: center; justify-content: center; text-transform: uppercase;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-family: 'Plus Jakarta Sans',sans-serif; font-weight: 700; font-size: 0.875rem; color: #1a3028; }
+    .user-email { font-size: 0.78rem; color: #7da592; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body>
@@ -305,10 +436,12 @@
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel" style="display:none;">
+    <!-- Overlay para el drawer móvil -->
+    <div class="nav-overlay" id="navOverlay" data-action="close-nav" aria-hidden="true"></div>
     <div class="admin-shell">
 
       <!-- SIDEBAR -->
-      <aside class="admin-sidebar">
+      <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-logo">
           <div style="display:flex;align-items:center;gap:0.625rem;">
             <img src="assets/logo-symbol-web.png" alt="" aria-hidden="true" style="width:32px;height:32px;opacity:0.9;">
@@ -320,6 +453,10 @@
           <button class="nav-item active" aria-current="page">
             <span class="material-symbols-outlined">shelves</span>
             Inventario
+          </button>
+          <button class="nav-item owner-only" data-action="open-users-modal" hidden>
+            <span class="material-symbols-outlined">manage_accounts</span>
+            Perfiles
           </button>
           <button class="nav-item" disabled style="opacity:0.4;cursor:not-allowed;">
             <span class="material-symbols-outlined">receipt_long</span>
@@ -351,14 +488,36 @@
       <div class="admin-main">
 
         <!-- TOP BAR -->
-        <header class="content-header">
-          <span id="adminEmail" style="font-size:0.8125rem;color:#6b8c7a;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;"></span>
-          <div style="width:1px;height:16px;background:#e8efeb;"></div>
-          <a href="index.html" style="font-size:0.8125rem;color:#396452;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none;display:flex;align-items:center;gap:0.25rem;">
-            Ver sitio <span class="material-symbols-outlined" style="font-size:0.875rem;">open_in_new</span>
-          </a>
-          <span style="color:#d9e8df;">|</span>
-          <button data-action="sign-out" style="background:none;border:none;font-size:0.8125rem;color:#6b8c7a;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;padding:0;">Log Out</button>
+        <header class="content-header" style="justify-content:space-between;">
+          <button class="hamburger-btn" data-action="toggle-nav" aria-label="Abrir menú de navegación" aria-controls="adminSidebar" aria-expanded="false">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+
+          <div class="account-menu" style="margin-left:auto;">
+            <button class="account-trigger" id="accountTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="accountDropdown">
+              <span class="account-avatar" id="accountAvatar" aria-hidden="true"></span>
+              <span class="account-name" id="accountName"></span>
+              <span class="material-symbols-outlined chev" aria-hidden="true">expand_more</span>
+            </button>
+            <div class="account-dropdown" id="accountDropdown" role="menu" hidden>
+              <div class="account-dropdown-head">
+                <div class="ad-email" id="accountEmail"></div>
+                <span class="role-badge" id="accountRoleBadge"></span>
+              </div>
+              <button class="account-item owner-only" data-action="open-users-modal" role="menuitem" hidden>
+                <span class="material-symbols-outlined">manage_accounts</span>
+                Gestionar perfiles
+              </button>
+              <a href="index.html" class="account-item" role="menuitem">
+                <span class="material-symbols-outlined">open_in_new</span>
+                Ver sitio
+              </a>
+              <button class="account-item account-item-danger" data-action="sign-out" role="menuitem">
+                <span class="material-symbols-outlined">logout</span>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
         </header>
 
         <div class="content-body">
@@ -445,6 +604,8 @@
         </button>
       </div>
       <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+
+        <p class="form-section"><span class="material-symbols-outlined">badge</span> Identidad</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
           <div>
             <label class="form-label" for="f-nombre">Nombre *</label>
@@ -455,6 +616,12 @@
             <input class="form-input" id="f-sci" type="text">
           </div>
         </div>
+        <div>
+          <label class="form-label" for="f-desc">Descripción *</label>
+          <textarea class="form-textarea" id="f-desc"></textarea>
+        </div>
+
+        <p class="form-section"><span class="material-symbols-outlined">category</span> Clasificación y cuidados</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
           <div>
             <label class="form-label" for="f-cat">Categoría *</label>
@@ -468,17 +635,12 @@
             </select>
           </div>
           <div>
-            <label class="form-label" for="f-disp">Disponibilidad *</label>
-            <select class="form-select" id="f-disp">
-              <option value="disponible">Disponible</option>
-              <option value="bajo pedido">Bajo pedido</option>
-              <option value="agotado">Agotado</option>
+            <label class="form-label" for="f-mascotas">Mascotas *</label>
+            <select class="form-select" id="f-mascotas">
+              <option value="no tóxica">No tóxica</option>
+              <option value="tóxica">Tóxica</option>
             </select>
           </div>
-        </div>
-        <div>
-          <label class="form-label" for="f-desc">Descripción *</label>
-          <textarea class="form-textarea" id="f-desc"></textarea>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
           <div>
@@ -507,20 +669,23 @@
             </select>
           </div>
         </div>
+
+        <p class="form-section"><span class="material-symbols-outlined">local_shipping</span> Disponibilidad y logística</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div>
+            <label class="form-label" for="f-disp">Disponibilidad *</label>
+            <select class="form-select" id="f-disp">
+              <option value="disponible">Disponible</option>
+              <option value="bajo pedido">Bajo pedido</option>
+              <option value="agotado">Agotado</option>
+            </select>
+          </div>
           <div>
             <label class="form-label" for="f-suc">Sucursal *</label>
             <select class="form-select" id="f-suc">
               <option value="ambas">Ambas</option>
               <option value="matriz">Matriz</option>
               <option value="embarques">Embarques</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" for="f-mascotas">Mascotas *</label>
-            <select class="form-select" id="f-mascotas">
-              <option value="no tóxica">No tóxica</option>
-              <option value="tóxica">Tóxica</option>
             </select>
           </div>
         </div>
@@ -536,8 +701,9 @@
           <label class="form-label" for="f-sku">SKU</label>
           <input class="form-input" id="f-sku" type="text" maxlength="10" placeholder="ej. CEM06P120" autocomplete="off" spellcheck="false">
         </div>
+
+        <p class="form-section"><span class="material-symbols-outlined">image</span> Imagen</p>
         <div>
-          <label class="form-label">Imagen</label>
           <p style="font-size:0.75rem;color:#7da592;margin-bottom:0.5rem;line-height:1.4;">JPG, PNG o WebP · máx. 5MB · guardada con el nombre del SKU</p>
           <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
             <label class="btn-ghost" style="cursor:pointer;position:relative;">
@@ -575,6 +741,80 @@
     </div>
   </div>
 
+  <!-- MODAL: Gestionar perfiles (solo dueño) -->
+  <div class="modal-overlay" id="usersModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="usersModalTitle">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <h3 id="usersModalTitle" style="font-size:1.125rem;font-weight:700;margin:0;color:#1a3028;">Gestionar perfiles</h3>
+        <button data-action="close-users-modal" style="background:none;border:none;cursor:pointer;padding:0.25rem;border-radius:6px;color:#7da592;" aria-label="Cerrar gestión de perfiles">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.25rem;">
+
+        <!-- Crear perfil -->
+        <div>
+          <p class="form-section"><span class="material-symbols-outlined">person_add</span> Crear perfil</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.75rem;">
+            <div>
+              <label class="form-label" for="u-nombre">Nombre *</label>
+              <input class="form-input" id="u-nombre" type="text" autocomplete="name">
+            </div>
+            <div>
+              <label class="form-label" for="u-role">Rol *</label>
+              <select class="form-select" id="u-role">
+                <option value="editor">Editor — solo inventario</option>
+                <option value="owner">Dueño — acceso total</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:1rem;">
+            <label class="form-label" for="u-email">Correo *</label>
+            <input class="form-input" id="u-email" type="email" autocomplete="off" spellcheck="false">
+          </div>
+          <div style="margin-top:1rem;">
+            <label class="form-label" for="u-password">Contraseña * <span style="font-weight:500;color:#7da592;">(mín. 8 caracteres)</span></label>
+            <div class="pw-wrap">
+              <input class="form-input" id="u-password" type="password" autocomplete="new-password" style="padding-right:2.5rem;">
+              <button type="button" class="pw-toggle" data-action="toggle-password" aria-label="Mostrar contraseña">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;display:flex;justify-content:flex-end;">
+            <button class="btn-primary" id="createUserBtn">
+              <span class="material-symbols-outlined" style="font-size:1rem;">person_add</span>
+              Crear perfil
+            </button>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #f0f5f2;"></div>
+
+        <!-- Lista de perfiles -->
+        <div>
+          <p class="form-section"><span class="material-symbols-outlined">group</span> Perfiles existentes</p>
+          <div id="usersList" style="margin-top:0.5rem;"><!-- rendered by JS --></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User row template (XSS-safe) -->
+  <template id="user-row-template">
+    <div class="user-row" data-id="">
+      <div class="user-avatar" aria-hidden="true"></div>
+      <div class="user-info">
+        <div class="user-name"></div>
+        <div class="user-email"></div>
+      </div>
+      <span class="role-badge" style="margin-top:0;"></span>
+      <button class="btn-icon btn-delete user-del-btn" aria-label="">
+        <span class="material-symbols-outlined">delete</span>
+      </button>
+    </div>
+  </template>
+
   <!-- Plant row template — textContent only (XSS-safe) -->
   <template id="plant-row-template">
     <div class="plant-card plant-row" data-id="">
@@ -586,6 +826,11 @@
         <div class="plant-meta" style="font-size:0.75rem;color:#a0b9ad;margin-top:3px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;display:none;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+        <select class="suc-select" aria-label="">
+          <option value="ambas">Ambas</option>
+          <option value="matriz">Matriz</option>
+          <option value="embarques">Embarques</option>
+        </select>
         <select class="disp-select" aria-label="">
           <option value="disponible">Disponible</option>
           <option value="bajo pedido">Bajo pedido</option>

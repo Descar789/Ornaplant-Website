@@ -58,11 +58,25 @@ function get_bearer_token(): ?string {
     return null;
 }
 
+// Roles válidos para acceder al panel. 'admin' se conserva por compatibilidad
+// con tokens emitidos antes de la migración de roles (TTL 8h).
+const ADMIN_ROLES = ['owner', 'editor', 'admin'];
+const OWNER_ROLES = ['owner', 'admin'];
+
 function require_admin(): array {
     $token = get_bearer_token();
     if (!$token) json_error('Token requerido', 401);
     $payload = jwt_decode($token);
     if (!$payload) json_error('Token inválido o expirado', 401);
-    if (($payload['role'] ?? '') !== 'admin') json_error('No autorizado', 403);
+    if (!in_array($payload['role'] ?? '', ADMIN_ROLES, true)) json_error('No autorizado', 403);
+    return $payload;
+}
+
+// Exige rol de dueño. Para acciones de gestión de perfiles.
+function require_owner(): array {
+    $payload = require_admin();
+    if (!in_array($payload['role'] ?? '', OWNER_ROLES, true)) {
+        json_error('Requiere permisos de dueño', 403);
+    }
     return $payload;
 }

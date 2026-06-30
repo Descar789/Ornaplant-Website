@@ -21,7 +21,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     json_error('Email inválido', 400);
 }
 
-$stmt = db()->prepare('SELECT id, email, password_hash FROM admins WHERE email = :email LIMIT 1');
+$stmt = db()->prepare('SELECT id, email, password_hash, role, nombre, activo FROM admins WHERE email = :email LIMIT 1');
 $stmt->execute([':email' => $email]);
 $admin = $stmt->fetch();
 
@@ -35,14 +35,22 @@ if (!password_verify($password, $admin['password_hash'])) {
     json_error('Credenciales inválidas', 401);
 }
 
+if (isset($admin['activo']) && (int)$admin['activo'] === 0) {
+    json_error('Cuenta desactivada', 403);
+}
+
+$role = $admin['role'] ?? 'owner';
+
 $token = jwt_encode([
     'sub'   => (int)$admin['id'],
     'email' => $admin['email'],
-    'role'  => 'admin',
+    'role'  => $role,
 ], null, 8 * 3600);
 
 json_response([
     'token' => $token,
     'email' => $admin['email'],
+    'role'  => $role,
+    'nombre' => $admin['nombre'] ?? '',
     'expira_en' => 8 * 3600,
 ]);

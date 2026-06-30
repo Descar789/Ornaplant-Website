@@ -104,6 +104,12 @@ export function renderList() {
     if (p.sku) { metaEl.textContent = p.sku; metaEl.style.display = 'block'; }
     else { metaEl.style.display = 'none'; }
 
+    const sucSel = clone.querySelector('.suc-select');
+    if (sucSel) {
+      sucSel.value = p.sucursal || 'ambas';
+      sucSel.setAttribute('aria-label', `Sucursal de ${p.nombre}`);
+    }
+
     const select = clone.querySelector('.disp-select');
     select.className = `disp-select ${dispStyle(p.disponibilidad)}`;
     select.value = p.disponibilidad || 'disponible';

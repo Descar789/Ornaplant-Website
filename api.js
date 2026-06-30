@@ -107,12 +107,16 @@ export async function adminLogin(email, password) {
   });
   sessionStorage.setItem(TOKEN_KEY, data.token);
   sessionStorage.setItem('ornaplant_email', data.email);
+  sessionStorage.setItem('ornaplant_role', data.role || 'editor');
+  sessionStorage.setItem('ornaplant_nombre', data.nombre || '');
   return data;
 }
 
 export function adminLogout() {
   sessionStorage.removeItem(TOKEN_KEY);
   sessionStorage.removeItem('ornaplant_email');
+  sessionStorage.removeItem('ornaplant_role');
+  sessionStorage.removeItem('ornaplant_nombre');
 }
 
 export function isAdminLogged() {
@@ -121,4 +125,32 @@ export function isAdminLogged() {
 
 export function getAdminEmail() {
   return sessionStorage.getItem('ornaplant_email') || '';
+}
+
+export function getAdminRole() {
+  return sessionStorage.getItem('ornaplant_role') || 'editor';
+}
+
+export function getAdminNombre() {
+  return sessionStorage.getItem('ornaplant_nombre') || '';
+}
+
+// ── PERFILES / USUARIOS (admin dueño, requieren JWT) ─────────────
+export async function listUsers() {
+  return apiFetch('/admin/usuarios.php', { headers: { ...authHeaders() } });
+}
+
+export async function createUser(data) {
+  return apiFetch('/admin/usuarios.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteUser(id) {
+  return apiFetch(`/admin/usuarios.php?id=${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { ...authHeaders() },
+  });
 }
