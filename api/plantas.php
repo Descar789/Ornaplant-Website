@@ -20,6 +20,8 @@ function decode_planta(array $row): array {
     $row['nombreCientifico'] = $row['nombre_cientifico'] ?? '';
     unset($row['nombre_cientifico']);
     $row['vistas'] = (int)($row['vistas'] ?? 0);
+    // Campos internos de auditoria de fotos: nunca expuestos al publico.
+    unset($row['revision_estado'], $row['imagenes_historial']);
     return $row;
 }
 
