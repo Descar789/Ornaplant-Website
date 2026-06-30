@@ -536,10 +536,16 @@
 
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:1rem;flex-wrap:wrap;">
               <h2 id="plants-heading" style="font-size:1.125rem;font-weight:800;color:#1a3028;margin:0;">Inventario</h2>
-              <button class="btn-primary" id="addPlantBtn">
-                <span class="material-symbols-outlined">add</span>
-                Agregar Planta
-              </button>
+              <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
+                <button class="btn-ghost owner-only" data-action="open-users-modal" hidden>
+                  <span class="material-symbols-outlined" style="font-size:1.125rem;">manage_accounts</span>
+                  Perfiles
+                </button>
+                <button class="btn-primary" id="addPlantBtn">
+                  <span class="material-symbols-outlined">add</span>
+                  Agregar Planta
+                </button>
+              </div>
             </div>
 
             <!-- SEARCH + FILTERS -->
