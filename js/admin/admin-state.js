@@ -28,8 +28,16 @@ export function removePlantFromList(id) {
   plantList = plantList.filter(p => p.id !== id);
 }
 
+export function resetAllRevisionInList() {
+  plantList = plantList.map(p => ({ ...p, revision_estado: 'no revisada' }));
+}
+
 export function dispStyle(d) {
-  return d === 'disponible' ? 'disponible' : d === 'bajo pedido' ? 'bajo-pedido' : 'agotado';
+  return d === 'disponible' ? 'disponible' : d === 'de temporada' ? 'de-temporada' : 'agotado';
+}
+
+export function revisionStyle(r) {
+  return r === 'correcta' ? 'correcta' : r === 'incorrecta' ? 'incorrecta' : 'no-revisada';
 }
 
 // ── Filtros y orden ───────────────────────────────────────────────
