@@ -72,11 +72,13 @@ export function closeVisitasModal() {
 
 export function renderStats() {
   const plants = getPlants();
-  let disponibles = 0, agotadas = 0;
+  let disponibles = 0, agotadas = 0, porRevisar = 0, revisadas = 0;
   const cats = new Set();
   plants.forEach(p => {
     if (p.disponibilidad === 'disponible') disponibles++;
     if (p.disponibilidad === 'agotado') agotadas++;
+    if ((p.revision_estado || 'no revisada') === 'no revisada') porRevisar++;
+    else revisadas++;
     if (p.categoria) cats.add(p.categoria);
   });
 
@@ -84,6 +86,8 @@ export function renderStats() {
     { icon: 'local_florist', num: plants.length, label: 'Total Plantas' },
     { icon: 'check_circle',  num: disponibles,   label: 'Disponibles' },
     { icon: 'cancel',        num: agotadas,      label: 'Agotados' },
+    { icon: 'fact_check',    num: porRevisar,    label: 'Por revisar' },
+    { icon: 'task_alt',      num: revisadas,     label: 'Revisadas' },
     { icon: 'visibility',    num: getGlobalVisits(), label: 'Visitas Generales', detail: true },
     { icon: 'category',      num: cats.size,     label: 'Categorías' },
   ];
