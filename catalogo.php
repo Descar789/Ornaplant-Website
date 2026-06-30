@@ -462,7 +462,7 @@ try {
             <div class="filter-options" role="radiogroup" aria-labelledby="disp-label">
               <label class="filter-option"><input type="radio" name="disponibilidad" value="todas" checked> Todas</label>
               <label class="filter-option"><input type="radio" name="disponibilidad" value="disponible"> Disponible</label>
-              <label class="filter-option"><input type="radio" name="disponibilidad" value="bajo pedido"> Bajo pedido</label>
+              <label class="filter-option"><input type="radio" name="disponibilidad" value="de temporada"> De temporada</label>
               <label class="filter-option"><input type="radio" name="disponibilidad" value="agotado"> Agotado</label>
             </div>
           </div>
@@ -640,6 +640,15 @@ try {
 
       function pageSize() { return getColumns() * ROWS_PER_PAGE; }
 
+      function tierOf(p) {
+        const disp = (p.disponibilidad || '').toLowerCase();
+        const popular = Array.isArray(p.etiquetas) && (p.etiquetas.includes('popular') || p.etiquetas.includes('recomendada'));
+        if (disp === 'disponible' && popular) return 0;
+        if (disp === 'disponible') return 1;
+        if (disp === 'de temporada') return 2;
+        return 3;
+      }
+
       function applyFilters() {
         const q = filters.search.toLowerCase();
         currentList = plantas.filter(p => {
@@ -651,6 +660,8 @@ try {
           if (filters.mascotas !== 'todas' && p.mascotas !== filters.mascotas) return false;
           return true;
         });
+        // Array.sort es estable (ES2019+): conserva el orden relativo dentro de cada nivel.
+        currentList.sort((a, b) => tierOf(a) - tierOf(b));
         currentPage = 1;
         render();
       }
