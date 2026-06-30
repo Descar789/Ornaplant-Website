@@ -1,7 +1,9 @@
 # Diseño: Bitácora de auditoría del catálogo de plantas
 
 Fecha: 2026-06-30
-Estado: aprobado (diseño)
+Estado: **superado** — basado en versión truncada del pedido original.
+Ver `2026-06-30-revision-disponibilidad-design.md` para el sistema real
+(revisión de fotos + disponibilidad automática), que reemplaza esto.
 
 ## Objetivo
 
