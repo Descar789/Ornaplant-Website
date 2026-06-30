@@ -1,0 +1,95 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-30-revision-estado.md",
+  "tasks": [
+    {
+      "id": 0,
+      "subject": "Task 1: Database migration",
+      "status": "pending",
+      "description": "**Goal:** Add `revision_estado` and `imagenes_historial` columns to `plantas`, migrate existing `bajo pedido` rows to `de temporada`.\n\n**Files:**\n- Create: `sql/migrations/005_revision_estado.sql`\n\n```json:metadata\n{\"files\": [\"sql/migrations/005_revision_estado.sql\"], \"verifyCommand\": \"manual review\", \"acceptanceCriteria\": [\"Migration adds both columns with correct types/defaults\", \"Migrates bajo pedido rows to de temporada\", \"Matches 004 header style\"]}\n```"
+    },
+    {
+      "id": 1,
+      "subject": "Task 2: Admin backend — api/admin/plantas.php",
+      "status": "pending",
+      "blockedBy": [0],
+      "description": "**Goal:** Accept/validate `revision_estado`, decode `imagenes_historial`, preserve replaced photos automatically, add owner-only bulk-reset action.\n\n**Files:**\n- Modify: `api/admin/plantas.php`\n\n```json:metadata\n{\"files\": [\"api/admin/plantas.php\"], \"verifyCommand\": \"grep -n \\\"revision_estado|imagenes_historial|bajo pedido\\\" api/admin/plantas.php\", \"acceptanceCriteria\": [\"ENUMS updated\", \"revision_estado validated\", \"imagenes_historial decoded\", \"PUT preserves dropped images\", \"PATCH reset_revision owner-only\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 3: Public backend — api/plantas.php",
+      "status": "pending",
+      "blockedBy": [0],
+      "description": "**Goal:** Strip revision_estado and imagenes_historial from public API responses.\n\n**Files:**\n- Modify: `api/plantas.php`\n\n```json:metadata\n{\"files\": [\"api/plantas.php\"], \"verifyCommand\": \"manual review\", \"acceptanceCriteria\": [\"public decode_planta strips internal fields\"]}\n```"
+    },
+    {
+      "id": 3,
+      "subject": "Task 4: api.js — resetRevision()",
+      "status": "pending",
+      "blockedBy": [1],
+      "description": "**Goal:** Add client function for bulk-reset endpoint.\n\n**Files:**\n- Modify: `api.js`\n\n```json:metadata\n{\"files\": [\"api.js\"], \"verifyCommand\": \"grep -n \\\"resetRevision\\\" api.js\", \"acceptanceCriteria\": [\"resetRevision exported and calls correct endpoint\"]}\n```"
+    },
+    {
+      "id": 4,
+      "subject": "Task 5: admin-state.js — rename + revision helpers",
+      "status": "pending",
+      "description": "**Goal:** Rename dispStyle mapping, add revisionStyle + resetAllRevisionInList.\n\n**Files:**\n- Modify: `js/admin/admin-state.js`\n\n```json:metadata\n{\"files\": [\"js/admin/admin-state.js\"], \"verifyCommand\": \"grep -n \\\"de-temporada|revisionStyle|resetAllRevisionInList\\\" js/admin/admin-state.js\", \"acceptanceCriteria\": [\"dispStyle renamed\", \"revisionStyle added\", \"resetAllRevisionInList added\"]}\n```"
+    },
+    {
+      "id": 5,
+      "subject": "Task 6: admin.html — markup",
+      "status": "pending",
+      "blockedBy": [4],
+      "description": "**Goal:** Rename disponibilidad option everywhere in this file, add revision select (row+modal), photo-history mini-gallery, bulk-reset button+modal, CSS.\n\n**Files:**\n- Modify: `admin.html`\n\n```json:metadata\n{\"files\": [\"admin.html\"], \"verifyCommand\": \"grep -n \\\"bajo pedido|bajo-pedido\\\" admin.html\", \"acceptanceCriteria\": [\"rename complete\", \"revision select markup added\", \"mini-gallery added\", \"reset button+modal added\", \"CSS added\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 7: admin-ui-list.js — render revision select inline",
+      "status": "pending",
+      "blockedBy": [5],
+      "description": "**Goal:** Populate .revision-select per row on render.\n\n**Files:**\n- Modify: `js/admin/admin-ui-list.js`\n\n```json:metadata\n{\"files\": [\"js/admin/admin-ui-list.js\"], \"verifyCommand\": \"grep -n \\\"revisionStyle|revision-select\\\" js/admin/admin-ui-list.js\", \"acceptanceCriteria\": [\"revision select rendered per row\"]}\n```"
+    },
+    {
+      "id": 7,
+      "subject": "Task 8: admin-form.js — revision field + photo-history gallery",
+      "status": "pending",
+      "blockedBy": [5],
+      "description": "**Goal:** Load/save revision_estado in plant modal, render read-only photo-history gallery.\n\n**Files:**\n- Modify: `js/admin/admin-form.js`\n\n```json:metadata\n{\"files\": [\"js/admin/admin-form.js\"], \"verifyCommand\": \"grep -n \\\"f-revision|imagenes_historial|renderImgHistorial\\\" js/admin/admin-form.js\", \"acceptanceCriteria\": [\"revision field wired\", \"gallery renders\", \"payload includes revision_estado\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 9: admin-ui-stats.js — revision counts",
+      "status": "pending",
+      "blockedBy": [1],
+      "description": "**Goal:** Show \"Por revisar\"/\"Revisadas\" counts on dashboard from already-loaded plant list.\n\n**Files:**\n- Modify: `js/admin/admin-ui-stats.js`\n\n```json:metadata\n{\"files\": [\"js/admin/admin-ui-stats.js\"], \"verifyCommand\": \"grep -n \\\"Por revisar|Revisadas\\\" js/admin/admin-ui-stats.js\", \"acceptanceCriteria\": [\"counts added to stats grid\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 10: admin-events.js — wire revision select + bulk reset",
+      "status": "pending",
+      "blockedBy": [3, 6, 7],
+      "description": "**Goal:** Inline-edit revision-select with optimistic update+rollback; wire bulk-reset modal flow with typed confirmation gate.\n\n**Files:**\n- Modify: `js/admin/admin-events.js`\n\n```json:metadata\n{\"files\": [\"js/admin/admin-events.js\"], \"verifyCommand\": \"grep -n \\\"revision-select|resetRevisionModal|resetRevision|resetAllRevisionInList\\\" js/admin/admin-events.js\", \"acceptanceCriteria\": [\"revision select wired\", \"bulk reset flow wired\", \"escape closes modal\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 11: catalogo.php — rename + 4-tier sort",
+      "status": "pending",
+      "blockedBy": [0],
+      "description": "**Goal:** Rename public filter option, add disponible+popular -> disponible -> de temporada -> agotado ordering.\n\n**Files:**\n- Modify: `catalogo.php`\n\n```json:metadata\n{\"files\": [\"catalogo.php\"], \"verifyCommand\": \"grep -n \\\"de temporada|tierOf\\\" catalogo.php\", \"acceptanceCriteria\": [\"filter renamed\", \"tierOf sort implemented\"]}\n```"
+    },
+    {
+      "id": 11,
+      "subject": "Task 12: planta.php + index.html — rename badge/label maps",
+      "status": "pending",
+      "blockedBy": [0],
+      "description": "**Goal:** Finish bajo pedido -> de temporada rename on plant detail page and homepage popular-plants widget.\n\n**Files:**\n- Modify: `planta.php`\n- Modify: `index.html`\n\n```json:metadata\n{\"files\": [\"planta.php\", \"index.html\"], \"verifyCommand\": \"grep -n \\\"bajo pedido\\\" planta.php index.html\", \"acceptanceCriteria\": [\"rename complete in both files\"]}\n```"
+    },
+    {
+      "id": 12,
+      "subject": "Task 13: CLAUDE.md — documentation update",
+      "status": "pending",
+      "blockedBy": [1, 10, 11],
+      "description": "**Goal:** Update enum documentation in user-level CLAUDE.md (outside repo, no commit).\n\n**Files:**\n- Modify: `C:\\Users\\axdel\\CLAUDE.md` (outside the repo)\n\n```json:metadata\n{\"files\": [\"C:\\\\Users\\\\axdel\\\\CLAUDE.md\"], \"verifyCommand\": \"manual review\", \"acceptanceCriteria\": [\"enum doc updated\", \"revision_estado documented as internal\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-30T00:00:00Z"
+}
