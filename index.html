@@ -300,8 +300,8 @@
     import { getPlants } from './api.js?v=2';
 
     (async function () {
-      const disp = { disponible: 'badge-available', 'bajo pedido': 'badge-order', agotado: 'badge-sold' };
-      const dispL = { disponible: 'Disponible', 'bajo pedido': 'Bajo pedido', agotado: 'Agotado' };
+      const disp = { disponible: 'badge-available', 'de temporada': 'badge-order', agotado: 'badge-sold' };
+      const dispL = { disponible: 'Disponible', 'de temporada': 'De temporada', agotado: 'Agotado' };
       const grid = document.getElementById('featuredGrid');
 
       let plantas;

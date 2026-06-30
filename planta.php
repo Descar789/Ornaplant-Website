@@ -85,7 +85,7 @@ if (!$planta) {
     // Marcado estructurado Product JSON-LD (Offers sin precio simulado para evitar penalizaciones)
     $availMap = [
         'disponible'  => 'https://schema.org/InStock',
-        'bajo pedido' => 'https://schema.org/PreOrder',
+        'de temporada' => 'https://schema.org/PreOrder',
         'agotado'     => 'https://schema.org/OutOfStock',
     ];
     $schema = [
@@ -226,8 +226,8 @@ if (!$planta) {
       $skuLine = $planta['sku'] ? "\n- SKU: " . $planta['sku'] : '';
       $waMsg = rawurlencode("Hola ORNAPLANT, me interesa la siguiente planta:\n- Nombre: {$planta['nombre']}{$skuLine}\n¿Está disponible?");
       
-      $dispCls = ['disponible' => 'disp-available', 'bajo pedido' => 'disp-order', 'agotado' => 'disp-sold'];
-      $dispLbl = ['disponible' => 'Disponible', 'bajo pedido' => 'Bajo pedido', 'agotado' => 'Agotado'];
+      $dispCls = ['disponible' => 'disp-available', 'de temporada' => 'disp-order', 'agotado' => 'disp-sold'];
+      $dispLbl = ['disponible' => 'Disponible', 'de temporada' => 'De temporada', 'agotado' => 'Agotado'];
       $luzIcon = ['sol directo' => 'wb_sunny', 'luz indirecta' => 'light_mode', 'media sombra' => 'partly_cloudy_day', 'sombra' => 'cloud'];
       $cuidadoIcon = ['fácil' => 'sentiment_satisfied', 'intermedio' => 'sentiment_neutral', 'difícil' => 'sentiment_dissatisfied'];
       ?>
