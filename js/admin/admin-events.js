@@ -1,9 +1,9 @@
-import { getPlants, updatePlantInList, setSearchTerm, setCurrentPage, getCurrentPage, dispStyle, setFilterCat, setFilterDisp, setFilterSuc, setSort } from './admin-state.js';
+import { getPlants, updatePlantInList, setSearchTerm, setCurrentPage, getCurrentPage, dispStyle, revisionStyle, setFilterCat, setFilterDisp, setFilterSuc, setSort, resetAllRevisionInList } from './admin-state.js';
 import { renderList } from './admin-ui-list.js';
 import { renderStats, openVisitasModal, closeVisitasModal } from './admin-ui-stats.js';
 import { openModal, closeModal, savePlantUI, handleDeleteClick, handleImageUpload } from './admin-form.js';
 import { doSignOut } from './admin-auth.js';
-import { updatePlant } from '../../api.js?v=3';
+import { updatePlant, resetRevision } from '../../api.js?v=3';
 import { showToast } from './admin-toast.js';
 import { toggleNav, closeNav, toggleAccountMenu, closeAccountMenu, isAccountMenuOpen } from './admin-nav.js';
 import { openUsersModal, closeUsersModal, createUserUI, handleUserDeleteClick, togglePassword } from './admin-users.js';
@@ -35,7 +35,34 @@ export function setupEvents() {
     }
   });
 
-  // Sucursal en línea — optimista con rollback
+  // Revision en linea - optimista con rollback
+  document.addEventListener('change', async (e) => {
+    const sel = e.target.closest('.revision-select');
+    if (!sel) return;
+    const row = sel.closest('.plant-row');
+    if (!row) return;
+    const id = row.dataset.id;
+    const val = sel.value;
+    const plant = getPlants().find(p => p.id === id);
+    if (!plant) return;
+    const prev = plant.revision_estado;
+
+    updatePlantInList(id, { revision_estado: val });
+    sel.className = `revision-select ${revisionStyle(val)}`;
+    renderStats();
+
+    try {
+      await updatePlant(id, { revision_estado: val });
+    } catch {
+      updatePlantInList(id, { revision_estado: prev });
+      sel.className = `revision-select ${revisionStyle(prev)}`;
+      sel.value = prev || 'no revisada';
+      renderStats();
+      showToast('Error al actualizar revision.', 'error');
+    }
+  });
+
+  // Sucursal en linea - optimista con rollback
   document.addEventListener('change', async (e) => {
     const sel = e.target.closest('.suc-select');
     if (!sel) return;
@@ -72,6 +99,17 @@ export function setupEvents() {
     }
   });
 
+  // Confirmacion escrita para reinicio masivo de revision
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'reset-revision-confirm') {
+      const btn = document.getElementById('confirmResetRevisionBtn');
+      if (!btn) return;
+      const ok = e.target.value.trim() === 'REINICIAR';
+      btn.disabled = !ok;
+      btn.style.opacity = ok ? '1' : '0.5';
+    }
+  });
+
   // Filters + sort
   document.addEventListener('change', (e) => {
     if (e.target.id === 'filterCat')  { setFilterCat(e.target.value);  renderList(); return; }
@@ -98,6 +136,43 @@ export function setupEvents() {
       closeAccountMenu(); closeNav(); openUsersModal(); return;
     }
     if (e.target.closest('[data-action="close-users-modal"]') || e.target.id === 'usersModal') { closeUsersModal(); return; }
+
+    // Reinicio masivo de revision (solo dueno)
+    if (e.target.closest('[data-action="open-reset-revision-modal"]')) {
+      closeAccountMenu(); closeNav();
+      const input = document.getElementById('reset-revision-confirm');
+      const btn = document.getElementById('confirmResetRevisionBtn');
+      if (input) input.value = '';
+      if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+      const modal = document.getElementById('resetRevisionModal');
+      if (modal) modal.style.display = 'flex';
+      return;
+    }
+    if (e.target.closest('[data-action="close-reset-revision-modal"]') || e.target.id === 'resetRevisionModal') {
+      const modal = document.getElementById('resetRevisionModal');
+      if (modal) modal.style.display = 'none';
+      return;
+    }
+    if (e.target.closest('#confirmResetRevisionBtn')) {
+      const btn = e.target.closest('#confirmResetRevisionBtn');
+      if (btn.disabled) return;
+      btn.disabled = true;
+      resetRevision()
+        .then(() => {
+          resetAllRevisionInList();
+          renderList();
+          renderStats();
+          const modal = document.getElementById('resetRevisionModal');
+          if (modal) modal.style.display = 'none';
+          showToast('Revision reiniciada en todas las plantas.', 'success');
+        })
+        .catch((err) => {
+          btn.disabled = false;
+          showToast('Error al reiniciar: ' + err.message, 'error');
+        });
+      return;
+    }
+
     if (e.target.closest('[data-action="toggle-password"]')) { togglePassword(e.target.closest('[data-action="toggle-password"]')); return; }
     if (e.target.closest('#createUserBtn')) { createUserUI(); return; }
     const userDel = e.target.closest('.user-del-btn');
@@ -159,6 +234,8 @@ export function setupEvents() {
       closeUsersModal();
       closeAccountMenu();
       closeNav();
+      const resetModal = document.getElementById('resetRevisionModal');
+      if (resetModal) resetModal.style.display = 'none';
     }
   });
 }
