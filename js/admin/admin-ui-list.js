@@ -1,5 +1,5 @@
 import {
-  getPlants, getSearchTerm, getCurrentPage, dispStyle,
+  getPlants, getSearchTerm, getCurrentPage, dispStyle, revisionStyle,
   getFilterCat, getFilterDisp, getFilterSuc, getSortField, getSortDir,
 } from './admin-state.js';
 
@@ -114,6 +114,11 @@ export function renderList() {
     select.className = `disp-select ${dispStyle(p.disponibilidad)}`;
     select.value = p.disponibilidad || 'disponible';
     select.setAttribute('aria-label', `Disponibilidad de ${p.nombre}`);
+
+    const revSelect = clone.querySelector('.revision-select');
+    revSelect.className = `revision-select ${revisionStyle(p.revision_estado)}`;
+    revSelect.value = p.revision_estado || 'no revisada';
+    revSelect.setAttribute('aria-label', `Revision de ${p.nombre}`);
 
     clone.querySelector('.edit-btn').setAttribute('aria-label',   `Editar ${p.nombre}`);
     clone.querySelector('.delete-btn').setAttribute('aria-label', `Eliminar ${p.nombre}`);
