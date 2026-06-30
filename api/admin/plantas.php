@@ -23,13 +23,14 @@ const ENUMS = [
     'luz'            => ['sol directo', 'luz indirecta', 'media sombra', 'sombra'],
     'riego'          => ['bajo', 'medio', 'alto'],
     'cuidado'        => ['fácil', 'intermedio', 'difícil'],
-    'disponibilidad' => ['disponible', 'bajo pedido', 'agotado'],
+    'disponibilidad' => ['disponible', 'de temporada', 'agotado'],
     'sucursal'       => ['ambas', 'matriz', 'embarques'],
+    'revision_estado' => ['no revisada', 'correcta', 'incorrecta'],
     'mascotas'       => ['no tóxica', 'tóxica'],
 ];
 
 function decode_planta(array $row): array {
-    foreach (['etiquetas', 'variaciones', 'imagenes'] as $f) {
+    foreach (['etiquetas', 'variaciones', 'imagenes', 'imagenes_historial'] as $f) {
         $row[$f] = $row[$f] ? json_decode($row[$f], true) : [];
         if (!is_array($row[$f])) $row[$f] = [];
     }
@@ -56,7 +57,7 @@ function build_payload(array $body, bool $isUpdate = false): array {
     $allowed = [
         'nombre', 'nombre_cientifico', 'categoria', 'descripcion',
         'luz', 'riego', 'cuidado', 'disponibilidad', 'sucursal', 'mascotas',
-        'sku', 'etiquetas', 'variaciones', 'imagenes',
+        'sku', 'etiquetas', 'variaciones', 'imagenes', 'revision_estado',
     ];
     $out = [];
     foreach ($allowed as $f) {
@@ -67,7 +68,7 @@ function build_payload(array $body, bool $isUpdate = false): array {
         if (empty($out['nombre'])) json_error('Campo "nombre" requerido', 400);
     }
 
-    foreach (['categoria', 'luz', 'riego', 'cuidado', 'disponibilidad', 'sucursal', 'mascotas'] as $f) {
+    foreach (['categoria', 'luz', 'riego', 'cuidado', 'disponibilidad', 'sucursal', 'mascotas', 'revision_estado'] as $f) {
         if (isset($out[$f])) validate_enum($f, $out[$f]);
     }
 
@@ -129,6 +130,26 @@ if ($method === 'PUT') {
     $payload = build_payload($body, true);
     if (!$payload) json_error('Sin campos para actualizar', 400);
 
+    // Conservar fotos reemplazadas: nunca se pierden, quedan en imagenes_historial.
+    if (isset($payload['imagenes'])) {
+        $stmtImgs = db()->prepare('SELECT imagenes, imagenes_historial FROM plantas WHERE id = :id LIMIT 1');
+        $stmtImgs->execute([':id' => $id]);
+        $imgRow = $stmtImgs->fetch();
+        if ($imgRow) {
+            $oldImgs = $imgRow['imagenes'] ? json_decode($imgRow['imagenes'], true) : [];
+            $newImgs = json_decode($payload['imagenes'], true) ?: [];
+            $historial = $imgRow['imagenes_historial'] ? json_decode($imgRow['imagenes_historial'], true) : [];
+            if (!is_array($oldImgs)) $oldImgs = [];
+            if (!is_array($newImgs)) $newImgs = [];
+            if (!is_array($historial)) $historial = [];
+            $dropped = array_diff($oldImgs, $newImgs);
+            foreach ($dropped as $url) {
+                if (!in_array($url, $historial, true)) $historial[] = $url;
+            }
+            if ($dropped) $payload['imagenes_historial'] = json_encode(array_values($historial), JSON_UNESCAPED_UNICODE);
+        }
+    }
+
     // Obtener el slug actual en la DB
     $stmtCheck = db()->prepare('SELECT slug FROM plantas WHERE id = :id LIMIT 1');
     $stmtCheck->execute([':id' => $id]);
@@ -169,6 +190,14 @@ if ($method === 'DELETE') {
     $stmt = db()->prepare('DELETE FROM plantas WHERE id = :id');
     $stmt->execute([':id' => $id]);
     if ($stmt->rowCount() === 0) json_error('Planta no encontrada', 404);
+    json_response(['ok' => true]);
+}
+
+if ($method === 'PATCH') {
+    $action = $_GET['action'] ?? '';
+    if ($action !== 'reset_revision') json_error('Accion no valida', 400);
+    require_owner();
+    db()->exec("UPDATE plantas SET revision_estado = 'no revisada'");
     json_response(['ok' => true]);
 }
 
