@@ -80,6 +80,13 @@ export async function deletePlant(id) {
   });
 }
 
+export async function resetRevision() {
+  return apiFetch('/admin/plantas.php?action=reset_revision', {
+    method: 'PATCH',
+    headers: { ...authHeaders() },
+  });
+}
+
 // ── UPLOAD imagen al hosting (admin) ─────────────────────────────
 export async function uploadImage(file, sku) {
   if (!file) throw new Error('Archivo requerido');
