@@ -1,5 +1,5 @@
 // admin-users.js — gestión de perfiles (solo dueño).
-import { listUsers, createUser, deleteUser } from '../../api.js?v=2';
+import { listUsers, createUser, deleteUser } from '../../api.js?v=3';
 import { getEmail } from './admin-auth.js';
 import { setRoleBadge } from './admin-nav.js';
 import { showToast } from './admin-toast.js';

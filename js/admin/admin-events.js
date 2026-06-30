@@ -3,7 +3,7 @@ import { renderList } from './admin-ui-list.js';
 import { renderStats, openVisitasModal, closeVisitasModal } from './admin-ui-stats.js';
 import { openModal, closeModal, savePlantUI, handleDeleteClick, handleImageUpload } from './admin-form.js';
 import { doSignOut } from './admin-auth.js';
-import { updatePlant } from '../../api.js?v=2';
+import { updatePlant } from '../../api.js?v=3';
 import { showToast } from './admin-toast.js';
 import { toggleNav, closeNav, toggleAccountMenu, closeAccountMenu, isAccountMenuOpen } from './admin-nav.js';
 import { openUsersModal, closeUsersModal, createUserUI, handleUserDeleteClick, togglePassword } from './admin-users.js';

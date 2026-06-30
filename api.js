@@ -127,8 +127,23 @@ export function getAdminEmail() {
   return sessionStorage.getItem('ornaplant_email') || '';
 }
 
+// El rol autoritativo viene del JWT (lo firma el servidor). Caemos a
+// sessionStorage solo si el token no se puede leer. 'admin' es un rol
+// heredado (tokens previos a la migración de roles) y equivale a dueño.
+function roleFromToken() {
+  const t = getToken();
+  if (!t) return '';
+  try {
+    const b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(b64));
+    return payload.role || '';
+  } catch { return ''; }
+}
+
 export function getAdminRole() {
-  return sessionStorage.getItem('ornaplant_role') || 'editor';
+  let role = roleFromToken() || sessionStorage.getItem('ornaplant_role') || 'editor';
+  if (role === 'admin') role = 'owner';
+  return role;
 }
 
 export function getAdminNombre() {

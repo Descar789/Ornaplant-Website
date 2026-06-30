@@ -4,7 +4,7 @@ import { setupEvents } from './admin-events.js';
 import { setPlants, setGlobalVisits } from './admin-state.js';
 import { renderList } from './admin-ui-list.js';
 import { renderStats } from './admin-ui-stats.js';
-import { getPlants as fetchPlants, getGlobalVisits as fetchVisits } from '../../api.js?v=2';
+import { getPlants as fetchPlants, getGlobalVisits as fetchVisits } from '../../api.js?v=3';
 
 let panelBooted = false;
 
