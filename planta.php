@@ -176,6 +176,11 @@ if (!$planta) {
     .whatsapp-cta:hover { background: #128C7E; }
     .whatsapp-cta:active { transform: scale(0.97); }
     .whatsapp-cta svg { width: 1.25rem; height: 1.25rem; fill: currentColor; }
+    .add-to-cart-detail { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 48px; background: #ffffff; color: #396452; border: 1.5px solid #396452; border-radius: 8px; padding: 0.75rem 2rem; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 0.9375rem; cursor: pointer; width: 100%; transition: background 160ms ease, color 160ms ease, transform 120ms ease; touch-action: manipulation; }
+    .add-to-cart-detail:hover,
+    .add-to-cart-detail.is-in-cart { background: #eef4ec; }
+    .add-to-cart-detail:active { transform: scale(0.98); }
+    .add-to-cart-detail:focus-visible { outline: 3px solid rgba(180, 60, 109, 0.48); outline-offset: 3px; }
     .breadcrumb { display: flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--muted, #69776d); flex-wrap: wrap; }
     .breadcrumb a { color: var(--muted, #69776d); text-decoration: none; transition: color 200ms ease; }
     .breadcrumb a:hover { color: var(--green-800, #396452); }
@@ -188,6 +193,7 @@ if (!$planta) {
   </style>
   <script type="module" src="<?= $base ?>/js/analytics.js?v=1"></script>
   <script type="module" src="<?= $base ?>/js/cookie-consent.js?v=1"></script>
+  <script type="module" src="<?= $base ?>/js/cart.js?v=1"></script>
 </head>
 <body class="tailwind-page">
 
@@ -334,6 +340,12 @@ if (!$planta) {
               </div>
             <?php endif; ?>
 
+            <!-- AGREGAR AL CARRITO -->
+            <button type="button" id="addToCartBtn" class="add-to-cart-detail">
+              <span class="material-symbols-outlined" id="addToCartIcon" aria-hidden="true" style="font-size:1.1rem;">add_shopping_cart</span>
+              <span id="addToCartLabel">Agregar al carrito</span>
+            </button>
+
             <!-- CTA WHATSAPP -->
             <a href="https://wa.me/527351024413?text=<?= $waMsg ?>" class="whatsapp-cta" target="_blank" rel="noopener noreferrer" aria-label="Consultar disponibilidad de <?= htmlspecialchars($planta['nombre'], ENT_QUOTES, 'UTF-8') ?> por WhatsApp">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -427,6 +439,41 @@ if (!$planta) {
   <?php if ($planta && !empty($planta['id'])): ?>
   <script>
     window.__ORNAPLANT_PLANT_ID__ = <?= json_encode((string)$planta['id'], JSON_UNESCAPED_SLASHES) ?>;
+    window.__ORNAPLANT_PLANT__ = <?= json_encode([
+        'id'     => (string)$planta['id'],
+        'nombre' => (string)$planta['nombre'],
+        'sku'    => (string)($planta['sku'] ?? ''),
+        'slug'   => (string)($planta['slug'] ?? ''),
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+  </script>
+  <script type="module">
+    import { addToCart, removeFromCart, isInCart } from '<?= $base ?>/js/cart-state.js?v=1';
+
+    const plant = window.__ORNAPLANT_PLANT__;
+    const button = document.getElementById('addToCartBtn');
+    const icon = document.getElementById('addToCartIcon');
+    const label = document.getElementById('addToCartLabel');
+
+    function syncAddToCartButton() {
+      if (!button || !icon || !label || !plant) return;
+      const inCart = isInCart(plant.id);
+      icon.textContent = inCart ? 'check' : 'add_shopping_cart';
+      label.textContent = inCart ? 'En tu carrito' : 'Agregar al carrito';
+      button.classList.toggle('is-in-cart', inCart);
+      button.setAttribute('aria-label', `${inCart ? 'Quitar' : 'Agregar'} ${plant.nombre} ${inCart ? 'del' : 'al'} carrito`);
+    }
+
+    if (button && plant) {
+      button.addEventListener('click', () => {
+        if (isInCart(plant.id)) {
+          removeFromCart(plant.id);
+        } else {
+          addToCart(plant);
+        }
+      });
+      window.addEventListener('ornaplant:cart-changed', syncAddToCartButton);
+      syncAddToCartButton();
+    }
   </script>
   <?php endif; ?>
   <script src="<?= $base ?>/script.js"></script>
