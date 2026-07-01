@@ -230,12 +230,61 @@ try {
       flex-direction: column;
       text-decoration: none;
       color: inherit;
+      position: relative;
       border-right: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
       background: #fff;
       transition: background 180ms ease;
     }
     .plant-card-v2:hover { background: #fafaf8; }
+
+    .pcv2-link {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      color: inherit;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .cat-add-cart-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      z-index: 2;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #396452;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(26, 48, 40, 0.25);
+      transition: background 160ms ease, color 160ms ease, transform 120ms ease;
+      touch-action: manipulation;
+    }
+
+    .cat-add-cart-btn:hover {
+      background: #eef4ec;
+      transform: translateY(-1px);
+    }
+
+    .cat-add-cart-btn.is-in-cart {
+      background: #396452;
+      color: #ffffff;
+    }
+
+    .cat-add-cart-btn:focus-visible {
+      outline: 3px solid rgba(180, 60, 109, 0.48);
+      outline-offset: 3px;
+    }
+
+    .cat-add-cart-btn .material-symbols-outlined {
+      font-size: 1.15rem;
+    }
 
     /* Remove right border on last column */
     .plant-card-v2:nth-child(5n) { border-right: none; }
@@ -385,6 +434,7 @@ try {
   </style>
   <script type="module" src="js/analytics.js?v=1"></script>
   <script type="module" src="js/cookie-consent.js?v=1"></script>
+  <script type="module" src="js/cart.js?v=1"></script>
 </head>
 <body>
 
@@ -586,33 +636,57 @@ try {
   <script type="module">
     import { getPlants } from './api.js?v=2';
     import { WHATSAPP_NUMBER } from './config.js?v=2';
+    import { addToCart, removeFromCart, isInCart } from './js/cart-state.js?v=1';
 
     (async function () {
       const grid = document.getElementById('plantGrid');
       let plantas = [];
 
+      function escHtml(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
+
+      function escAttr(value) {
+        return escHtml(value)
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
       function plantCard(p) {
         const img = (p.imagenes && p.imagenes[0]) || 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&auto=format&fit=crop';
         const href = p.slug ? `/catalogo/${encodeURIComponent(p.slug)}` : `/planta/${encodeURIComponent(p.id)}`;
+        const id = String(p.id);
+        const nombre = p.nombre || 'Planta';
         const luzLabel = (p.luz || 'luz indirecta').toUpperCase();
         const riegoLabel = 'AGUA ' + (p.riego || 'medio').toUpperCase();
-        const skuHtml = p.sku ? `<div class="pcv2-sku">${p.sku}</div>` : '';
+        const skuHtml = p.sku ? `<div class="pcv2-sku">${escHtml(p.sku)}</div>` : '';
+        const inCart = isInCart(id);
+        const cartIcon = inCart ? 'check' : 'add_shopping_cart';
+        const cartLabel = `${inCart ? 'Quitar' : 'Agregar'} ${nombre} ${inCart ? 'del' : 'al'} carrito`;
         return `
-          <a href="${href}" class="plant-card-v2" aria-label="Ver detalle de ${p.nombre}">
+          <article class="plant-card-v2">
+          <a href="${escAttr(href)}" class="pcv2-link" aria-label="Ver detalle de ${escAttr(nombre)}">
             <div class="pcv2-img">
-              <img src="${img}" alt="${p.nombre} — ORNAPLANT" loading="lazy" width="400" height="400">
+              <img src="${escAttr(img)}" alt="${escAttr(nombre)} — ORNAPLANT" loading="lazy" width="400" height="400">
             </div>
             <div class="pcv2-body">
-              <div class="pcv2-name">${p.nombre}</div>
-              <div class="pcv2-sci">${p.nombreCientifico || ''}</div>
+              <div class="pcv2-name">${escHtml(nombre)}</div>
+              <div class="pcv2-sci">${escHtml(p.nombreCientifico || '')}</div>
               ${skuHtml}
               <div class="pcv2-care" aria-label="Cuidados">
-                <span class="pcv2-care-item">${luzLabel}</span>
+                <span class="pcv2-care-item">${escHtml(luzLabel)}</span>
                 <span class="pcv2-care-sep" aria-hidden="true">·</span>
-                <span class="pcv2-care-item">${riegoLabel}</span>
+                <span class="pcv2-care-item">${escHtml(riegoLabel)}</span>
               </div>
             </div>
-          </a>`;
+          </a>
+          <button type="button" class="cat-add-cart-btn${inCart ? ' is-in-cart' : ''}" data-cart-id="${escAttr(id)}" aria-label="${escAttr(cartLabel)}">
+            <span class="material-symbols-outlined" aria-hidden="true">${cartIcon}</span>
+          </button>
+          </article>`;
       }
 
       let filters = { search: '', categoria: 'todas', disponibilidad: 'todas', luz: [], cuidado: [], mascotas: 'todas' };
@@ -716,6 +790,44 @@ try {
         const top = (document.getElementById('catalog-heading')?.getBoundingClientRect().top || 0) + window.scrollY - 80;
         window.scrollTo({ top, behavior: 'smooth' });
       });
+
+      function findPlantById(id) {
+        const normalizedId = String(id);
+        return currentList.find(p => String(p.id) === normalizedId) || plantas.find(p => String(p.id) === normalizedId);
+      }
+
+      function syncCardButtons() {
+        document.querySelectorAll('.cat-add-cart-btn').forEach(btn => {
+          const id = btn.dataset.cartId;
+          const plant = findPlantById(id);
+          const inCart = isInCart(id);
+          const icon = btn.querySelector('.material-symbols-outlined');
+          const nombre = plant?.nombre || 'esta planta';
+          if (icon) icon.textContent = inCart ? 'check' : 'add_shopping_cart';
+          btn.classList.toggle('is-in-cart', inCart);
+          btn.setAttribute('aria-label', `${inCart ? 'Quitar' : 'Agregar'} ${nombre} ${inCart ? 'del' : 'al'} carrito`);
+        });
+      }
+
+      grid.addEventListener('click', e => {
+        const btn = e.target.closest('.cat-add-cart-btn');
+        if (!btn) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const id = btn.dataset.cartId;
+        const plant = findPlantById(id);
+        if (!plant) return;
+
+        if (isInCart(id)) {
+          removeFromCart(id);
+        } else {
+          addToCart({ id: plant.id, nombre: plant.nombre, sku: plant.sku || '', slug: plant.slug || '' });
+        }
+      });
+
+      window.addEventListener('ornaplant:cart-changed', syncCardButtons);
 
       let resizeTimer;
       let lastSize = 0;
