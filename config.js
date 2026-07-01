@@ -15,4 +15,4 @@ export const API_URL = isLocal
 
 export const WHATSAPP_NUMBER = '527351024413';
 
-export const GA_MEASUREMENT_ID = '';
+export const GA_MEASUREMENT_ID = 'G-SH5VPP4HT3';
